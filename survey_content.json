@@ -4,7 +4,7 @@
             "title": "basic_info",
             "questions": [
                 {
-                    "id": "name",
+                    "id": "name_primary",
                     "text": "お客様のフルネームをお教えください。",
                     "type": "text",
                     "next": "name_kana"
