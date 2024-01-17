@@ -1,0 +1,216 @@
+{
+    "states": [
+      {
+        "major_states": [
+          {
+            "state_id": "property_searching",
+            "minor_states": [
+              {
+                "state_id": "waiting",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "added",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "basic_info_registered",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "search_condition_added",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              }
+            ]
+          },
+          {
+            "state_id": "property_selected",
+            "minor_states": [
+              {
+                "state_id": "purchase_confirmation_prep",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "purchase_confirmation_ready",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "bank_sounding_prep",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "bank_sounding_ready",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "contract_prep",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "contract_ready",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "payment_prep",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              },
+              {
+                "state_id": "payment_ready",
+                "actions_on_transition": {},
+                "permitted_actions": {}
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "basic_info_registeration",
+        "steps": [
+          {
+            "step_id": "name_primary"
+          },
+          {
+            "step_id": "name_kana"
+          },
+          {
+            "step_id": "postal_code"
+          },
+          {
+            "step_id": "address"
+          },
+          {
+            "step_id": "residence_category"
+          },
+          {
+            "step_id": "email_address"
+          },
+          {
+            "step_id": "phone_number"
+          },
+          {
+            "step_id": "workplace_name"
+          },
+          {
+            "step_id": "workplace_address"
+          },
+          {
+            "step_id": "department"
+          },
+          {
+            "step_id": "length_of_service"
+          },
+          {
+            "step_id": "gross_salary_-1"
+          },
+          {
+            "step_id": "gross_salary_-2"
+          },
+          {
+            "step_id": "gross_salary_-3"
+          },
+          {
+            "step_id": "family_structure_spouse"
+          },
+          {
+            "step_id": "family_structure_children"
+          },
+          {
+            "step_id": "borrowed_money"
+          },
+          {
+            "step_id": "deposit"
+          },
+          {
+            "step_id": "other_assets"
+          },
+          {
+            "step_id": "purchaser_category"
+          },
+          {
+            "step_id": "complete"
+          }
+        ],
+        "trigger_text": ">お客様情報の登録/変更"
+      },
+      {
+        "\"action_id\"": "basic_info_inquiry",
+        "trigger_text": ">お客様情報の照会"
+      },
+      {
+        "action_id": "search_condition",
+        "steps": [
+          {
+            "step_id": "price"
+          },
+          {
+            "step_id": "target"
+          },
+          {
+            "step_id": "area"
+          },
+          {
+            "step_id": "structure"
+          },
+          {
+            "step_id": "yield"
+          },
+          {
+            "step_id": "complete"
+          }
+        ],
+        "trigger_text": ">希望物件条件の登録/更新"
+      },
+      {
+        "\"action_id\"": "search_condition_inquiry",
+        "trigger_text": ">希望物件条件の照会"
+      },
+      {
+        "action_id": "concierge_message",
+        "steps": [],
+        "trigger_text": ">担当者にメッセージ"
+      },
+      {
+        "action_id": "external_property",
+        "steps": [],
+        "trigger_text": ">他サイト物件を問い合わせる"
+      },
+      {
+        "action_id": "user_page",
+        "steps": [],
+        "trigger_text": ">"
+      },
+      {
+        "action_id": "purchase_confirmation",
+        "steps": [],
+        "trigger_text": ">"
+      },
+      {
+        "action_id": "bank_sounding",
+        "steps": [],
+        "trigger_text": ">"
+      },
+      {
+        "action_id": "contract",
+        "steps": [],
+        "trigger_text": ">"
+      },
+      {
+        "action_id": "payment_prep",
+        "steps": [],
+        "trigger_text": ">"
+      }
+    ]
+  }
