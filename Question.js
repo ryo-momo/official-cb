@@ -1,6 +1,3 @@
-const fs = require('fs');
-const surveyContent = JSON.parse(fs.readFileSync('./survey_content.json', 'utf8'));
-
 class Question {
     constructor(id, text, type, next) {
         this.id = id;
