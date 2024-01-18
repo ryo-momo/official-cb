@@ -1,0 +1,32 @@
+{
+    "users": [
+        {
+            "user_id": "44a19ffd-3135-9d54-084f-136760e48d3a",
+            "user_line_id": null,
+            "name": "井上遼太郎",
+            "name_kana": "イノウエリョウタロウ",
+            "address": {
+                "postal_code": "1640012",
+                "prefecture": "東京都",
+                "remain": "中野区本町2丁目51-6"
+            },
+            "residence_category": "賃貸",
+            "email_address": "ryotaro@momotarou-f.com",
+            "phone_number": "08039723028",
+            "workplace_name": "ももたろう不動産株式会社",
+            "workplace_address": "東京都中央区日本橋3丁目6-2日本橋フロント1F",
+            "department": "IT",
+            "job_category": "CTO",
+            "years_of_service": 0,
+            "gross_salary_-1": 150,
+            "gross_salary_-2": 0,
+            "gross_salary_-3": 0,
+            "family_structure_spouse": false,
+            "family_structure_children": 0,
+            "borrowed_money": 0,
+            "deposit": 80,
+            "other_assets": 0,
+            "purchaser_category": "個人"
+        }
+    ]
+}

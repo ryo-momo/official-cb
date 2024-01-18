@@ -1,0 +1,160 @@
+{
+    "type": "object",
+    "properties": {
+        "user_id": {
+            "type": "number"
+        },
+        "user_line_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "name_kana": {
+            "type": "string"
+        },
+        "address": {
+            "type": "object",
+            "properties": {
+                "postal_code": {
+                    "type": "string"
+                },
+                "prefecture": {
+                    "type": "string"
+                },
+                "remain": {
+                    "type": "string"
+                }
+            }
+        },
+        "residence_category": {
+            "type": "string"
+        },
+        "email_address": {
+            "type": "string"
+        },
+        "phone_number": {
+            "type": "string"
+        },
+        "workplace_name": {
+            "type": "string"
+        },
+        "workplace_address": {
+            "type": "string"
+        },
+        "department": {
+            "type": "string"
+        },
+        "job_category": {
+            "type": "string"
+        },
+        "years_of_service": {
+            "type": "number"
+        },
+        "gross_salary_-1": {
+            "type": "number"
+        },
+        "gross_salary_-2": {
+            "type": "number"
+        },
+        "gross_salary_-3": {
+            "type": "number"
+        },
+        "family_structure_spouse": {
+            "type": "boolean"
+        },
+        "family_structure_children": {
+            "type": "number"
+        },
+        "borrowed_money": {
+            "type": "number"
+        },
+        "deposit": {
+            "type": "number"
+        },
+        "other_assets": {
+            "type": "number"
+        },
+        "purchaser_category": {
+            "type": "string"
+        },
+        "property_conditions": {
+            "type": "object",
+            "properties": {
+                "price": {
+                    "type": "string"
+                },
+                "target": {
+                    "type": "string"
+                },
+                "area": {
+                    "type": "string"
+                },
+                "structure": {
+                    "type": "string"
+                },
+                "yield": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "user_state": {
+        "type": "obejct",
+        "properties": {
+            "major_state_id": {
+                "type": "string"
+            },
+            "minor_state_id": {
+                "type": "string"
+            },
+            "current_action_id": {
+                "type": "string"
+            },
+            "current_step_id": {
+                "type": "string"
+            },
+            "current_question": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "choices_allowed": {
+                        "type": "number"
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "id": {
+                                "type": "number"
+                            },
+                            "text": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "next": {
+                        "oneOf": [
+                            {
+                                "type": "object"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "answers": {
+                        "type": "array"
+                    }
+                }
+            }
+        }
+    }
+}
