@@ -12,10 +12,15 @@ class User {
 
     //Returns the user's current survey in progress
     getCurrentSurvey(){
-        const surveys = JSON.parse(fs.readFileSync('./survey_content.json', 'utf8'));
-        const actions = JSON.parse(fs.readFileSync('./user_states.json','utf-8')).actions;
-        return surveys.find(survey => survey.title ===
-            actions.find(action => this.current_action_id === action.action_id).survey_title);
+        try {
+            const surveys = JSON.parse(fs.readFileSync('./survey_content.json', 'utf8'));
+            const actions = JSON.parse(fs.readFileSync('./user_states.json','utf-8')).actions;
+            return surveys.find(survey => survey.title ===
+                actions.find(action => this.current_action_id === action.action_id).survey_title);
+        } catch (error) {
+            console.error('エラーが発生しました:', error);
+            return null;
+        }
     }
 }
 
