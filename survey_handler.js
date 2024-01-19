@@ -19,8 +19,12 @@ function basicInfoSurveyHandler(user, answer_text) {
         user.current_question = user.getCurrentSurvey().questions[0];
         return user
     } else {
-        //Validate the answer
-        if (basicInfoValidator(user, answer_text).isValid) {
+        //Validate and format the answer
+        validation_result = basicInfoValidator(user, answer_text)
+        if (validation_result.isValid) {
+            user = validation_result.user_object;
+            answer_text = validation_result.answer_text_revised;
+
             switch(user.current_question.type){
                 case "text":
                     user = handleTextQuestion(user, answer_text)
@@ -40,14 +44,6 @@ function basicInfoSurveyHandler(user, answer_text) {
             return basicInfoValidator(user, answer_text).user_object;
         }
     }
-
 }
-
-function textQuestionHandler(question) {
-
-}
-
-
-
 
 console.log(questionObjects);
