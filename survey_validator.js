@@ -1,5 +1,33 @@
-//Validates the answer_text for corresponding question
-//It also revises the answer to certain format for some questions.
+function validateTextType(answer_text) {
+    if (typeof answer_text !== 'string' || answer_text.trim() === '') {
+        return {
+            isValid: false,
+            errorMessage: "回答が無効な形式です。文字列を入力してください。\n\n"
+        };
+    }
+    return { isValid: true };
+}
+
+function validateSingleChoiceType(answer_text, options) {
+    if (!options.some(option => option.text === answer_text)) {
+        return {
+            isValid: false,
+            errorMessage: "回答が無効な形式です。表示される選択肢の中から選択してください。\n\n"
+        };
+    }
+    return { isValid: true };
+}
+
+function validateNumberType(answer_text) {
+    if (isNaN(answer_text) || answer_text < 0) {
+        return {
+            isValid: false,
+            errorMessage: "回答が無効な形式です。0以上の数字を入力してください。\n\n"
+        };
+    }
+    return { isValid: true };
+}
+
 function basicInfoValidator(user, answer_text){
     const response = {
         isValid: true,
@@ -7,6 +35,7 @@ function basicInfoValidator(user, answer_text){
         user_object: user
     }
 
+    let validationResult;
     switch(user.current_question.id){
         case "name_primary":
         case "name_kana":
@@ -16,41 +45,20 @@ function basicInfoValidator(user, answer_text){
         case "workplace_address":
         case "department":
         case "job_category":
-            // テキストタイプの質問に対するバリデーション
-            if (typeof answer_text !== 'string' || answer_text.trim() === '') {
-                response.isValid = false;
-                response.user_object.current_question.text = "回答が無効な形式です。文字列を入力してください。\n\n" + response.user_object.current_question.text;
-            }
+            validationResult = validateTextType(answer_text);
             break;
         case "postal_code":
-            // 郵便番号のバリデーション
-            const revisedPostalCode = answer_text.replace(/\D/g, '');
-            const postalCodePattern = /^\d{7}$/;
-            if (!postalCodePattern.test(revisedPostalCode)) {
-                response.isValid = false;
-                response.user_object.current_question.text = "回答が無効な形式です。7桁の数字を入力してください。\n\n" + response.user_object.current_question.text;
-            } else {
-                response.answer_text_revised = revisedPostalCode;
-            }
-            break;
         case "phone_number":
-            // 電話番号のバリデーション
-            const revisedPhoneNumber = answer_text.replace(/\D/g, '');
-            if (revisedPhoneNumber.length < 9) {
-                response.isValid = false;
-                response.user_object.current_question.text = "回答が無効な形式です。9桁以上の数字を入力してください。\n\n" + response.user_object.current_question.text;
-            } else {
-                response.answer_text_revised = revisedPhoneNumber;
+            const revisedAnswer = answer_text.replace(/\D/g, '');
+            validationResult = validateTextType(revisedAnswer);
+            if (validationResult.isValid) {
+                response.answer_text_revised = revisedAnswer;
             }
             break;
         case "residence_category":
         case "family_structure_spouse":
         case "purchaser_category":
-            // 単一選択タイプの質問に対するバリデーション
-            if (!user.current_question.options.some(option => option.text === answer_text)) {
-                response.isValid = false;
-                response.user_object.current_question.text = "回答が無効な形式です。表示される選択肢の中から選択してください。\n\n" + response.user_object.current_question.text;
-            }
+            validationResult = validateSingleChoiceType(answer_text, user.current_question.options);
             break;
         case "years_of_service":
         case "gross_salary_-1":
@@ -60,14 +68,15 @@ function basicInfoValidator(user, answer_text){
         case "borrowed_money":
         case "deposit":
         case "other_assets":
-            // 数値タイプの質問に対するバリデーション
-            if (isNaN(answer_text) || answer_text < 0) {
-                response.isValid = false;
-                response.user_object.current_question.text = "回答が無効な形式です。0以上の数字を入力してください。\n\n" + response.user_object.current_question.text;
-            }
+            validationResult = validateNumberType(answer_text);
             break;
         default:
-            response.isValid = false;
+            validationResult = { isValid: false };
+    }
+
+    if (!validationResult.isValid) {
+        response.isValid = false;
+        response.user_object.current_question.text = validationResult.errorMessage + response.user_object.current_question.text;
     }
 
     return response;
