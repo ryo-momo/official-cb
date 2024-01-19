@@ -76,3 +76,5 @@ class DatabaseCommunicator {
         return this.query(sql);
     }
 }
+
+module.exports = DatabaseCommunicator;
