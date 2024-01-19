@@ -13,10 +13,17 @@ function handleSingleChoiceQuestion(user, answer_text) {
 }
 
 function handleMultipleChoiceQuestion(user, answer_text) {
+    //add the answer to the current answer array
     user.current_question.answers.push(answer_text);
+    //delete the selected option from the current option array
+    user.current_question.options = user.current_question.options.filter(option => option.text !== answer_text);
+
+
     const answers_to_go = user.current_question.answers_allowed - user.current_question.answers.length;
     const answers_in_text = user.current_question.answers.join('\n');
 
+    //if the number of the answers reach the maximum, store those to DB
+    //if not, have the user select another answer
     if (answers_to_go === 0) {
         return {
             user_object: user,
@@ -29,6 +36,6 @@ function handleMultipleChoiceQuestion(user, answer_text) {
             storeValueToDB: false
         };
     }else{
-        console.log("ERROR: answers_to_go is less than zero");
+        console.log("ERROR: answers_to_go has gone less than zero");
     }
 }
