@@ -7,7 +7,7 @@ function surveyHandler(user, answer_text) {
         case "basic_info":
             user = basicInfoSurveyHandler(user, answer_text);
         default:
-            console.log("Unknown survey ID: ${user.current_survey_id}");
+            console.log(`Unknown survey ID: ${user.current_survey_id}`);
     }
     return user
 }
@@ -27,15 +27,20 @@ function basicInfoSurveyHandler(user, answer_text) {
 
             switch(user.current_question.type){
                 case "text":
-                    user = handleTextQuestion(user, answer_text)
+                    process_result = handleTextQuestion(user, answer_text);
                     break;
                 case "single-choice":
-                    user = handleSingleChoiceQuestion(user, answer_text)
+                    process_result = handleSingleChoiceQuestion(user, answer_text);
                     break;
                 case "multiple-choice":
-                    user = handleMultipleChoiceQuestion(user, answer_text)
+                    process_result = handleMultipleChoiceQuestion(user, answer_text);
                     break;
             }
+
+            if(process_result.storeValueToDB){
+                //TODO: store the answer to DB
+            }
+
             //change the user data to the next step
             user.goToTheNextStep();
             return user
