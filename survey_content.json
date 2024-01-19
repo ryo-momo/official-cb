@@ -1,7 +1,7 @@
 {
     "surveys": [
         {
-            "title": "basic_info",
+            "id": "basic_info",
             "questions": [
                 {
                     "id": "name_primary",
@@ -181,7 +181,7 @@
             ]
         },
         {
-            "title": "property_conditions",
+            "id": "property_conditions",
             "questions": [
                 {
                     "id": "price",

@@ -92,7 +92,7 @@
     "actions": [
       {
         "action_id": "basic_info_registeration",
-        "survey_title": "basic_info",
+        "survey_id": "basic_info",
         "steps": [
           {
             "step_id": "name_primary",
