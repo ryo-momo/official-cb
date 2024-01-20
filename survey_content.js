@@ -1,4 +1,6 @@
-module.exports = {
+const db_data = require('./config')
+const columns = db_data.tables.users.columns
+const survey_contents = {
     surveys: [
         {
             id: "basic_info",
@@ -7,25 +9,29 @@ module.exports = {
                     id: "name_primary",
                     text: "お客様のフルネームをお教えください。",
                     type: "text",
-                    next: "name_kana"
+                    next: "name_kana",
+                    related_column: columns.user_name
                 },
                 {
                     id: "name_kana",
                     text: "お客様のフルネームをカタカナでお教えください。",
                     type: "text",
-                    next: "postal_code"
+                    next: "postal_code",
+                    related_column: columns.user_name_kana
                 },
                 {
                     id: "postal_code",
                     text: "お客様のお住まいの郵便番号をお教えください。",
                     type: "text",
-                    next: "address"
+                    next: "address",
+                    related_column: columns.address_postal_code
                 },
                 {
                     id: "address",
                     text: "お客様の住所をお教えください。",
                     type: "text",
-                    next: "residence_category"
+                    next: "residence_category",
+                    related_column: columns.address
                 },
                 {
                     id: "residence_category",
@@ -49,67 +55,78 @@ module.exports = {
                         1: "email_address",
                         2: "email_address",
                         3: "email_address"
-                    }
+                    },
+                    related_column: columns.residence_category
                 },
                 {
                     id: "email_address",
                     text: "お客様のEメールアドレスをお教えください。",
                     type: "text",
-                    next: "residence_category"
+                    next: "phone_number",
+                    related_column: columns.email_address
                 },
                 {
                     id: "phone_number",
                     text: "お客様の電話番号をお教えください。",
                     type: "text",
-                    next: "workplace_name"
+                    next: "workplace_name",
+                    related_column: columns.phone_number
                 },
                 {
                     id: "workplace_name",
                     text: "お客様の職業についてお聞きします。まず、勤務先会社名をお教えください。",
                     type: "text",
-                    next: "workplace_address"
+                    next: "workplace_address",
+                    related_column: columns.workplace_name
                 },
                 {
                     id: "workplace_address",
                     text: "お客様の勤務先住所をお教えください。",
                     type: "text",
-                    next: "department"
+                    next: "department",
+                    related_column: columns.workplace_address
                 },
                 {
                     id: "department",
                     text: "お客様の役職をお教えください。",
                     type: "text",
-                    next: "job_category"
+                    next: "job_category",
+                    related_column: columns.workplace_department
                 },
                 {
                     id: "job_category",
                     text: "お客様の職種をお教えください。",
                     type: "text",
-                    next: "length_of_service"
+                    next: "length_of_service",
+                    related_column: columns.workplace_job_category
                 },
                 {
                     id: "years_of_service",
                     text: "お客様の現在の勤続年数をお教えください。",
                     type: "text",
-                    next: "gross_salary-1"
+                    next: "gross_salary_minus_1",
+                    related_column: columns.workplace_years_of_service
                 },
                 {
-                    id: "gross_salary_-1",
-                    text: "お客様の過去三年の額面給与額をお聞きします。\nまず、令和{reiwa_year - 1}年度の額面給与額（万円）をお教えください。",
+                    id: "gross_salary_minus_1",
+                    text: `お客様の過去三年の額面給与額をお聞きします。\nまず、令和${reiwa_year - 1}年度の額面給与額（万円）をお教えください。`,
                     type: "text",
-                    next: "gross_salary_-2"
+                    next: "gross_salary_minus_2",
+                    related_column: columns.gross_salary_minus_1
                 },
                 {
-                    id: "gross_salary_-2",
-                    text: "次に、令和{reiwa_year - 2}年度の額面給与額（万円）をお教えください。",
+                    id: "gross_salary_minus_2",
+                    text: `次に、令和${reiwa_year - 2}年度の額面給与額（万円）をお教えください。`,
                     type: "text",
-                    next: "gross_salary_-3"
+                    next: "gross_salary_minus_3",
+                    related_column: columns.gross_salary_minus_2
                 },
                 {
-                    id: "gross_salary_-3",
-                    text: "最後に、令和{reiwa_year - 3}年度の額面給与額（万円）をお教えください。",
+                    id: "gross_salary_minus_3",
+                    text: `最後に、令和${reiwa_year - 3}年度の額面給与額（万円）をお教えください。`,
                     type: "text",
-                    next: "family_structure_spouse"
+                    next: "family_structure_spouse",
+                    related_column: columns.gross_salary_minus_3
                 },
                 {
                     id: "family_structure_spouse",
@@ -128,31 +145,36 @@ module.exports = {
                     next: {
                         1: "family_structure_children",
                         2: "family_structure_children"
-                    }
+                    },
+                    related_column: columns.family_structure_spouse
                 },
                 {
                     id: "family_structure_children",
                     text: "お子様の人数をお教えください。",
                     type: "text",
-                    next: "borrowed_money"
+                    next: "borrowed_money",
+                    related_column: columns.family_structure_children
                 },
                 {
                     id: "borrowed_money",
                     text: "お客様の保有する資産についてお聞きします。まず、現在の借入総額（万円）をお教えください。",
                     type: "text",
-                    next: "deposit"
+                    next: "deposit",
+                    related_column: columns.borrowed_money
                 },
                 {
                     id: "deposit",
                     text: "現在の預金総額（万円）をお教えください。",
                     type: "text",
-                    next: "other_assets"
+                    next: "other_assets",
+                    related_column: columns.deposit
                 },
                 {
                     id: "other_assets",
                     text: "その他の資産総額（万円）をお教えください。",
                     type: "text",
-                    next: ""
+                    next: "",
+                    related_column: columns.other_assets
                 },
                 {
                     id: "purchaser_category",
@@ -176,7 +198,8 @@ module.exports = {
                         1: "end",
                         2: "end",
                         3: "end"
-                    }
+                    },
+                    related_column: columns.purchaser_category
                 }
             ]
         },
@@ -906,3 +929,5 @@ module.exports = {
         }
     ]
 }
+
+module.exports = survey_contents
