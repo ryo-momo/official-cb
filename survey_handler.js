@@ -1,5 +1,7 @@
 const AWS = require('aws-sdk');
 const fs = require('fs');
+const DatabaseCommunicator = require('./DatabaseCommunicator');
+const db_connection_data = require('./config');
 
 
 function surveyHandler(user, answer_text) {
@@ -39,6 +41,10 @@ function basicInfoSurveyHandler(user, answer_text) {
 
             if(process_result.storeValueToDB){
                 //TODO: store the answer to DB
+                dbc = new DatabaseCommunicator(db_connection_data)
+                dbc.connect()
+                
+                dbc.disconnect()
             }
 
             return user;

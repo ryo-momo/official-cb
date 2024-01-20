@@ -75,6 +75,13 @@ class DatabaseCommunicator {
         const sql = `DELETE FROM ${table} WHERE ${condition}`;
         return this.query(sql);
     }
+
+    // Method to check if a user exists in the database
+    // user: User object with a user_id property
+    userExists(user) {
+        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ${mysql.escape(user.user_id)})`;
+        return this.query(sql).then(rows => rows[0][sql] === 1);
+    }
 }
 
 module.exports = DatabaseCommunicator;
