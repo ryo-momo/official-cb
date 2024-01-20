@@ -1,7 +1,8 @@
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const DatabaseCommunicator = require('./DatabaseCommunicator');
-const db_connection_data = require('./config');
+const db_data = require('./config');
+const survey_contents = require('./survey_content')
 
 
 function surveyHandler(user, answer_text) {
@@ -40,10 +41,14 @@ function basicInfoSurveyHandler(user, answer_text) {
             }
 
             if(process_result.storeValueToDB){
-                //TODO: store the answer to DB
-                dbc = new DatabaseCommunicator(db_connection_data)
+                dbc = new DatabaseCommunicator(db_data)
                 dbc.connect()
-                
+                if(dbc.userExists(user)){
+                    dbc.updateUserColumn(user.user_id, user.current_question.related_column, answer_text)
+                    .then(() => console.log('Update successful'))
+                    .catch(err => console.error(err))
+                    .finally(() => dbc.disconnect());
+                }
                 dbc.disconnect()
             }
 
