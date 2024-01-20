@@ -182,7 +182,7 @@
         "trigger_text": ">お客様情報の登録/変更"
       },
       {
-        "\"action_id\"": "basic_info_inquiry",
+        "action_id": "basic_info_inquiry",
         "trigger_text": ">お客様情報の照会"
       },
       {

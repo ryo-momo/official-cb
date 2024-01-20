@@ -19,8 +19,10 @@ class User {
         }
     }
 
-    goToTheNextStep(){
-        pass
+    getCurrentStep(){
+        actions = JSON.parse(fs.readFileSync('./user_states.json', 'utf8'));
+        steps = actions.find(action => action.action_id === this.current_action_id).steps;
+        return steps.find(step => step.step_id === this.current_step_id);
     }
 
     //Returns the user's current survey in progress

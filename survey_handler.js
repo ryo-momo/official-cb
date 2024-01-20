@@ -9,7 +9,7 @@ function surveyHandler(user, answer_text) {
         default:
             console.log(`Unknown survey ID: ${user.current_survey_id}`);
     }
-    return user
+    return user;
 }
 
 //Validates the answer, stores the answer to DB and returns the modified User instance
@@ -17,7 +17,7 @@ function basicInfoSurveyHandler(user, answer_text) {
     if (user.isInInitialStep()) {
         user.current_survey_id = "basic_info";
         user.current_question = user.getCurrentSurvey().questions[0];
-        return user
+        return user;
     } else {
         //Validate and format the answer
         validation_result = basicInfoValidator(user, answer_text)
@@ -41,9 +41,7 @@ function basicInfoSurveyHandler(user, answer_text) {
                 //TODO: store the answer to DB
             }
 
-            //change the user data to the next step
-            user.goToTheNextStep();
-            return user
+            return user;
         } else {
             //If the answer is illegal, return the error message
             return basicInfoValidator(user, answer_text).user_object;
