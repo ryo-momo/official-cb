@@ -1,4 +1,4 @@
-const mysql  = require('mysql');
+const mysql = require('mysql');
 
 class DatabaseCommunicator {
     constructor(db_connection_data){
@@ -81,6 +81,17 @@ class DatabaseCommunicator {
     userExists(user) {
         const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ${mysql.escape(user.user_id)})`;
         return this.query(sql).then(rows => rows[0][sql] === 1);
+    }
+
+    // Method to update a specific column of a user in the database
+    // userId: ID of the user to update
+    // columnName: Name of the column to update
+    // newValue: New value to set
+    updateUserColumn(userId, columnName, newValue) {
+        const table = db_data.tables.users.name;
+        const condition = `${db_data.tables.users.columns.user_id} = ${mysql.escape(userId)}`;
+        const data = { [columnName]: newValue };
+        return this.update(table, data, condition);
     }
 }
 
