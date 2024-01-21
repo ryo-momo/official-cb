@@ -1,7 +1,7 @@
 // const AWS = require('aws-sdk');
 // const fs = require('fs');
 const DatabaseCommunicator = require('./DatabaseCommunicator');
-const db_data = require('./config');
+const db_data = require('./data/config');
 
 
 function surveyHandler(user, answer_text) {

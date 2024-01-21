@@ -1,5 +1,5 @@
-const user_states = require('./user_states')
-const surveys = require('./survey_content')
+const user_states = require('./data/user_states')
+const surveys = require('./data/survey_content')
 
 class User {
     constructor(user_property) {
