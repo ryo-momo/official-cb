@@ -5,7 +5,6 @@ const db_data = {
     database: process.env.DB_NAME,
     tables: {
         users: {
-            name: 'users',
             columns: {
                 user_id: 'user_id',
                 user_line_id: 'user_line_id',

@@ -52,6 +52,7 @@ function basicInfoSurveyHandler(user, answer_text) {
             }
 
             return user;
+
         } else {
             //If the answer is illegal, return the error message
             return basicInfoValidator(user, answer_text).user_object;
