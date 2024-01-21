@@ -39,6 +39,7 @@ function basicInfoSurveyHandler(user, answer_text) {
                     break;
             }
 
+            //if question handler returns to store the data, then store the answer data to DB
             if(process_result.storeValueToDB){
                 dbc = new DatabaseCommunicator(db_data)
                 dbc.connect()
