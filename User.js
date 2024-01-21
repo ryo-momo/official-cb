@@ -1,4 +1,5 @@
-const fs = require('fs');
+const user_states = require('./user_states')
+const surveys = require('./survey_content')
 
 class User {
     constructor(user_property) {
@@ -21,28 +22,24 @@ class User {
 
     ///returns the user's current major state object
     getCurrentMajorState(){
-        user_states = JSON.parse(fs.readFileSync('./user_states.json', 'utf8'));
-        return user_states.find(major_state => major_state.state_id === this.major_state_id);
+        return user_states.major_states.find(major_state => major_state.state_id === this.major_state_id);
     }
 
     ///returns the user's current minor state object
     getCurrentMinorState(){
-        user_states = JSON.parse(fs.readFileSync('./user_states.json', 'utf8'));
         minor_states = user_states.major_states.find(major_state => major_state.state_id === this.major_state_id).mimor_states
         return minor_states.find(minor_state => minor_state.state_id === this.minor_state_id);
     }
 
     ///returns the user's current step object
     getCurrentStep(){
-        actions = JSON.parse(fs.readFileSync('./user_states.json', 'utf8')).actions;
-        steps = actions.find(action => action.action_id === this.current_action_id).steps;
+        steps = user_states.actions.find(action => action.action_id === this.current_action_id).steps;
         return steps.find(step => step.step_id === this.current_step_id);
     }
 
     //Returns the user's current survey in progress
     getCurrentSurvey(){
         try {
-            const surveys = JSON.parse(fs.readFileSync('./survey_content.json', 'utf8'));
             return surveys.find(survey => survey.title === this.current_survey_id);
         } catch (error) {
             console.error('エラーが発生しました:', error);
