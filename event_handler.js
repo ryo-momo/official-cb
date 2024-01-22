@@ -23,7 +23,6 @@ function isActionAllowedInCurrentState(user, text) {
     return isAllowed;
 }
 
-
 //event = {
 //     user_line_id: "userLineId",
 //     text: "text"
@@ -71,7 +70,6 @@ function eventHandler(event) {
                 user = actionHandler(user, event.text)
                 return user
             }
-
         }
     }
 }

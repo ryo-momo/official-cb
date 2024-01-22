@@ -1,3 +1,5 @@
+const basicInfoSurveyHandler = require('../basic_info_survey_handler');
+
 const user_states = {
     major_states: [
         {
@@ -176,7 +178,8 @@ const user_states = {
                     next: "end"
                 }
             ],
-            trigger_text: ">お客様情報の登録/変更"
+            trigger_text: ">お客様情報の登録/変更",
+            handler: basicInfoSurveyHandler
         },
         {
             action_id: "basic_info_inquiry",

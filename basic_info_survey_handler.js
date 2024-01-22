@@ -3,17 +3,6 @@
 const DatabaseCommunicator = require('./DatabaseCommunicator');
 const db_data = require('./data/config');
 
-
-function surveyHandler(user, answer_text) {
-    switch (user.current_survey_id) {
-        case "basic_info":
-            user = basicInfoSurveyHandler(user, answer_text);
-        default:
-            console.log(`Unknown survey ID: ${user.current_survey_id}`);
-    }
-    return user;
-}
-
 //Validates the answer, stores the answer to DB and returns the modified User instance
 function basicInfoSurveyHandler(user, answer_text) {
     if (user.isInInitialStep()) {
@@ -61,4 +50,5 @@ function basicInfoSurveyHandler(user, answer_text) {
     }
 }
 
-console.log(questionObjects);
+module.exports = basicInfoSurveyHandler;
+

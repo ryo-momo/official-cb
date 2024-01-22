@@ -32,6 +32,10 @@ class User {
         return minor_states.find(minor_state => minor_state.state_id === this.minor_state_id);
     }
 
+    getCurrentAction(){
+        return user_states.actions.find(action => action.action_id === this.current_action_id);
+    }
+
     ///returns the user's current step object
     getCurrentStep(){
         steps = user_states.actions.find(action => action.action_id === this.current_action_id).steps;
