@@ -3,13 +3,14 @@ const surveys = require('./data/survey_content')
 
 class User {
     constructor(user_property) {
-        this.user_id = user_property.user_id;
-        this.major_state_id = user_property.user_state.major_state_id;
-        this.minor_state_id = user_property.user_state.minor_state_id;
-        this.current_action_id = user_property.user_state.current_action_id;
-        this.current_survey_id = user_property.user_state.current_survey_id;
-        this.current_step_id = user_property.user_state.current_step_id;
-        this.current_question = user_property.user_state.current_question;
+        this.user_id = user_property.user_id || null;
+        this.user_line_id = user_property.user_line_id;
+        this.major_state_id = user_property.major_state_id || null;
+        this.minor_state_id = user_property.minor_state_id || null;
+        this.current_action_id = user_property.current_action_id || null;
+        this.current_survey_id = user_property.current_survey_id || null;
+        this.current_step_id = user_property.current_step_id || null;
+        this.current_question = user_property.current_question || null;
     }
 
     isInInitialStep(){

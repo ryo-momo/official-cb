@@ -76,13 +76,50 @@ class DatabaseCommunicator {
         return this.query(sql);
     }
 
+
+// ------- User Methods -------
+
+
     // Method to check if a user exists in the database
     // user: User object with a user_id property
-    userExists(user) {
-        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ${mysql.escape(user.user_id)})`;
+    userExists(user_line_id) {
+        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ${mysql.escape(user_line_id)})`;
         return this.query(sql).then(rows => rows[0][sql] === 1);
     }
 
+    // searches user by LINE ID and
+    // returns an object with user class object properties
+    getUserByLineId(user_line_id){
+        const sql = `SELECT user_id, user_line_id, major_state_id, minor_state_id, current_action_id, current_survey_id, current_step_id, current_question FROM users WHERE user_line_id = ${mysql.escape(user_line_id)}`;
+        return this.query(sql).then(rows => {
+            if (rows.length > 0) {
+                return rows[0];
+            } else {
+                return null;
+            }
+        });
+    }
+
+    // Method to insert a new user into the database
+    // user: User object with properties to insert
+    // All properties except user_line_id can be null, if user_line_id is null, it throws an error
+    insertUser(user) {
+        if (user.user_line_id === null) {
+            throw new Error("user_line_id cannot be null");
+        }
+        const table = db_data.tables.users.name;
+        const data = {
+            user_id: user.user_id || null,
+            user_line_id: user.user_line_id,
+            major_state_id: user.major_state_id || null,
+            minor_state_id: user.minor_state_id || null,
+            current_action_id: user.current_action_id || null,
+            current_survey_id: user.current_survey_id || null,
+            current_step_id: user.current_step_id || null,
+            current_question: user.current_question || null
+        };
+        return this.write(table, data);
+    }
     // Method to update a specific column of a user in the database
     // userId: ID of the user to update
     // columnName: Name of the column to update
