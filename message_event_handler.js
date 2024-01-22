@@ -29,7 +29,7 @@ function isActionAllowedInCurrentState(user, text) {
 // }
 //と想定
 //TODO 日付も取得してそれに付随した一連の処理の実装
-function eventHandler(event) {
+function messageEventHandler(event) {
     dbc = DatabaseCommunicator(db_data)
     //If the user exists in the DB
     if (dbc.userExists(event.user_line_id)) {
@@ -44,6 +44,7 @@ function eventHandler(event) {
         dbc.insertUser(user)
         dbc.disconnect()
     } else {
+        //user is an existing user
         dbc.connect()
         const user = new User(dbc.getUserByLineId(event.user_line_id))
         dbc.disconnect()
@@ -73,4 +74,6 @@ function eventHandler(event) {
         }
     }
 }
+
+module.exports = messageEventHandler
 
