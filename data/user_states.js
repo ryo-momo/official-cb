@@ -175,7 +175,8 @@ const user_states = {
                 },
                 {
                     step_id: "complete",
-                    next: "end"
+                    next: "end",
+                    text: "お客様情報の登録が完了いたしました、お疲れさまでした。"
                 }
             ],
             trigger_text: ">お客様情報の登録/変更",
