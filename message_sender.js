@@ -7,6 +7,18 @@ class MessageSender {
 
     async sendReplyMessage(replyToken, messages, notificationDisabled = false) {
         try {
+            // Validate the messages before sending
+            const validationResponse = await this.client.validateReply({
+                replyToken: replyToken,
+                messages: messages
+            });
+
+            if (!validationResponse) {
+                // Log: Invalid message format
+                console.error('Invalid message format');
+                return;
+            }
+
             const response = await this.client.replyMessage({
                 replyToken: replyToken,
                 messages: messages,
