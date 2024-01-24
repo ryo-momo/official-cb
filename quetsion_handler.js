@@ -36,7 +36,7 @@ function handleMultipleChoiceQuestion(user, answer_text) {
             storeValueToDB: false
         };
     }else{
-        console.log("ERROR: answers_to_go has gone less than zero");
+        throw new Error("ERROR: answers_to_go has gone less than zero");
     }
 }
 
