@@ -1,3 +1,8 @@
+/**
+ * Validates a text type answer.
+ * @param {string} answer_text - The answer text to validate.
+ * @returns {object} A response object. If the answer is valid, isValid is set to true. If not, isValid is set to false and an error message is included.
+ */
 function validateTextType(answer_text) {
     if (typeof answer_text !== 'string' || answer_text.trim() === '') {
         return {
@@ -8,6 +13,12 @@ function validateTextType(answer_text) {
     return { isValid: true };
 }
 
+/**
+ * Validates a single choice type answer.
+ * @param {string} answer_text - The answer text to validate.
+ * @param {array} options - The options to validate against.
+ * @returns {object} A response object. If the answer is valid, isValid is set to true. If not, isValid is set to false and an error message is included.
+ */
 function validateSingleChoiceType(answer_text, options) {
     if (!options.some(option => option.text === answer_text)) {
         return {
@@ -18,6 +29,11 @@ function validateSingleChoiceType(answer_text, options) {
     return { isValid: true };
 }
 
+/**
+ * Validates a number type answer.
+ * @param {string} answer_text - The answer text to validate.
+ * @returns {object} A response object. If the answer is valid, isValid is set to true. If not, isValid is set to false and an error message is included.
+ */
 function validateNumberType(answer_text) {
     if (isNaN(answer_text) || answer_text < 0) {
         return {
@@ -28,6 +44,12 @@ function validateNumberType(answer_text) {
     return { isValid: true };
 }
 
+/**
+ * Validates a user's answer based on the type of the current question.
+ * @param {object} user - The user object.
+ * @param {string} answer_text - The answer text to validate.
+ * @returns {object} A response object. If the answer is valid, isValid is set to true and the revised answer text is included. If not, isValid is set to false and an error message is included.
+ */
 function basicInfoValidator(user, answer_text){
     const response = {
         isValid: true,
