@@ -1,5 +1,6 @@
 const db_data = require('./config')
 const user_columns = db_data.tables.users.columns
+const reiwa_year = 6
 const survey_contents = {
     surveys: [
         {

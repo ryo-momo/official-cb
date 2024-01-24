@@ -6,27 +6,21 @@ const user_states = {
             state_id: "property_searching",
             minor_states: [
                 {
-                    state_id: "waiting",
-                    actions_on_transition: {},
-                    permitted_actions: {},
-                    next: "added"
-                },
-                {
                     state_id: "added",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: ["basic_info_registeration"],
                     next: "basic_info_registered"
                 },
                 {
                     state_id: "basic_info_registered",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "search_condition_added"
                 },
                 {
                     state_id: "search_condition_added",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "end"
                 }
             ],
@@ -37,50 +31,50 @@ const user_states = {
             minor_states: [
                 {
                     state_id: "purchase_confirmation_prep",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "purchase_confirmation_ready"
                 },
                 {
                     state_id: "purchase_confirmation_ready",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "bank_sounding_prep"
                 },
                 {
                     state_id: "bank_sounding_prep",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "bank_sounding_ready"
                 },
                 {
                     state_id: "bank_sounding_ready",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "contract_prep"
                 },
                 {
                     state_id: "contract_prep",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "contract_ready"
                 },
                 {
                     state_id: "contract_ready",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "payment_prep"
                 },
                 {
                     state_id: "payment_prep",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "payment_ready"
                 },
                 {
                     state_id: "payment_ready",
-                    actions_on_transition: {},
-                    permitted_actions: {},
+                    actions_on_transition: [],
+                    permitted_actions: [],
                     next: "end"
                 }
             ],

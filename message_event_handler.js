@@ -20,7 +20,7 @@ function isActionAllowedInCurrentState(user, text) {
     // Get the current minor state of the user
     const currentMinorState = user.getCurrentMinorState();
     // Determine if it is allowed by the action ID
-    const isAllowed = currentMinorState.permitted_actions.some(permittedAction => permittedAction === action.id);
+    const isAllowed = currentMinorState.permitted_actions.some(permittedAction => permittedAction === action.action_id);
     return isAllowed;
 }
 
@@ -44,6 +44,7 @@ function messageEventHandler(event) {
         dbc.connect()
         dbc.insertUser(user)
         dbc.disconnect()
+        console.log("New user is added to the DB")
     } else {
         //user is an existing user
         dbc.connect()

@@ -28,7 +28,7 @@ class User {
 
     ///returns the user's current minor state object
     getCurrentMinorState(){
-        minor_states = user_states.major_states.find(major_state => major_state.state_id === this.major_state_id).mimor_states
+        let minor_states = user_states.major_states.find(major_state => major_state.state_id === this.major_state_id).minor_states;
         return minor_states.find(minor_state => minor_state.state_id === this.minor_state_id);
     }
 
@@ -38,14 +38,14 @@ class User {
 
     ///returns the user's current step object
     getCurrentStep(){
-        steps = user_states.actions.find(action => action.action_id === this.current_action_id).steps;
+        let steps = user_states.actions.find(action => action.action_id === this.current_action_id).steps;
         return steps.find(step => step.step_id === this.current_step_id);
     }
 
     //Returns the user's current survey in progress
     getCurrentSurvey(){
         try {
-            return surveys.find(survey => survey.title === this.current_survey_id);
+            return surveys.surveys.find(survey => survey.id === this.current_survey_id);
         } catch (error) {
             console.error('エラーが発生しました:', error);
             return null;
