@@ -42,7 +42,14 @@ function messageEventHandler(event) {
             minor_state_id: user_states.major_states[0].minor_states[0].state_id
         })
         dbc.connect()
-        dbc.insertUser(user)
+        // Assuming the rest of the code is unchanged and the DatabaseCommunicator instance is already created and connected.
+        dbc.saveUser(user)
+            .then(() => console.log("User saved successfully"))
+            .catch(err => {
+                console.error("Error saving user: ", err);
+                // Handle the error appropriately
+            })
+            .finally(() => dbc.disconnect());
         dbc.disconnect()
         console.log("New user is added to the DB")
     } else {
@@ -53,9 +60,9 @@ function messageEventHandler(event) {
 
         const triggered_action = findActionByTrigger(event.text)
         if (triggered_action !== null) {
-            if(isActionAllowedInCurrentState(user, event.text)){
+            if (isActionAllowedInCurrentState(user, event.text)) {
                 user = actionHandler(user, event.text, triggered_action)
-                if(user.current_action_id !== null){
+                if (user.current_action_id !== null) {
                     //TODO user is trying to start a new action while in the middle of another action
                     //send a message that the user is in the middle of another action
                     //TODO IN THE FUTURE: ask the user if they want to suspend the current action and start the new one
@@ -78,4 +85,3 @@ function messageEventHandler(event) {
 }
 
 module.exports = messageEventHandler, isActionAllowedInCurrentState
-

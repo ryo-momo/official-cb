@@ -113,10 +113,10 @@ class DatabaseCommunicator {
         });
     }
 
-    // Method to insert a new user into the database
-    // user: User object with properties to insert
+    // Method to save a user to the database
+    // user: User object with properties to insert or update
     // All properties except user_line_id can be null, if user_line_id is null, it throws an error
-    insertUser(user) {
+    saveUser(user) {
         if (user.user_line_id === null) {
             throw new Error("user_line_id cannot be null");
         }
@@ -131,18 +131,13 @@ class DatabaseCommunicator {
             current_step_id: user.current_step_id || null,
             current_question: user.current_question || null
         };
-        return this.write(table, data);
-    }
-    // Method to update a specific column of a user in the database
-    // userId: ID of the user to update
-    // columnName: Name of the column to update
-    // newValue: New value to set
-    updateUserColumn(userId, columnName, newValue) {
-        const table = db_data.tables.users.name;
-        const condition = `${db_data.tables.users.columns.user_id} = ?`;
-        const data = { [columnName]: newValue };
-        let args = [mysql.escape(userId)];
-        return this.update(table, data, condition);
+
+        if (this.userExists(user.user_line_id)) {
+            const condition = `${db_data.tables.users.columns.user_id} = ?`;
+            return this.update(table, data, condition);
+        } else {
+            return this.write(table, data);
+        }
     }
 }
 

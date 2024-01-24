@@ -38,17 +38,14 @@ function basicInfoSurveyHandler(user, answer_text) {
                 console.log('Storing answer to database.'); // Log message
                 let dbc = new DatabaseCommunicator(db_data)
                 dbc.connect()
-                if(dbc.userExists(user)){
-                    dbc.updateUserColumn(user.user_id, user.current_question.related_column, answer_text)
-                    .then(() => console.log('Update successful')) // Log message
-                    .catch(err => {
-                        console.error('Error updating user column: ', err); // Log error message
-                        throw err; 
-                    })
-                    .finally(() => dbc.disconnect());
-                } else {
-                    dbc.disconnect();
-                }
+                user[user.current_question.related_column] = answer_text;
+                dbc.saveUser(user)
+                .then(() => console.log('Update successful')) // Log message
+                .catch(err => {
+                    console.error('Error updating user column: ', err); // Log error message
+                    throw err;
+                })
+                .finally(() => dbc.disconnect());
             }
 
             return user;
