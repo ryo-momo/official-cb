@@ -39,3 +39,10 @@ function handleMultipleChoiceQuestion(user, answer_text) {
         console.log("ERROR: answers_to_go has gone less than zero");
     }
 }
+
+module.exports = {
+    handleTextQuestion,
+    handleSingleChoiceQuestion,
+    handleMultipleChoiceQuestion
+}
+

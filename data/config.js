@@ -1,8 +1,16 @@
 const db_data = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_CLIENT_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    // host: process.env.DB_HOST,
+    // user: process.env.DB_CLIENT_USER,
+    // password: process.env.DB_PASSWORD,
+    // database: process.env.DB_NAME,
+
+//-----for test--------------------------------------
+    host: "database-1.cb4ycsccwg4y.ap-northeast-1.rds.amazonaws.com",
+    user: "admin",
+    password: "	7VtOtxEN22FEfHHiP6Pe",
+    database: "database-1",
+//-------------------------------------------------
+
     tables: {
         users: {
             columns: {

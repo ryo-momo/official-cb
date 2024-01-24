@@ -2,6 +2,8 @@
 // const fs = require('fs');
 const DatabaseCommunicator = require('./DatabaseCommunicator');
 const db_data = require('./data/config');
+const { handleTextQuestion, handleSingleChoiceQuestion, handleMultipleChoiceQuestion } = require('./quetsion_handler');
+const basicInfoValidator = require('./survey_validator');
 
 //Validates the answer, stores the answer to DB and returns the modified User instance
 function basicInfoSurveyHandler(user, answer_text) {

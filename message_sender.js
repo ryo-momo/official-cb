@@ -33,3 +33,5 @@ class MessageSender {
     }
 }
 
+module.exports = MessageSender
+

@@ -47,3 +47,6 @@ function webhookHandler(body){
         }
     });
 }
+
+module.exports = webhookHandler
+

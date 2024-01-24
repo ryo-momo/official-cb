@@ -3,6 +3,7 @@ const DatabaseCommunicator = require("./DatabaseCommunicator");
 const User = require("./User");
 const db_data = require("./data/config");
 const user_states = require('./data/user_states');
+const actionHandler = require('./action_handler');
 
 // Return the action if a match is found, otherwise return null
 function findActionByTrigger(text) {
@@ -75,5 +76,5 @@ function messageEventHandler(event) {
     }
 }
 
-module.exports = messageEventHandler
+module.exports = messageEventHandler, isActionAllowedInCurrentState
 

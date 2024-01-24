@@ -81,3 +81,6 @@ function basicInfoValidator(user, answer_text){
 
     return response;
 }
+
+module.exports = basicInfoValidator
+

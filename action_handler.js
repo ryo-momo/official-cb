@@ -9,3 +9,5 @@ function actionHandler(user, text, action) {
     }
     return user;
 }
+
+module.exports = actionHandler
