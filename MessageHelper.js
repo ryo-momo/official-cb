@@ -1,6 +1,9 @@
 class MessageHelper {
     // Simple message object
     createSimpleMessage(text) {
+        if (typeof text !== 'string') {
+            throw new Error('Invalid argument: text must be a string');
+        }
         return {
             type: 'text',
             text: text
@@ -19,9 +22,14 @@ class MessageHelper {
         }));
     }
 
-
     // Flex message object
     createFlexMessage(altText, contents) {
+        if (typeof altText !== 'string') {
+            throw new Error('Invalid argument: altText must be a string');
+        }
+        if (!Array.isArray(contents)) {
+            throw new Error('Invalid argument: contents must be an array');
+        }
         return {
             type: 'flex',
             altText: altText,
@@ -29,49 +37,43 @@ class MessageHelper {
         };
     }
 
-
-//------- Interface methods ---------------
-
-    // Create a message object with quick reply
-    // If no items are passed, generate a simple text object
-    createMessage(text, quickReplyItems) {
+    // Add quick reply items to a message object
+    addQuickReplyItems(message, quickReplyItems) {
+        if (typeof message !== 'object') {
+            throw new Error('Invalid argument: message must be an object');
+        }
+        if (quickReplyItems && !Array.isArray(quickReplyItems)) {
+            throw new Error('Invalid argument: quickReplyItems must be an array');
+        }
         if (quickReplyItems && quickReplyItems.length > 0) {
-            return {
-                type: 'text',
-                text: text,
-                quickReply: {
-                    items: quickReplyItems
-                }
+            message.quickReply = {
+                items: quickReplyItems
             };
         } else {
             // Log: No items provided, generating a simple text object
             console.log("No items provided for quick reply, generating a simple text object");
-            return {
-                type: 'text',
-                text: text
-            };
         }
+        return message;
+    }
+
+    //------- Interface methods ---------------
+
+    // Create a message object with quick reply
+    // If no items are passed, generate a simple text object
+    createMessage(text, quickReplyItems) {
+        let message = {
+            type: 'text',
+            text: text
+        };
+        return this.addQuickReplyItems(message, quickReplyItems);
     }
 
     // Generate Flex Message with Quick Replies
     createFlexMessageWithQuickReplies(altText, contents, quickReplyItems) {
         // Create the base flex message
         let flexMessage = this.createFlexMessage(altText, contents);
-        // If quickReplyItems are provided, add them to the flex message
-        if (quickReplyItems && quickReplyItems.length > 0) {
-            flexMessage.quickReply = {
-                items: quickReplyItems
-            };
-        } else {
-            // Log: No quick reply items provided, generating a standard flex message
-            console.log("No quick reply items provided, generating a standard flex message");
-        }
-        return flexMessage;
+        return this.addQuickReplyItems(flexMessage, quickReplyItems);
     }
 }
 
-
 module.exports = MessageHelper;
-
-
-
