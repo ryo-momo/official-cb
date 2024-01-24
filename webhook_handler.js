@@ -29,8 +29,15 @@ const messageEventHandler = require('./message_event_handler');
 // }
 
 function webhookHandler(body){
-    // Convert body to a JavaScript object
-    let data = JSON.parse(body);
+    let data;
+
+    // Try to parse the body
+    try {
+        data = JSON.parse(body);
+    } catch (error) {
+        console.error("Failed to parse body:", error);
+        return;
+    }
 
     // Iterate over each event in data.events
     data.events.forEach(event => {
