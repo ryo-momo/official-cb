@@ -16,6 +16,14 @@ class DatabaseCommunicator {
             password: this.password,
             database: this.database
         });
+
+        // Add error handling for connection
+        this.connection.connect(err => {
+            if (err) {
+                console.error('Error connecting to the database: ', err);
+                throw err;
+            }
+        });
     }
 
     // Method to disconnect from the database
@@ -29,8 +37,10 @@ class DatabaseCommunicator {
     query(sql, args) {
         return new Promise((resolve, reject) => {
             this.connection.query(sql, args, (err, rows) => {
-                if (err)
+                if (err) {
+                    console.error('Error executing query: ', err);
                     return reject(err);
+                }
                 resolve(rows);
             });
         });
@@ -41,21 +51,20 @@ class DatabaseCommunicator {
     // columns: Array of column names to select (e.g., ["id", "name"])
     // condition: SQL condition string for WHERE clause (e.g., "id = 1")
     read(table, columns, condition) {
-        let sql = `SELECT ${columns.join(', ')} FROM ${table}`;
-        if (condition) {
-            sql += ` WHERE ${condition}`;
-        }
-        return this.query(sql);
+        let sql = `SELECT ?? FROM ?? WHERE ??`;
+        let args = [columns, table, condition];
+        return this.query(sql, args);
     }
 
     // Method to write to the database
     // table: Name of the table to write to (e.g., "users")
     // data: Object where keys are column names and values are the corresponding data to insert (e.g., {name: "John", age: 30})
     write(table, data) {
-        const columns = Object.keys(data).join(', ');
-        const values = Object.values(data).map(value => mysql.escape(value)).join(', ');
-        const sql = `INSERT INTO ${table} (${columns}) VALUES (${values})`;
-        return this.query(sql);
+        const columns = Object.keys(data);
+        const values = Object.values(data);
+        const sql = `INSERT INTO ?? (??) VALUES (?)`;
+        let args = [table, columns, values];
+        return this.query(sql, args);
     }
 
     // Method to update the database
@@ -63,17 +72,19 @@ class DatabaseCommunicator {
     // data: Object where keys are column names and values are the new values to set (e.g., {name: "John", age: 31})
     // condition: SQL condition string for WHERE clause (e.g., "id = 1")
     update(table, data, condition) {
-        const updates = Object.entries(data).map(([column, value]) => `${column} = ${mysql.escape(value)}`).join(', ');
-        const sql = `UPDATE ${table} SET ${updates} WHERE ${condition}`;
-        return this.query(sql);
+        const updates = Object.entries(data).map(([column, value]) => `${column} = ?`).join(', ');
+        const sql = `UPDATE ?? SET ${updates} WHERE ??`;
+        let args = [table, ...Object.values(data), condition];
+        return this.query(sql, args);
     }
 
     // Method to delete from the database
     // table: Name of the table to delete from (e.g., "users")
     // condition: SQL condition string for WHERE clause (e.g., "id = 1")
     delete(table, condition) {
-        const sql = `DELETE FROM ${table} WHERE ${condition}`;
-        return this.query(sql);
+        const sql = `DELETE FROM ?? WHERE ??`;
+        let args = [table, condition];
+        return this.query(sql, args);
     }
 
 
@@ -83,15 +94,17 @@ class DatabaseCommunicator {
     // Method to check if a user exists in the database
     // user: User object with a user_id property
     userExists(user_line_id) {
-        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ${mysql.escape(user_line_id)})`;
-        return this.query(sql).then(rows => rows[0][sql] === 1);
+        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)`;
+        let args = [mysql.escape(user_line_id)];
+        return this.query(sql, args).then(rows => rows[0][sql] === 1);
     }
 
     // searches user by LINE ID and
     // returns an object with user class object properties
     getUserByLineId(user_line_id){
-        const sql = `SELECT user_id, user_line_id, major_state_id, minor_state_id, current_action_id, current_survey_id, current_step_id, current_question FROM users WHERE user_line_id = ${mysql.escape(user_line_id)}`;
-        return this.query(sql).then(rows => {
+        const sql = `SELECT user_id, user_line_id, major_state_id, minor_state_id, current_action_id, current_survey_id, current_step_id, current_question FROM users WHERE user_line_id = ?`;
+        let args = [mysql.escape(user_line_id)];
+        return this.query(sql, args).then(rows => {
             if (rows.length > 0) {
                 return rows[0];
             } else {
@@ -126,8 +139,9 @@ class DatabaseCommunicator {
     // newValue: New value to set
     updateUserColumn(userId, columnName, newValue) {
         const table = db_data.tables.users.name;
-        const condition = `${db_data.tables.users.columns.user_id} = ${mysql.escape(userId)}`;
+        const condition = `${db_data.tables.users.columns.user_id} = ?`;
         const data = { [columnName]: newValue };
+        let args = [mysql.escape(userId)];
         return this.update(table, data, condition);
     }
 }
