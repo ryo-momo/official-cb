@@ -102,10 +102,10 @@ class DatabaseCommunicator {
     // Method to check if a user exists in the database
     // user: User object with a user_id property
     async userExists(user_line_id) {
-        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE user_line_id = ?)`;
+        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE user_line_id = ?) AS user_exists`;
         let args = [user_line_id];
         const rows = await this.query(sql, args);
-        return rows[0][sql] === 1;
+        return rows[0].user_exists === 1;
     }
 
 // Other code...

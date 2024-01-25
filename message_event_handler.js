@@ -36,6 +36,7 @@ async function messageEventHandler(event) {
     dbc.connect()
     if (!(await dbc.userExists(event.user_line_id))) {
         //this user is a brand new user
+        console.log("User is a brand new user")
         let user = new User({
             user_id: uuidv4(),
             user_line_id: event.user_line_id,
@@ -54,6 +55,7 @@ async function messageEventHandler(event) {
         return user;
     } else {
         //user is an existing user
+        console.log("User is an existing user")
         let user = new User(await dbc.getUserByLineId(event.user_line_id));
 
         const triggered_action = findActionByTrigger(event.text)
