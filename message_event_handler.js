@@ -30,54 +30,64 @@ function isActionAllowedInCurrentState(user, text) {
 // }
 //と想定
 //TODO 日付も取得してそれに付随した一連の処理の実装
-function messageEventHandler(event) {
-    dbc = DatabaseCommunicator(db_data)
+async function messageEventHandler(event) {
+    dbc = new DatabaseCommunicator(db_data)
     //If the user exists in the DB
-    if (dbc.userExists(event.user_line_id)) {
+    dbc.connect()
+    if (!(await dbc.userExists(event.user_line_id))) {
         //this user is a brand new user
-        const user = new User({
+        let user = new User({
             user_id: uuidv4(),
             user_line_id: event.user_line_id,
             major_state_id: user_states.major_states[0].state_id,
             minor_state_id: user_states.major_states[0].minor_states[0].state_id
         })
-        dbc.connect()
         // Assuming the rest of the code is unchanged and the DatabaseCommunicator instance is already created and connected.
-        dbc.saveUser(user)
-            .then(() => console.log("User saved successfully"))
-            .catch(err => {
-                console.error("Error saving user: ", err);
-                // Handle the error appropriately
-            })
-            .finally(() => dbc.disconnect());
-        dbc.disconnect()
-        console.log("New user is added to the DB")
+        try {
+            await dbc.saveUser(user);
+            console.log("User saved successfully");
+        } catch (err) {
+            console.error("Error saving user: ", err);
+        } finally {
+            dbc.disconnect();
+        }
+        return user;
     } else {
         //user is an existing user
-        dbc.connect()
-        const user = new User(dbc.getUserByLineId(event.user_line_id))
-        dbc.disconnect()
+        let user = new User(await dbc.getUserByLineId(event.user_line_id));
 
         const triggered_action = findActionByTrigger(event.text)
         if (triggered_action !== null) {
             if (isActionAllowedInCurrentState(user, event.text)) {
-                user = actionHandler(user, event.text, triggered_action)
                 if (user.current_action_id !== null) {
                     //TODO user is trying to start a new action while in the middle of another action
+                    console.log("User is trying to start a new action while in the middle of another action")
+                    return user
                     //send a message that the user is in the middle of another action
                     //TODO IN THE FUTURE: ask the user if they want to suspend the current action and start the new one
+                } else {
+                    console.log("User is resuming the current action")
+                    user = actionHandler(user, event.text, triggered_action)
+                    dbc.disconnect()
+                    return user
                 }
             } else {
                 //TODO user is trying to do an action that is not allowed in the current state
                 //send a message to the user that the action is not allowed
+                console.log("User is trying to do an action that is not allowed in the current state")
+                return user
             }
         } else {
             if (user.current_action_id === null) {
                 //TODO user is sending a message that is not a trigger but user is not in the middle of an action either
                 //send an error message
+                console.log("User is sending a message that is not a trigger but user is not in the middle of an action either")
+                return user
             } else {
                 //user is in the middle of an action
+                console.log("User is in the middle of an action")
                 user = actionHandler(user, event.text)
+                dbc.disconnect()
                 return user
             }
         }

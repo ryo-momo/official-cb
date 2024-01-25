@@ -1,3 +1,1 @@
-const { v4: uuidv4 } = require('uuid');
-
-console.log(uuidv4())
+Ue478ad4286f7e7b0d2baf5e39bdb9908

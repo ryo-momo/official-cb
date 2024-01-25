@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const db_data = require('./data/config')
 
 class DatabaseCommunicator {
     constructor(db_connection_data){
@@ -14,7 +15,8 @@ class DatabaseCommunicator {
             host: this.host,
             user: this.user,
             password: this.password,
-            database: this.database
+            database: this.database,
+            connectTimeout: 30000
         });
 
         // Add error handling for connection
@@ -28,7 +30,14 @@ class DatabaseCommunicator {
 
     // Method to disconnect from the database
     disconnect() {
-        this.connection.end();
+        if (this.connection && this.connection.state !== 'disconnected') {
+            this.connection.end(err => {
+                if (err) {
+                    console.error('Error disconnecting from the database: ', err);
+                    throw err;
+                }
+            });
+        }
     }
 
     // Method to execute a query on the database
@@ -51,8 +60,8 @@ class DatabaseCommunicator {
     // columns: Array of column names to select (e.g., ["id", "name"])
     // condition: SQL condition string for WHERE clause (e.g., "id = 1")
     read(table, columns, condition) {
-        let sql = `SELECT ?? FROM ?? WHERE ??`;
-        let args = [columns, table, condition];
+        let sql = `SELECT ${columns.join(', ')} FROM ?? WHERE ${condition}`;
+        let args = [table];
         return this.query(sql, args);
     }
 
@@ -62,8 +71,8 @@ class DatabaseCommunicator {
     write(table, data) {
         const columns = Object.keys(data);
         const values = Object.values(data);
-        const sql = `INSERT INTO ?? (??) VALUES (?)`;
-        let args = [table, columns, values];
+        const sql = `INSERT INTO ?? (${columns.join(', ')}) VALUES (?)`;
+        let args = [table, values];
         return this.query(sql, args);
     }
 
@@ -73,8 +82,8 @@ class DatabaseCommunicator {
     // condition: SQL condition string for WHERE clause (e.g., "id = 1")
     update(table, data, condition) {
         const updates = Object.entries(data).map(([column, value]) => `${column} = ?`).join(', ');
-        const sql = `UPDATE ?? SET ${updates} WHERE ??`;
-        let args = [table, ...Object.values(data), condition];
+        const sql = `UPDATE ?? SET ${updates} WHERE ${condition}`;
+        let args = [table, ...Object.values(data)];
         return this.query(sql, args);
     }
 
@@ -82,32 +91,36 @@ class DatabaseCommunicator {
     // table: Name of the table to delete from (e.g., "users")
     // condition: SQL condition string for WHERE clause (e.g., "id = 1")
     delete(table, condition) {
-        const sql = `DELETE FROM ?? WHERE ??`;
-        let args = [table, condition];
+        const sql = `DELETE FROM ?? WHERE ${condition}`;
+        let args = [table];
         return this.query(sql, args);
     }
 
-
-// ------- User Methods -------
+    // ------- User Methods -------
 
 
     // Method to check if a user exists in the database
     // user: User object with a user_id property
-    userExists(user_line_id) {
-        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)`;
-        let args = [mysql.escape(user_line_id)];
-        return this.query(sql, args).then(rows => rows[0][sql] === 1);
+    async userExists(user_line_id) {
+        const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE user_line_id = ?)`;
+        let args = [user_line_id];
+        const rows = await this.query(sql, args);
+        return rows[0][sql] === 1;
     }
+
+// Other code...
 
     // searches user by LINE ID and
     // returns an object with user class object properties
     getUserByLineId(user_line_id){
         const sql = `SELECT user_id, user_line_id, major_state_id, minor_state_id, current_action_id, current_survey_id, current_step_id, current_question FROM users WHERE user_line_id = ?`;
-        let args = [mysql.escape(user_line_id)];
+        let args = [user_line_id];
         return this.query(sql, args).then(rows => {
             if (rows.length > 0) {
+                console.log("runj")
                 return rows[0];
             } else {
+                console.log("runjjjjjjj")
                 return null;
             }
         });
@@ -116,28 +129,11 @@ class DatabaseCommunicator {
     // Method to save a user to the database
     // user: User object with properties to insert or update
     // All properties except user_line_id can be null, if user_line_id is null, it throws an error
-    saveUser(user) {
-        if (user.user_line_id === null) {
-            throw new Error("user_line_id cannot be null");
-        }
-        const table = db_data.tables.users.name;
-        const data = {
-            user_id: user.user_id || null,
-            user_line_id: user.user_line_id,
-            major_state_id: user.major_state_id || null,
-            minor_state_id: user.minor_state_id || null,
-            current_action_id: user.current_action_id || null,
-            current_survey_id: user.current_survey_id || null,
-            current_step_id: user.current_step_id || null,
-            current_question: user.current_question || null
-        };
-
-        if (this.userExists(user.user_line_id)) {
-            const condition = `${db_data.tables.users.columns.user_id} = ?`;
-            return this.update(table, data, condition);
-        } else {
-            return this.write(table, data);
-        }
+    async saveUser(user) {
+        const tableName = db_data.tables.users.name;
+        const sql = `INSERT INTO \`${tableName}\` (user_id, user_line_id, major_state_id, minor_state_id, current_action_id, current_survey_id, current_step_id, current_question) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        let args = [user.user_id, user.user_line_id, user.major_state_id, user.minor_state_id, user.current_action_id, user.current_survey_id, user.current_step_id, user.current_question];
+        await this.query(sql, args);
     }
 }
 

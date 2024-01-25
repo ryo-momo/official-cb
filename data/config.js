@@ -7,12 +7,13 @@ const db_data = {
 //-----for test--------------------------------------
     host: "database-1.cb4ycsccwg4y.ap-northeast-1.rds.amazonaws.com",
     user: "admin",
-    password: "	7VtOtxEN22FEfHHiP6Pe",
-    database: "database-1",
+    password: "7VtOtxEN22FEfHHiP6Pe",
+    database: "official_cb_staging",
 //-------------------------------------------------
 
     tables: {
         users: {
+            name: "users",
             columns: {
                 user_id: 'user_id',
                 user_line_id: 'user_line_id',

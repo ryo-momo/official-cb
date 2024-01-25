@@ -28,32 +28,21 @@ const messageEventHandler = require('./message_event_handler');
 //     ]
 // }
 
-function webhookHandler(body){
-    let data;
-
-    // Try to parse the body
-    try {
-        data = JSON.parse(body);
-    } catch (error) {
-        console.error("Failed to parse body:", error);
-        return;
+async function webhookHandler(body) {
+    // Check if the event type is "message"
+    if (body.events[0].type === "message") {
+        console.log("Message event")
+        const user = await messageEventHandler({
+            user_line_id: body.events[0].source.userId,
+            text: body.events[0].message.text,
+            timestamp: body.events[0].timestamp
+        });
+        return user;
+    } else {
+        // TODO: Handle non-message event
+        console.log("Non-message event")
+        return null;
     }
-
-    // Iterate over each event in data.events
-    data.events.forEach(event => {
-        // Check if the event type is "message"
-        if (event.type === "message") {
-            return messageEventHandler({
-                user_line_id: event.source.userId,
-                text: event.message.text,
-                timestamp: event.timestamp
-            });
-        } else {
-            // TODO: Handle non-message event
-            return null;
-        }
-    });
-}
+};
 
 module.exports = webhookHandler
-
