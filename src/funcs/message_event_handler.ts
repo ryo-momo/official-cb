@@ -97,14 +97,11 @@ async function handleExistingUser(
     if (triggered_action !== null) {
         if (isActionAllowedInCurrentState(user, event.text)) {
             if (user.current_action_id !== null) {
-                //TODO user is trying to start a new action while in the middle of another action
-                //send a message that the user is in the middle of another action
                 console.log(
                     'User is trying to start a new action while in the middle of another action'
                 );
                 return { user, succeed: false };
             } else {
-                //TODO IN THE FUTURE: ask the user if they want to suspend the current action and start the new one
                 console.log("User's is not in the middle of an action, and is starting a new one");
                 user.current_action_id = triggered_action.action_id;
                 try {
@@ -117,21 +114,16 @@ async function handleExistingUser(
                 return { user: user, succeed: true };
             }
         } else {
-            //TODO user is trying to do an action that is not allowed in the current state
-            //send a message to the user that the action is not allowed
             console.log('User is trying to do an action that is not allowed in the current state');
             return { user: user, succeed: false };
         }
     } else {
         if (user.current_action_id === null) {
-            //TODO user is sending a message that is not a trigger but user is not in the middle of an action either
-            //send an error message
             console.log(
                 'User is sending a message that is not a trigger but user is not in the middle of an action either'
             );
             return { user: user, succeed: false };
         } else {
-            //user is in the middle of an action
             console.log('User is in the middle of an action');
             try {
                 user = await actionInvoker(user, event.text);
