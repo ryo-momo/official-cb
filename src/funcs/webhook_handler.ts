@@ -44,16 +44,21 @@ export async function webhookHandler(request_body: WebhookRequestBody) {
 
     // Create an array to store the results of each promise
     const results: Array<any> = [];
-    await Promise.all(
-        promises.map(async (p) => {
-            try {
-                const result = await p;
-                results.push(result);
-            } catch (error) {
-                console.error('Error in promise:', error);
-            }
-        })
-    );
+    try {
+        // Await the resolution of all promises
+        await Promise.all(
+            promises.map(async (p) => {
+                try {
+                    const result = await p;
+                    results.push(result);
+                } catch (error) {
+                    console.error('Error in promise:', error);
+                }
+            })
+        );
+    } catch (error) {
+        console.error('Error in Promise.all:', error);
+    }
     // Log the results of the promises including nested objects
     console.log(
         'Results of all promises including nested objects:',
