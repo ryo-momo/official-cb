@@ -62,22 +62,29 @@ async function handleNewUser(
     try {
         await dbc.insertUser(user);
         console.log('User saved successfully');
+        return { user: user, succeed: true };
     } catch (err) {
         console.error('Error saving user: ', err);
+        return { user: user, succeed: false };
     } finally {
         dbc.disconnect();
     }
-    return { user: user, succeed: true };
 }
 
 async function handleExistingUser(
     event: Event,
     reply_token: string
-): Promise<{ user: User; succeed: boolean }> {
+): Promise<{ user: User | null; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
     dbc.connect();
     console.log('User is an existing user');
-    const user_property = await dbc.getUserByLineId(event.user_line_id);
+    let user_property;
+    try {
+        user_property = await dbc.getUserByLineId(event.user_line_id);
+    } catch (err) {
+        console.error('Error getting user: ', err);
+        return { user: null, succeed: false };
+    }
     if (user_property === null) {
         throw new Error('User does not exist in the database');
     }
@@ -100,7 +107,12 @@ async function handleExistingUser(
                 //TODO IN THE FUTURE: ask the user if they want to suspend the current action and start the new one
                 console.log("User's is not in the middle of an action, and is starting a new one");
                 user.current_action_id = triggered_action.action_id;
-                user = actionInvoker(user, event.text, triggered_action);
+                try {
+                    user = await actionInvoker(user, event.text, triggered_action);
+                } catch (err) {
+                    console.error('Error invoking action: ', err);
+                    return { user, succeed: false };
+                }
                 dbc.disconnect();
                 return { user: user, succeed: true };
             }
@@ -121,7 +133,12 @@ async function handleExistingUser(
         } else {
             //user is in the middle of an action
             console.log('User is in the middle of an action');
-            user = actionInvoker(user, event.text);
+            try {
+                user = await actionInvoker(user, event.text);
+            } catch (err) {
+                console.error('Error invoking action: ', err);
+                return { user, succeed: false };
+            }
             dbc.disconnect();
             return { user: user, succeed: true };
         }
@@ -131,7 +148,7 @@ async function handleExistingUser(
 export async function messageEventHandler(
     event: Event,
     reply_token: string
-): Promise<{ user: User; succeed: boolean }> {
+): Promise<{ user: User | null; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
     dbc.connect();
     if (!(await dbc.userExists(event.user_line_id))) {

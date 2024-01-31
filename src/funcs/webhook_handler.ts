@@ -63,7 +63,7 @@ export async function webhookHandler(request_body: WebhookRequestBody) {
 
 export async function webhookEventHandler(
     event: WebhookEvent
-): Promise<{ user: User; succeed: boolean } | boolean> {
+): Promise<{ user: User | null; succeed: boolean } | boolean> {
     // Check if the event type is "message"
     if (event.type === 'message') {
         if (event.source.type === 'user') {
