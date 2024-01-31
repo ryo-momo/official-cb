@@ -27,38 +27,32 @@ function extractUserData(user: User): UserData {
 }
 
 export class DatabaseCommunicator {
-    private host: string;
-    private user: string;
-    private password: string;
-    private database: string;
     private connection: Connection | null;
     private db_data: DbData = db_data;
 
-    constructor(db_connection_data: DBConnectionData) {
-        this.host = db_connection_data.host;
-        this.user = db_connection_data.user;
-        this.password = db_connection_data.password;
-        this.database = db_connection_data.database;
+    constructor(private db_connection_data: DBConnectionData) {
         this.connection = null;
     }
 
     // Method to establish connection with the database
     connect(): void {
-        this.connection = mysql.createConnection({
-            host: this.host,
-            user: this.user,
-            password: this.password,
-            database: this.database,
-            connectTimeout: 30000,
-        });
+        if (!this.connection || this.connection.state === 'disconnected') {
+            this.connection = mysql.createConnection({
+                host: this.db_connection_data.host,
+                user: this.db_connection_data.user,
+                password: this.db_connection_data.password,
+                database: this.db_connection_data.database,
+                connectTimeout: 30000,
+            });
 
-        // Add error handling for connection
-        this.connection.connect((err) => {
-            if (err) {
-                console.error('Error connecting to the database: ', err);
-                throw err;
-            }
-        });
+            // Add error handling for connection
+            this.connection.connect((err) => {
+                if (err) {
+                    console.error('Error connecting to the database: ', err);
+                    throw err;
+                }
+            });
+        }
     }
 
     // Method to disconnect from the database
@@ -140,9 +134,11 @@ export class DatabaseCommunicator {
     // Method to check if a user exists in the database
     // user: User object with a user_id property
     async userExists(user_line_id: string): Promise<boolean> {
+        this.connect();
         const sql = `SELECT EXISTS(SELECT 1 FROM users WHERE user_line_id = ?) AS user_exists`;
         const args = [user_line_id];
         const rows = (await this.query(sql, args)) as { user_exists: number }[];
+        this.disconnect();
         return rows[0].user_exists === 1;
     }
 
@@ -168,6 +164,7 @@ export class DatabaseCommunicator {
 
     // Function to insert a new user
     async insertUser(user: User): Promise<void> {
+        this.connect();
         const user_data = extractUserData(user);
         const table_name = db_data.tables.users.name;
         const columns = db_references;
@@ -179,10 +176,12 @@ export class DatabaseCommunicator {
         const args = Object.values(user_data);
         await this.query(sql, args);
         console.log('User inserted into the database:', Object.values(user_data).toString());
+        this.disconnect();
     }
 
     // Function to update an existing user
     async updateUser(user: User): Promise<void> {
+        this.connect();
         const user_data = extractUserData(user);
         const table_name = db_data.tables.users.name;
         const updates = Object.keys(user_data)
@@ -192,5 +191,6 @@ export class DatabaseCommunicator {
         const args = [...Object.values(user_data), user.user_line_id];
         await this.query(sql, args);
         console.log('User updated in the database:', Object.values(user_data).toString());
+        this.disconnect();
     }
 }
