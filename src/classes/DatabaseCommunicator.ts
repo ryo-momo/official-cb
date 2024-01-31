@@ -81,7 +81,9 @@ export class DatabaseCommunicator {
                     resolve(rows);
                 });
             } else {
-                reject(new Error('Database connection is null.'));
+                const error = new Error('Database connection is null.');
+                console.error('Error executing query: ', error);
+                reject(error);
             }
         });
     }
