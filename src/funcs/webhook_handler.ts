@@ -69,16 +69,21 @@ export async function webhookEventHandler(
         if (event.source.type === 'user') {
             if ('text' in event.message && event.message.text) {
                 console.log('User Message event received');
-                const result = await messageEventHandler(
-                    {
-                        user_line_id: event.source.userId,
-                        text: event.message.text,
-                        timestamp: event.timestamp,
-                        reply_token: event.replyToken,
-                    },
-                    event.replyToken
-                );
-                return result;
+                try {
+                    const result = await messageEventHandler(
+                        {
+                            user_line_id: event.source.userId,
+                            text: event.message.text,
+                            timestamp: event.timestamp,
+                            reply_token: event.replyToken,
+                        },
+                        event.replyToken
+                    );
+                    return result;
+                } catch (error) {
+                    console.error('Error in messageEventHandler:', error);
+                    return false;
+                }
             } else {
                 console.log(
                     'User Message event received but no text, perhaps an StickerMessageEvent'
