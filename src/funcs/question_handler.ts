@@ -7,7 +7,13 @@ interface QuestionHandlerResult {
     goToNextStep: boolean;
 }
 
-export function handleTextQuestion(user: User, answer_text: string): QuestionHandlerResult {
+const ERROR_MESSAGES = {
+    NULL_OPTIONS: 'ERROR: current_question.options is null',
+    NULL_QUESTION: 'ERROR: current_question is null',
+    NEGATIVE_ANSWERS: 'ERROR: answers_to_go has gone less than zero',
+};
+
+export function handleQuestion(user: User, answer_text: string): QuestionHandlerResult {
     return {
         user_object: user,
         storeValueToDB: true,
@@ -15,13 +21,8 @@ export function handleTextQuestion(user: User, answer_text: string): QuestionHan
     };
 }
 
-export function handleSingleChoiceQuestion(user: User, answer_text: string): QuestionHandlerResult {
-    return {
-        user_object: user,
-        storeValueToDB: true,
-        goToNextStep: true,
-    };
-}
+export const handleTextQuestion = handleQuestion;
+export const handleSingleChoiceQuestion = handleQuestion;
 
 export function handleMultipleChoiceQuestion(
     user: User,
@@ -37,7 +38,7 @@ export function handleMultipleChoiceQuestion(
                 (option) => option.text !== answer_text
             );
         } else {
-            throw new Error('ERROR: current_question.options is null');
+            throw new Error(ERROR_MESSAGES.NULL_OPTIONS);
         }
 
         const answers_to_go = current_question.choices_allowed - user.current_answers.length;
@@ -59,9 +60,9 @@ export function handleMultipleChoiceQuestion(
                 goToNextStep: false,
             };
         } else {
-            throw new Error('ERROR: answers_to_go has gone less than zero');
+            throw new Error(ERROR_MESSAGES.NEGATIVE_ANSWERS);
         }
     } else {
-        throw new Error('ERROR: current_question is null');
+        throw new Error(ERROR_MESSAGES.NULL_QUESTION);
     }
 }
