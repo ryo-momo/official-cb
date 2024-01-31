@@ -81,59 +81,53 @@ async function handleExistingUser(
     let user_property;
     try {
         user_property = await dbc.getUserByLineId(event.user_line_id);
-    } catch (err) {
-        console.error('Error getting user: ', err);
-        return { user: null, succeed: false };
-    }
-    if (user_property === null) {
-        throw new Error('User does not exist in the database');
-    }
-    let user = new User(user_property, {
-        shouldReply: true,
-        reply_token: reply_token,
-    });
+        if (user_property === null) {
+            throw new Error('User does not exist in the database');
+        }
+        let user = new User(user_property, {
+            shouldReply: true,
+            reply_token: reply_token,
+        });
 
-    const triggered_action = findActionByTrigger(event.text);
-    if (triggered_action !== null) {
-        if (isActionAllowedInCurrentState(user, event.text)) {
-            if (user.current_action_id !== null) {
-                console.log(
-                    'User is trying to start a new action while in the middle of another action'
-                );
-                return { user, succeed: false };
-            } else {
-                console.log("User's is not in the middle of an action, and is starting a new one");
-                user.current_action_id = triggered_action.action_id;
-                try {
-                    user = await actionInvoker(user, event.text, triggered_action);
-                } catch (err) {
-                    console.error('Error invoking action: ', err);
+        const triggered_action = findActionByTrigger(event.text);
+        if (triggered_action !== null) {
+            if (isActionAllowedInCurrentState(user, event.text)) {
+                if (user.current_action_id !== null) {
+                    console.log(
+                        'User is trying to start a new action while in the middle of another action'
+                    );
                     return { user, succeed: false };
+                } else {
+                    console.log(
+                        "User's is not in the middle of an action, and is starting a new one"
+                    );
+                    user.current_action_id = triggered_action.action_id;
+                    user = await actionInvoker(user, event.text, triggered_action);
+                    return { user: user, succeed: true };
                 }
-                dbc.disconnect();
+            } else {
+                console.log(
+                    'User is trying to do an action that is not allowed in the current state'
+                );
+                return { user: user, succeed: false };
+            }
+        } else {
+            if (user.current_action_id === null) {
+                console.log(
+                    'User is sending a message that is not a trigger but user is not in the middle of an action either'
+                );
+                return { user: user, succeed: false };
+            } else {
+                console.log('User is in the middle of an action');
+                user = await actionInvoker(user, event.text);
                 return { user: user, succeed: true };
             }
-        } else {
-            console.log('User is trying to do an action that is not allowed in the current state');
-            return { user: user, succeed: false };
         }
-    } else {
-        if (user.current_action_id === null) {
-            console.log(
-                'User is sending a message that is not a trigger but user is not in the middle of an action either'
-            );
-            return { user: user, succeed: false };
-        } else {
-            console.log('User is in the middle of an action');
-            try {
-                user = await actionInvoker(user, event.text);
-            } catch (err) {
-                console.error('Error invoking action: ', err);
-                return { user, succeed: false };
-            }
-            dbc.disconnect();
-            return { user: user, succeed: true };
-        }
+    } catch (err) {
+        console.error('Error handling existing user: ', err);
+        return { user: null, succeed: false };
+    } finally {
+        dbc.disconnect();
     }
 }
 
