@@ -19,11 +19,19 @@ interface ValidatorResponse {
     error_message: string | null;
 }
 
+const ERROR_MESSAGES = {
+    INVALID_TEXT: '回答が無効な形式です。文字列を入力してください。\n\n',
+    INVALID_SINGLE_CHOICE: '回答が無効な形式です。表示される選択肢の中から選択してください。\n\n',
+    INVALID_NUMBER: '回答が無効な形式です。0以上の数字を入力してください。\n\n',
+    NO_OPTIONS: '選択肢が存在しません。\n\n',
+    UNSUPPORTED_QUESTION: '問題が発生しました、お手数ですが担当にご連絡をお願いいたします。\n\n',
+};
+
 function validateTextType(answer_text: string): ValidationResult {
     if (typeof answer_text !== 'string' || answer_text.trim() === '') {
         return {
             isValid: false,
-            error_message: '回答が無効な形式です。文字列を入力してください。\n\n',
+            error_message: ERROR_MESSAGES.INVALID_TEXT,
         };
     }
     return { isValid: true };
@@ -36,7 +44,7 @@ function validateSingleChoiceType(
     if (!options.some((option) => option.text === answer_text)) {
         return {
             isValid: false,
-            error_message: '回答が無効な形式です。表示される選択肢の中から選択してください。\n\n',
+            error_message: ERROR_MESSAGES.INVALID_SINGLE_CHOICE,
         };
     }
     return { isValid: true };
@@ -46,7 +54,7 @@ function validateNumberType(answer_text: string): ValidationResult {
     if (isNaN(Number(answer_text)) || Number(answer_text) < 0) {
         return {
             isValid: false,
-            error_message: '回答が無効な形式です。0以上の数字を入力してください。\n\n',
+            error_message: ERROR_MESSAGES.INVALID_NUMBER,
         };
     }
     return { isValid: true };
@@ -91,7 +99,7 @@ export function basicInfoValidator(user: User, answer_text: string): ValidatorRe
             if ('options' in current_question) {
                 validationResult = validateSingleChoiceType(answer_text, current_question.options);
             } else {
-                validationResult = { isValid: false, error_message: '選択肢が存在しません。\n\n' };
+                validationResult = { isValid: false, error_message: ERROR_MESSAGES.NO_OPTIONS };
             }
             break;
         case 'years_of_service':
@@ -108,8 +116,7 @@ export function basicInfoValidator(user: User, answer_text: string): ValidatorRe
             console.log('The current question is not supported for validation.');
             validationResult = {
                 isValid: false,
-                error_message:
-                    '問題が発生しました、お手数ですが担当にご連絡をお願いいたします。\n\n',
+                error_message: ERROR_MESSAGES.UNSUPPORTED_QUESTION,
             };
     }
 

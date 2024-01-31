@@ -2,8 +2,7 @@ import { webhookHandler } from './src/funcs/webhook_handler';
 import { WebhookRequestBody } from '@line/bot-sdk';
 
 const YOUR_CHANNEL_ACCESS_TOKEN =
-    '1i8dcuhxOTmw8SXwhH25YLoAkW/tJgfug7rIpeIMlTGQXDbVjlBliOGBjPghAwpjVuqTnqYOn+Hd7XwXIkm/A2/XKSOO7hXnlpFI2PagAVIOt0NkyPbJKpRvbgQMv0QX5PPZOpT28yS7mIN0dsmctwdB04t89/1O/w1cDnyilFU=';
-
+    '5q0BQsVkYmlb28z4s+7BKbYytgHutLg8OC1mDnpF6TheHb2o3+bEw4dMwQwDt9XgVuqTnqYOn+Hd7XwXIkm/A2/XKSOO7hXnlpFI2PagAVKCxNxUyC0F9MNgz8y/LkT1wVTeZsvRtW/6zUQAd0e56AdB04t89/1O/w1cDnyilFU=';
 const request_body: WebhookRequestBody = {
     destination: 'Ude07b1faacabdf9fc4971644c94fd76d',
     events: [
