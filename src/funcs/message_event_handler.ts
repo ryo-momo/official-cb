@@ -137,11 +137,17 @@ export async function messageEventHandler(
 ): Promise<{ user: User | null; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
     dbc.connect();
-    if (!(await dbc.userExists(event.user_line_id))) {
-        //this user is a brand new user
-        return handleNewUser(event, reply_token);
-    } else {
-        //user is an existing user
-        return handleExistingUser(event, reply_token);
+    try {
+        const userExists = await dbc.userExists(event.user_line_id);
+        if (!userExists) {
+            // this user is a brand new user
+            return handleNewUser(event, reply_token);
+        } else {
+            // user is an existing user
+            return handleExistingUser(event, reply_token);
+        }
+    } catch (err) {
+        console.error('Error checking if user exists: ', err);
+        return { user: null, succeed: false };
     }
 }
