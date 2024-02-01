@@ -39,7 +39,7 @@ async function handleNewUser(
     reply_token: string
 ): Promise<{ user: User; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
-    dbc.connect();
+    await dbc.connect();
     console.log('User is a brand new user');
     let user = new User(
         {
@@ -67,7 +67,7 @@ async function handleNewUser(
         console.error('Error saving user: ', err);
         return { user: user, succeed: false };
     } finally {
-        dbc.disconnect();
+        await dbc.disconnect();
     }
 }
 
@@ -76,7 +76,7 @@ async function handleExistingUser(
     reply_token: string
 ): Promise<{ user: User | null; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
-    dbc.connect();
+    await dbc.connect();
     console.log('User is an existing user');
     let user_property;
     try {
@@ -127,7 +127,7 @@ async function handleExistingUser(
         console.error('Error handling existing user: ', err);
         return { user: null, succeed: false };
     } finally {
-        dbc.disconnect();
+        await dbc.disconnect();
     }
 }
 
@@ -136,7 +136,7 @@ export async function messageEventHandler(
     reply_token: string
 ): Promise<{ user: User | null; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
-    dbc.connect();
+    await dbc.connect();
     try {
         const userExists = await dbc.userExists(event.user_line_id);
         if (!userExists) {
@@ -149,5 +149,7 @@ export async function messageEventHandler(
     } catch (err) {
         console.error('Error checking if user exists: ', err);
         return { user: null, succeed: false };
+    } finally {
+        await dbc.disconnect();
     }
 }

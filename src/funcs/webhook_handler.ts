@@ -35,36 +35,30 @@ async function eventResultHandler(result: object) {
 }
 
 export async function webhookHandler(request_body: WebhookRequestBody) {
-    const promises = request_body.events.map((event) =>
-        webhookEventHandler(event)
-            .then((result) => {
-                // eventResultHandler(result);
-                return result;
-            })
-            .catch((error) => {
-                console.error('Error in webhookEventHandler:', error);
-                return false;
-            })
-    );
+    const promises = request_body.events.map(async (event) => {
+        try {
+            const result = await webhookEventHandler(event);
+            // eventResultHandler(result);
+            return result;
+        } catch (error) {
+            console.error('Error in webhookEventHandler:', error);
+            return false;
+        }
+    });
 
-    // Create an array to store the results of each promise
     const results: Array<any> = [];
     try {
-        // Await the resolution of all promises
-        await Promise.all(
-            promises.map(async (p) => {
-                try {
-                    const result = await p;
-                    results.push(result);
-                } catch (error) {
-                    console.error('Error in promise:', error);
-                }
-            })
-        );
+        for (const promise of promises) {
+            try {
+                const result = await promise;
+                results.push(result);
+            } catch (error) {
+                console.error('Error in promise:', error);
+            }
+        }
     } catch (error) {
-        console.error('Error in Promise.all:', error);
+        console.error('Error in processing promises:', error);
     }
-    // Log the results of the promises including nested objects
     console.log(
         'Results of all promises including nested objects:',
         JSON.stringify(results, null, 2)

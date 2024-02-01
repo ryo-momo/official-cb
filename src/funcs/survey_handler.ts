@@ -12,23 +12,23 @@ import { Message, FlexMessage } from '../classes/MessageHelper';
 import { Question, Survey } from '../data/survey_content';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
-export function basicInfoSurveyHandler(user: User, answer_text: string): User {
+export async function basicInfoSurveyHandler(user: User, answer_text: string): Promise<User> {
     if (user.isInInitialStep()) {
-        return handleInitialStep(user);
+        return await handleInitialStep(user);
     } else {
         return handleSubsequentSteps(user, answer_text);
     }
 }
 
-export function searchConditionSurveyHandler(user: User, answer_text: string): User {
+export async function searchConditionSurveyHandler(user: User, answer_text: string): Promise<User> {
     if (user.isInInitialStep()) {
-        return handleInitialStep(user);
+        return await handleInitialStep(user);
     } else {
         return handleSubsequentSteps(user, answer_text);
     }
 }
 
-function handleInitialStep(user: User): User {
+async function handleInitialStep(user: User): Promise<User> {
     let current_action = user.getCurrentAction();
     if ('survey_id' in current_action) {
         console.log('User is in initial step. Setting current survey and question.'); // Log message
@@ -46,12 +46,19 @@ function handleInitialStep(user: User): User {
         }
         console.log(`Updated the user's step to ${user.current_step_id}`);
         console.log('Storing the user to database.'); // Log message
-        updateUserInDatabase(user);
+        try {
+            updateUserInDatabase(user);
+        } catch (err) {
+            console.error('Error updating user in database: ', err);
+            // Handle the error appropriately
+        }
         return user;
     } else {
         throw new Error('User is in initial step, but current action is not a survey action.');
     }
 }
+
+// 他のupdateUserInDatabaseを呼び出している関数も同様に修正します。
 
 function handleSubsequentSteps(user: User, answer_text: string): User {
     let validation_result = basicInfoValidator(user, answer_text);
@@ -82,8 +89,13 @@ function handleSubsequentSteps(user: User, answer_text: string): User {
 
         // If the answer needs to be stored in the database, connect to the database and update the user's information.
         console.log('Storing answer to database.'); // Log message
-        storeAnswerInDatabase(user, answer_text);
-
+        try {
+            storeAnswerInDatabase(user, answer_text);
+            console.log('Answer stored in database successfully.'); // Log message
+        } catch (err) {
+            console.error('Error storing answer in database: ', err); // Log message
+            // Handle the error appropriately
+        }
         if (process_result.goToNextStep) {
             handleNextStep(user, answer_text);
         }
@@ -129,37 +141,47 @@ function handleNextStep(user: User, answer_text: string) {
         }
     }
     console.log('Storing the user to database.'); // Log message
-    updateUserInDatabase(user);
+    try {
+        updateUserInDatabase(user);
+    } catch (err) {
+        console.error('Error updating user in database: ', err);
+        // Handle the error appropriately
+    }
 }
 
-function updateUserInDatabase(user: User) {
+// Rewrite the function to use async/await
+async function updateUserInDatabase(user: User) {
     let dbc = new DatabaseCommunicator(db_data);
-    dbc.connect();
-    dbc.updateUser(user)
-        .then(() => console.log('User Update successful')) // Log message
-        .catch((err) => {
-            console.error('Error updating user column: ', err); // Log error message
-            throw err;
-        })
-        .finally(() => dbc.disconnect());
+    try {
+        await dbc.connect();
+        await dbc.updateUser(user);
+        console.log('User Update successful'); // Log message
+    } catch (err) {
+        console.error('Error updating user column: ', err); // Log error message
+        throw err;
+    } finally {
+        await dbc.disconnect();
+    }
 }
 
-function storeAnswerInDatabase(user: User, answer_text: string) {
+async function storeAnswerInDatabase(user: User, answer_text: string) {
     let dbc = new DatabaseCommunicator(db_data);
-    dbc.connect();
+    await dbc.connect();
     const current_question = user.getCurrentQuestion();
-    console.log('現在の質問：', user.current_question_id);
-    dbc.update(
-        current_question.related_table,
-        { [current_question.related_column]: answer_text },
-        'user_id = "' + user.user_id + '"'
-    )
-        .then(() => console.log('Answer save successful')) // Log message
-        .catch((err) => {
-            console.error('Error updating user column: ', err); // Log error message
-            throw err;
-        })
-        .finally(() => dbc.disconnect());
+    console.log('現在の質問：', user.current_question_id); // Log message in English
+    try {
+        await dbc.update(
+            current_question.related_table,
+            { [current_question.related_column]: answer_text },
+            'user_id = "' + user.user_id + '"'
+        );
+        console.log('Answer save successful'); // Log message in English
+    } catch (err) {
+        console.error('Error updating user column: ', err); // Log error message in English
+        throw err;
+    } finally {
+        await dbc.disconnect();
+    }
 }
 
 function endAction(user: User) {
