@@ -13,7 +13,7 @@ const request_body: WebhookRequestBody = {
                 id: '489235210962207227',
                 quoteToken:
                     'L9RsBpEYLH9GOcYH7b0Jf3tFzFuqmihcOFK6-SIgxjkfY6JVfw3cthFToNt02REUPD6zDOZ-iYIZdv3nhuAowKIcx19e6uEMDxzrObD4hy3TfMSS-B0bIaNXC7Ty2X4Dte2KRe37IvR5_bx75ehEnQ',
-                text: '個',
+                text: '>お客様情報の登録/変更',
             },
             webhookEventId: '01HKC6YB99P4X1WA0GQHMZQPMQ',
             deliveryContext: {
@@ -33,7 +33,7 @@ const request_body: WebhookRequestBody = {
 (async () => {
     try {
         const user = await webhookHandler(request_body);
-        console.log('user is ', user);
+        console.log('user is', user);
     } catch (err) {
         console.error('Error in webhookHandler: ', err);
     }

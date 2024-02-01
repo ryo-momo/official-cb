@@ -160,20 +160,20 @@ export class DatabaseCommunicator {
 
     // searches user by LINE ID and
     // returns an object with user class object properties
-    getUserByLineId(user_line_id: string): Promise<UserData | null> {
+    // searches user by LINE ID and
+    // returns an object with user class object properties
+    async getUserByLineId(user_line_id: string): Promise<UserData | null> {
         const table_name = db_data.tables.users.name;
         const columns = db_references;
         const columns_string = Object.keys(columns).toString();
         const sql = `SELECT ${columns_string} FROM \`${table_name}\` WHERE user_line_id = ?`;
         const args = [user_line_id];
-        return this.query(sql, args).then((rows) => {
-            const typedRows = rows as UserData[];
-            if (typedRows.length > 0) {
-                return typedRows[0];
-            } else {
-                return null;
-            }
-        });
+        const rows = (await this.query(sql, args)) as UserData[];
+        if (rows.length > 0) {
+            return rows[0];
+        } else {
+            return null;
+        }
     }
 
     // Function to insert a new user
