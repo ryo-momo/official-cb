@@ -36,10 +36,15 @@ async function eventResultHandler(result: object) {
 
 export async function webhookHandler(request_body: WebhookRequestBody) {
     const promises = request_body.events.map((event) =>
-        webhookEventHandler(event).then((result) => {
-            // eventResultHandler(result);
-            return result;
-        })
+        webhookEventHandler(event)
+            .then((result) => {
+                // eventResultHandler(result);
+                return result;
+            })
+            .catch((error) => {
+                console.error('Error in webhookEventHandler:', error);
+                return false;
+            })
     );
 
     // Create an array to store the results of each promise
