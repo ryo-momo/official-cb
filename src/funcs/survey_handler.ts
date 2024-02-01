@@ -8,7 +8,7 @@ import {
 import { basicInfoValidator } from './survey_validator';
 import { User } from '../classes/User';
 import { Step } from '../data/user_states';
-import { Message, FlexMessage } from '../classes/MessageHelper';
+import { Message, FlexMessage, generateQuickReplyItems } from './message_helper';
 import { Question, Survey } from '../data/survey_content';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
@@ -114,7 +114,7 @@ function handleNextStep(user: User, answer_text: string) {
     const current_action = user.getCurrentAction();
     const current_survey = user.getCurrentSurvey();
     const current_question = user.getCurrentQuestion();
-    let next_question = getNextQuestion(user, answer_text, current_question, current_survey);
+    let next_question = getNextQuestion(answer_text, current_question, current_survey);
 
     if (!next_question) {
         //it was the last question
@@ -197,28 +197,46 @@ function endAction(user: User) {
     } as Message;
 }
 
-function setNextQuestion(user: User, current_question: any) {
-    if (current_question.design !== undefined) {
-        //next question is a flex message type
-        const message = (user.response.message = {} as FlexMessage);
-        message.type = 'flex';
-        message.altText = '次の質問をご確認ください。';
-        (user.response.message as FlexMessage).contents = current_question.design;
-        //TODO quick replyの管理
+function setNextQuestion(user: User, current_question: Question) {
+    // Initialize message explicitly
+    let message: Message | FlexMessage;
+
+    if (current_question.design) {
+        // Flex message
+        message = {
+            type: 'flex',
+            altText: '次の質問をご確認ください。',
+            contents: current_question.design,
+            ...('options' in current_question && {
+                // 型ガードを使用してoptionsの存在をチェック
+                quickReply: {
+                    items: generateQuickReplyItems(current_question.options),
+                },
+            }),
+        } as FlexMessage;
     } else {
-        //next question is a text message type
-        const message = (user.response.message = {} as Message);
-        message.type = 'text';
-        message.text = current_question.text!;
+        // Text message with conditional quickReply, using type guard
+        message = {
+            type: 'text',
+            text: current_question.text || '質問のテキストが設定されていません。',
+            ...('options' in current_question && {
+                // 型ガードを使用してoptionsの存在をチェック
+                quickReply: {
+                    items: generateQuickReplyItems(current_question.options),
+                },
+            }),
+        } as Message;
     }
+
+    // update user response
+    user.response.message = message;
 }
 
 function getNextQuestion(
-    user: User,
     answer_text: string,
     current_question: Question,
     current_survey: Survey
-) {
+): Question | undefined {
     let next_question;
     // Check if current_question.next is a string or an object
     if (current_question.type !== 'single-choice') {

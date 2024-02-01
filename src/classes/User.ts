@@ -1,6 +1,6 @@
 import { user_states, MajorState, MinorState, Action, Step } from '../data/user_states';
 import { survey_contents, Survey } from '../data/survey_content';
-import { Message, FlexMessage } from './MessageHelper';
+import { Message, FlexMessage } from '../funcs/message_helper';
 import { Question } from '../data/survey_content';
 import { db_data } from '../data/config';
 

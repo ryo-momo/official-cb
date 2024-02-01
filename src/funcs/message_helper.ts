@@ -1,3 +1,5 @@
+import { QuestionOption } from '../data/survey_content';
+
 export interface QuickReplyOption {
     type: string;
     action: {
@@ -36,13 +38,13 @@ export function createSimpleMessage(text: string): Message {
 }
 
 // Generate quick reply items
-export function generateQuickReplyItems(options: QuickReplyOption[]): QuickReplyOption[] {
+export function generateQuickReplyItems(options: QuestionOption[]): QuickReplyOption[] {
     return options.map((option) => ({
         type: 'action',
         action: {
             type: 'message',
-            label: option.action.label,
-            text: option.action.text,
+            label: option.text,
+            text: option.text,
         },
     }));
 }
