@@ -16,7 +16,12 @@ export async function basicInfoSurveyHandler(user: User, answer_text: string): P
     if (user.isInInitialStep()) {
         return await handleInitialStep(user);
     } else {
-        return handleSubsequentSteps(user, answer_text);
+        try {
+            return await handleSubsequentSteps(user, answer_text);
+        } catch (err) {
+            throw new Error(`Error handling subsequent steps: ${err}`);
+            // Handle the error appropriately
+        }
     }
 }
 
@@ -24,7 +29,12 @@ export async function searchConditionSurveyHandler(user: User, answer_text: stri
     if (user.isInInitialStep()) {
         return await handleInitialStep(user);
     } else {
-        return handleSubsequentSteps(user, answer_text);
+        try {
+            return await handleSubsequentSteps(user, answer_text);
+        } catch (err) {
+            throw new Error(`Error handling subsequent steps: ${err}`);
+            // Handle the error appropriately
+        }
     }
 }
 
@@ -60,7 +70,7 @@ async function handleInitialStep(user: User): Promise<User> {
 
 // 他のupdateUserInDatabaseを呼び出している関数も同様に修正します。
 
-function handleSubsequentSteps(user: User, answer_text: string): User {
+async function handleSubsequentSteps(user: User, answer_text: string): Promise<User> {
     let validation_result = basicInfoValidator(user, answer_text);
     user = validation_result.user_object;
     if (validation_result.isValid) {
@@ -90,12 +100,12 @@ function handleSubsequentSteps(user: User, answer_text: string): User {
         // If the answer needs to be stored in the database, connect to the database and update the user's information.
         console.log('Storing answer to database.'); // Log message
         try {
-            storeAnswerInDatabase(user, answer_text);
-            console.log('Answer stored in database successfully.'); // Log message
+            await storeAnswerInDatabase(user, answer_text);
         } catch (err) {
             console.error('Error storing answer in database: ', err); // Log message
             // Handle the error appropriately
         }
+        console.log('Answer stored in database successfully.'); // Log message
         if (process_result.goToNextStep) {
             handleNextStep(user, answer_text);
         }
