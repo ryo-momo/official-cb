@@ -273,207 +273,219 @@ export const survey_contents: SurveyContents = {
                 },
             ],
         },
-        // {
-        //     id: 'property_conditions',
-        //     questions: [
-        //         {
-        //             id: 'price',
-        //             type: 'single-choice',
-        //             related_column: 'price',
-        //             design: flex_message_contents.find((flex_message_content)=>flex_message_content.id === 'property_conditions_price')
-        //                 ?.design,
-        //             options: [
-        //                 {
-        //                     id: 1,
-        //                     text: '3000～5000万円',
-        //                 },
-        //                 {
-        //                     id: 2,
-        //                     text: '5000～7500万円',
-        //                 },
-        //                 {
-        //                     id: 3,
-        //                     text: '7500万～1億円',
-        //                 },
-        //                 {
-        //                     id: 4,
-        //                     text: '1億～1億5000万円',
-        //                 },
-        //                 {
-        //                     id: 5,
-        //                     text: '1億5000万～2億円',
-        //                 },
-        //                 {
-        //                     id: 6,
-        //                     text: '2億円～3億円',
-        //                 },
-        //                 {
-        //                     id: 7,
-        //                     text: '3億～5億円',
-        //                 },
-        //                 {
-        //                     id: 8,
-        //                     text: '5億円以上',
-        //                 },
-        //             ],
-        //             next: {
-        //                 1: 'target',
-        //                 2: 'target',
-        //                 3: 'target',
-        //                 4: 'target',
-        //                 5: 'target',
-        //                 6: 'target',
-        //                 7: 'target',
-        //                 8: 'target',
-        //             },
-        //         },
-        //         {
-        //             id: 'target',
-        //             type: 'single-choice',
-        //             related_column: 'property_target',
-        //             options: [
-        //                 {
-        //                     id: 1,
-        //                     text: '単身者/カップル向け（1R,1K,1DK,1LDK中心）',
-        //                 },
-        //                 {
-        //                     id: 2,
-        //                     text: 'ファミリー向け（2DK以上）',
-        //                 },
-        //             ],
-        //             next: {
-        //                 1: 'area',
-        //                 2: 'area',
-        //             },
-        //         },
-        //         {
-        //             id: 'area',
-        //             type: 'single-choice',
-        //             related_column: 'area',
-        //             design: flex_message_contents.find((flex_message_content)=>flex_message_content.id === 'property_conditions_area')
-        //                 ?.design,
-        //             options: [
-        //                 {
-        //                     id: 1,
-        //                     text: '東京都（城北エリア）',
-        //                 },
-        //                 {
-        //                     id: 2,
-        //                     text: '東京都（城南エリア）',
-        //                 },
-        //                 {
-        //                     id: 3,
-        //                     text: '東京都（城西エリア）',
-        //                 },
-        //                 {
-        //                     id: 4,
-        //                     text: '東京都（城東エリア）',
-        //                 },
-        //                 {
-        //                     id: 5,
-        //                     text: '東京都（23区外）',
-        //                 },
-        //                 {
-        //                     id: 6,
-        //                     text: '埼玉県（さいたま市）',
-        //                 },
-        //                 {
-        //                     id: 7,
-        //                     text: '埼玉県（さいたま市以外）',
-        //                 },
-        //                 {
-        //                     id: 8,
-        //                     text: '神奈川県（横浜市）',
-        //                 },
-        //                 {
-        //                     id: 9,
-        //                     text: '神奈川県（横浜市以外）',
-        //                 },
-        //                 {
-        //                     id: 10,
-        //                     text: '千葉県（千葉市、船橋市）',
-        //                 },
-        //                 {
-        //                     id: 11,
-        //                     text: '千葉県（千葉市、船橋市以外）',
-        //                 },
-        //             ],
-        //             next: {
-        //                 1: 'structure',
-        //                 2: 'structure',
-        //                 3: 'structure',
-        //                 4: 'structure',
-        //                 5: 'structure',
-        //                 6: 'structure',
-        //                 7: 'structure',
-        //                 8: 'structure',
-        //                 9: 'structure',
-        //                 10: 'structure',
-        //                 11: 'structure',
-        //             },
-        //         },
-        //         {
-        //             id: 'structure',
-        //             type: 'multiple-choice',
-        //             related_column: 'structure',
-        //             choices_allowed: 2,
-        //             options: [
-        //                 {
-        //                     id: 1,
-        //                     text: '木造',
-        //                 },
-        //                 {
-        //                     id: 2,
-        //                     text: '軽量鉄骨造',
-        //                 },
-        //                 {
-        //                     id: 3,
-        //                     text: '重量鉄骨造',
-        //                 },
-        //                 {
-        //                     id: 4,
-        //                     text: 'RC造',
-        //                 },
-        //             ],
-        //             next: 'yield',
-        //         },
-        //         {
-        //             id: 'yield',
-        //             type: 'single-choice',
-        //             related_column: 'yield',
-        //             design: flex_message_contents.find((flex_message_content)=>flex_message_content.id === 'property_conditions_yield')
-        //                 ?.design,
-        //             options: [
-        //                 {
-        //                     id: 1,
-        //                     text: '4％～（RC造 築浅中心）',
-        //                 },
-        //                 {
-        //                     id: 2,
-        //                     text: '5％～（RC/重量鉄骨造 築浅中心）',
-        //                 },
-        //                 {
-        //                     id: 3,
-        //                     text: '6％～（重量/軽量鉄骨造 中心）',
-        //                 },
-        //                 {
-        //                     id: 4,
-        //                     text: '7％～（軽量鉄骨造/木造 中心）',
-        //                 },
-        //                 {
-        //                     id: 5,
-        //                     text: '8％～（木造/耐用年数越え）',
-        //                 },
-        //             ],
-        //             next: {
-        //                 1: 'end',
-        //                 2: 'end',
-        //                 3: 'end',
-        //                 4: 'end',
-        //                 5: 'end',
-        //             },
-        //         },
-        //     ],
-        // },
+        {
+            id: 'property_conditions',
+            questions: [
+                {
+                    id: 'price',
+                    type: 'single-choice',
+                    related_table: db_data.tables.users.name,
+                    related_column: db_data.tables.users.columns.desired_price,
+                    design: flex_message_contents.find(
+                        (flex_message_content) =>
+                            flex_message_content.id === 'property_conditions_price'
+                    )?.design,
+                    options: [
+                        {
+                            id: 1,
+                            text: '3000～5000万円',
+                        },
+                        {
+                            id: 2,
+                            text: '5000～7500万円',
+                        },
+                        {
+                            id: 3,
+                            text: '7500万～1億円',
+                        },
+                        {
+                            id: 4,
+                            text: '1億～1億5000万円',
+                        },
+                        {
+                            id: 5,
+                            text: '1億5000万～2億円',
+                        },
+                        {
+                            id: 6,
+                            text: '2億円～3億円',
+                        },
+                        {
+                            id: 7,
+                            text: '3億～5億円',
+                        },
+                        {
+                            id: 8,
+                            text: '5億円以上',
+                        },
+                    ],
+                    next: {
+                        1: 'target',
+                        2: 'target',
+                        3: 'target',
+                        4: 'target',
+                        5: 'target',
+                        6: 'target',
+                        7: 'target',
+                        8: 'target',
+                    },
+                },
+                {
+                    id: 'target',
+                    type: 'single-choice',
+                    related_table: db_data.tables.users.name,
+                    related_column: db_data.tables.users.columns.desired_target,
+                    options: [
+                        {
+                            id: 1,
+                            text: '単身者/カップル向け（1R,1K,1DK,1LDK中心）',
+                        },
+                        {
+                            id: 2,
+                            text: 'ファミリー向け（2DK以上）',
+                        },
+                    ],
+                    next: {
+                        1: 'area',
+                        2: 'area',
+                    },
+                },
+                {
+                    id: 'area',
+                    type: 'single-choice',
+                    related_table: 'users',
+                    related_column: 'area',
+                    design: flex_message_contents.find(
+                        (flex_message_content) =>
+                            flex_message_content.id === 'property_conditions_area'
+                    )?.design,
+                    options: [
+                        {
+                            id: 1,
+                            text: '東京都（城北エリア）',
+                        },
+                        {
+                            id: 2,
+                            text: '東京都（城南エリア）',
+                        },
+                        {
+                            id: 3,
+                            text: '東京都（城西エリア）',
+                        },
+                        {
+                            id: 4,
+                            text: '東京都（城東エリア）',
+                        },
+                        {
+                            id: 5,
+                            text: '東京都（23区外）',
+                        },
+                        {
+                            id: 6,
+                            text: '埼玉県（さいたま市）',
+                        },
+                        {
+                            id: 7,
+                            text: '埼玉県（さいたま市以外）',
+                        },
+                        {
+                            id: 8,
+                            text: '神奈川県（横浜市）',
+                        },
+                        {
+                            id: 9,
+                            text: '神奈川県（横浜市以外）',
+                        },
+                        {
+                            id: 10,
+                            text: '千葉県（千葉市、船橋市）',
+                        },
+                        {
+                            id: 11,
+                            text: '千葉県（千葉市、船橋市以外）',
+                        },
+                    ],
+                    next: {
+                        1: 'structure',
+                        2: 'structure',
+                        3: 'structure',
+                        4: 'structure',
+                        5: 'structure',
+                        6: 'structure',
+                        7: 'structure',
+                        8: 'structure',
+                        9: 'structure',
+                        10: 'structure',
+                        11: 'structure',
+                    },
+                },
+                {
+                    id: 'structure',
+                    type: 'multiple-choice',
+                    related_table: db_data.tables.user_desired_structures.name,
+                    related_column:
+                        db_data.tables.user_desired_structures.columns.desired_structure,
+                    choices_allowed: 2,
+                    options: [
+                        {
+                            id: 1,
+                            text: '木造',
+                        },
+                        {
+                            id: 2,
+                            text: '軽量鉄骨造',
+                        },
+                        {
+                            id: 3,
+                            text: '重量鉄骨造',
+                        },
+                        {
+                            id: 4,
+                            text: 'RC造',
+                        },
+                    ],
+                    next: 'yield',
+                },
+                {
+                    id: 'yield',
+                    type: 'single-choice',
+                    related_table: db_data.tables.users.name,
+                    related_column: db_data.tables.users.columns.desired_yield,
+                    design: flex_message_contents.find(
+                        (flex_message_content) =>
+                            flex_message_content.id === 'property_conditions_yield'
+                    )?.design,
+                    options: [
+                        {
+                            id: 1,
+                            text: '4％～（RC造 築浅中心）',
+                        },
+                        {
+                            id: 2,
+                            text: '5％～（RC/重量鉄骨造 築浅中心）',
+                        },
+                        {
+                            id: 3,
+                            text: '6％～（重量/軽量鉄骨造 中心）',
+                        },
+                        {
+                            id: 4,
+                            text: '7％～（軽量鉄骨造/木造 中心）',
+                        },
+                        {
+                            id: 5,
+                            text: '8％～（木造/耐用年数越え）',
+                        },
+                    ],
+                    next: {
+                        1: 'end',
+                        2: 'end',
+                        3: 'end',
+                        4: 'end',
+                        5: 'end',
+                    },
+                },
+            ],
+        },
     ],
 };
