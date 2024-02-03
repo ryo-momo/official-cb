@@ -281,7 +281,7 @@ export const survey_contents: SurveyContents = {
         //             id: 'price',
         //             type: 'single-choice',
         //             related_column: 'price',
-        //             design: _.find(flex_message_contents, { id: 'property_conditions_price' })
+        //             design: flex_message_contents.find((flex_message_content)=>flex_message_content.id === 'property_conditions_price')
         //                 ?.design,
         //             options: [
         //                 {
@@ -351,7 +351,7 @@ export const survey_contents: SurveyContents = {
         //             id: 'area',
         //             type: 'single-choice',
         //             related_column: 'area',
-        //             design: _.find(flex_message_contents, { id: 'property_conditions_area' })
+        //             design: flex_message_contents.find((flex_message_content)=>flex_message_content.id === 'property_conditions_area')
         //                 ?.design,
         //             options: [
         //                 {
@@ -442,7 +442,7 @@ export const survey_contents: SurveyContents = {
         //             id: 'yield',
         //             type: 'single-choice',
         //             related_column: 'yield',
-        //             design: _.find(flex_message_contents, { id: 'property_conditions_yield' })
+        //             design: flex_message_contents.find((flex_message_content)=>flex_message_content.id === 'property_conditions_yield')
         //                 ?.design,
         //             options: [
         //                 {
