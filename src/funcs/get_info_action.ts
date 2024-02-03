@@ -77,32 +77,6 @@ export const user_info_columns: UserInfoColumns = {
     purchaser_category: users_columns.purchaser_category,
 };
 
-/*
-RowDataPacket {
-  user_name: 'a',
-  user_name_kana: 'なまえ　たろう',
-  address_postal_code: 'なまえ　たろう',
-  address: '1',
-  residence_category: 'とーきょー',
-  email_address: '賃貸',
-  phone_number: 'sh',
-  workplace_name: null,
-  workplace_address: null,
-  workplace_department: null,
-  workplace_job_category: null,
-  workplace_years_of_service: null,
-  gross_salary_minus_1: null,
-  gross_salary_minus_2: null,
-  gross_salary_minus_3: null,
-  family_structure_spouse: null,
-  family_structure_children: null,
-  borrowed_money: null,
-  deposit: null,
-  other_assets: 111,
-  purchaser_category: '個人'
-}
-*/
-
 export async function handleGetUserInfoAction(user: User, text: string) {
     const dbc = new DatabaseCommunicator(db_data);
     let user_info: UserInfo | null = null;
