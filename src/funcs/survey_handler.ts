@@ -106,6 +106,21 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
         console.log('Answer stored in database successfully.'); // Log message
         if (process_result.goToNextStep) {
             handleNextStep(user, answer_text);
+        } else {
+            //set the current question to the user response again, except deleting the already selected option from options.
+            const current_question = user.getCurrentQuestion();
+            if ('options' in current_question) {
+                current_question.options = current_question.options.filter(
+                    (option) => option.text !== answer_text
+                );
+                user.response.message = {
+                    type: 'text',
+                    text: current_question.text,
+                    quickReply: {
+                        items: generateQuickReplyItems(current_question.options),
+                    },
+                } as Message;
+            }
         }
         return user;
     } else {

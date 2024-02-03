@@ -332,6 +332,7 @@ export const survey_contents: SurveyContents = {
                 },
                 {
                     id: 'target',
+                    text: '次に、お客様の希望する物件のターゲット層をお教えください。',
                     type: 'single-choice',
                     related_table: db_data.tables.users.name,
                     related_column: db_data.tables.users.columns.desired_target,
@@ -421,6 +422,7 @@ export const survey_contents: SurveyContents = {
                 },
                 {
                     id: 'structure',
+                    text: '次に、お客様の希望する物件の構造をお教えください。（2つ選択）',
                     type: 'multiple-choice',
                     related_table: db_data.tables.user_desired_structures.name,
                     related_column:
