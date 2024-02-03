@@ -1,6 +1,5 @@
 import { db_data } from './config';
 import { flex_message_contents } from './flex_message_content';
-import _ from 'lodash';
 
 export interface QuestionOption {
     id: number;

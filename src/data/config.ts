@@ -29,6 +29,20 @@ export interface UserTableColumns {
     current_step_id: string;
     current_question_id: string;
     current_answers: string;
+    desired_price: string;
+    desired_target: string;
+    desired_area: string;
+    desired_yield: string;
+}
+
+export interface UserDesiredStructuresTableColumns {
+    user_id: string;
+    desired_structure: string;
+}
+
+export interface UserDesiredStructuresTable {
+    name: string;
+    columns: { user_id: string; desired_structure: string };
 }
 
 export interface UsersTable {
@@ -38,6 +52,7 @@ export interface UsersTable {
 
 export interface Tables {
     users: UsersTable;
+    user_desired_structures: UserDesiredStructuresTable;
 }
 
 export interface DbData {
@@ -98,6 +113,17 @@ export const db_data: DbData = {
                 current_step_id: 'current_step_id',
                 current_question_id: 'current_question_id',
                 current_answers: 'current_answers',
+                desired_price: 'desired_price',
+                desired_target: 'desired_target',
+                desired_area: 'desired_area',
+                desired_yield: 'desired_yield',
+            },
+        },
+        user_desired_structures: {
+            name: 'user_desired_structures',
+            columns: {
+                user_id: 'user_id',
+                desired_structure: 'desired_structure',
             },
         },
     },
