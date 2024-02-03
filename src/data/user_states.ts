@@ -53,7 +53,7 @@ export const user_states: UserStates = {
                 {
                     state_id: 'basic_info_registered',
                     actions_on_transition: [],
-                    permitted_actions: ['basic_info_inquiry'],
+                    permitted_actions: ['basic_info_inquiry', 'search_condition'],
                     next: 'search_condition_added',
                 },
                 {
@@ -221,6 +221,7 @@ export const user_states: UserStates = {
         },
         {
             action_id: 'search_condition',
+            survey_id: 'property_conditions',
             steps: [
                 {
                     step_id: 'price',

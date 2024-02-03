@@ -5,7 +5,7 @@ import {
     handleSingleChoiceQuestion,
     handleMultipleChoiceQuestion,
 } from './question_handler';
-import { basicInfoValidator } from './survey_validator';
+import { surveyValidator } from './survey_validator';
 import { User } from '../classes/User';
 import { Step } from '../data/user_states';
 import { Message, FlexMessage, generateQuickReplyItems } from './message_helper';
@@ -68,10 +68,8 @@ async function handleInitialStep(user: User): Promise<User> {
     }
 }
 
-// 他のupdateUserInDatabaseを呼び出している関数も同様に修正します。
-
 async function handleSubsequentSteps(user: User, answer_text: string): Promise<User> {
-    let validation_result = basicInfoValidator(user, answer_text);
+    let validation_result = surveyValidator(user, answer_text);
     user = validation_result.user_object;
     if (validation_result.isValid) {
         console.log('Answer is valid.'); // Log message

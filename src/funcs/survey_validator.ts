@@ -21,7 +21,7 @@ interface ValidatorResponse {
 
 const ERROR_MESSAGES = {
     INVALID_TEXT: '回答が無効な形式です。文字列を入力してください。\n\n',
-    INVALID_SINGLE_CHOICE: '回答が無効な形式です。表示される選択肢の中から選択してください。\n\n',
+    INVALID_CHOICE: '回答が無効な形式です。表示される選択肢の中から選択してください。\n\n',
     INVALID_NUMBER: '回答が無効な形式です。0以上の数字を入力してください。\n\n',
     NO_OPTIONS: '選択肢が存在しません。\n\n',
     UNSUPPORTED_QUESTION: '問題が発生しました、お手数ですが担当にご連絡をお願いいたします。\n\n',
@@ -37,14 +37,11 @@ function validateTextType(answer_text: string): ValidationResult {
     return { isValid: true };
 }
 
-function validateSingleChoiceType(
-    answer_text: string,
-    options: QuestionOption[]
-): ValidationResult {
+function validateChoiceType(answer_text: string, options: QuestionOption[]): ValidationResult {
     if (!options.some((option) => option.text === answer_text)) {
         return {
             isValid: false,
-            error_message: ERROR_MESSAGES.INVALID_SINGLE_CHOICE,
+            error_message: ERROR_MESSAGES.INVALID_CHOICE,
         };
     }
     return { isValid: true };
@@ -60,7 +57,7 @@ function validateNumberType(answer_text: string): ValidationResult {
     return { isValid: true };
 }
 
-export function basicInfoValidator(user: User, answer_text: string): ValidatorResponse {
+export function surveyValidator(user: User, answer_text: string): ValidatorResponse {
     if (user.current_question_id === null) {
         throw new Error('The current question is undefined.');
     }
@@ -75,6 +72,7 @@ export function basicInfoValidator(user: User, answer_text: string): ValidatorRe
     let validationResult: ValidationResult;
     let current_question = user.getCurrentQuestion();
     switch (current_question.id) {
+        //basic_info survey
         case 'name_primary':
         case 'name_kana':
         case 'address':
@@ -89,7 +87,7 @@ export function basicInfoValidator(user: User, answer_text: string): ValidatorRe
         case 'family_structure_spouse':
         case 'purchaser_category':
             if ('options' in current_question) {
-                validationResult = validateSingleChoiceType(answer_text, current_question.options);
+                validationResult = validateChoiceType(answer_text, current_question.options);
             } else {
                 validationResult = { isValid: false, error_message: ERROR_MESSAGES.NO_OPTIONS };
             }
@@ -105,6 +103,23 @@ export function basicInfoValidator(user: User, answer_text: string): ValidatorRe
         case 'postal_code':
         case 'phone_number':
             validationResult = validateNumberType(answer_text);
+            break;
+        //property_conditions survey
+        case 'price':
+        case 'target':
+        case 'area':
+        case 'structure':
+        case 'yield':
+            if ('options' in current_question) {
+                validationResult = validateChoiceType(
+                    answer_text,
+                    current_question.options.filter(
+                        (option) => !user.current_answers?.includes(option.text)
+                    )
+                );
+            } else {
+                validationResult = { isValid: false, error_message: ERROR_MESSAGES.NO_OPTIONS };
+            }
             break;
         default:
             console.log('The current question is not supported for validation.');
