@@ -2,6 +2,7 @@ import mysql, { Connection } from 'mysql';
 import { UserTableColumns, DbData, db_data } from '../data/config';
 import { User, db_references } from './User';
 import { UserData } from './User';
+import { UserInfo, user_info_columns } from '../funcs/get_info_action';
 
 interface DBConnectionData {
     host: string;
@@ -169,6 +170,23 @@ export class DatabaseCommunicator {
         const sql = `SELECT ${columns_string} FROM \`${table_name}\` WHERE user_line_id = ?`;
         const args = [user_line_id];
         const rows = (await this.query(sql, args)) as UserData[];
+        if (rows.length > 0) {
+            return rows[0];
+        } else {
+            return null;
+        }
+    }
+
+    // ユーザー情報を取得するメソッド
+    async getUserInfo(user_line_id: string): Promise<UserInfo | null> {
+        await this.connect();
+        const table_name = this.db_data.tables.users.name;
+        // Get the column names from user_info_columns
+        const columns = Object.keys(user_info_columns).join(', ');
+        const sql = `SELECT ${columns} FROM \`${table_name}\` WHERE user_line_id = ?`;
+        const args = [user_line_id];
+        const rows = (await this.query(sql, args)) as UserInfo[];
+        await this.disconnect();
         if (rows.length > 0) {
             return rows[0];
         } else {

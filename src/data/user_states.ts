@@ -1,4 +1,5 @@
 import { basicInfoSurveyHandler, searchConditionSurveyHandler } from '../funcs/survey_handler';
+import { handleGetUserInfoAction } from '../funcs/get_info_action';
 
 export interface MinorState {
     state_id: string;
@@ -52,7 +53,7 @@ export const user_states: UserStates = {
                 {
                     state_id: 'basic_info_registered',
                     actions_on_transition: [],
-                    permitted_actions: [],
+                    permitted_actions: ['basic_info_inquiry'],
                     next: 'search_condition_added',
                 },
                 {
@@ -216,6 +217,7 @@ export const user_states: UserStates = {
         {
             action_id: 'basic_info_inquiry',
             trigger_text: '>お客様情報の照会',
+            handler: handleGetUserInfoAction,
         },
         {
             action_id: 'search_condition',
