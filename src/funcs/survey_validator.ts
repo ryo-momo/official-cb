@@ -85,14 +85,6 @@ export function basicInfoValidator(user: User, answer_text: string): ValidatorRe
         case 'job_category':
             validationResult = validateTextType(answer_text);
             break;
-        case 'postal_code':
-        case 'phone_number':
-            const revisedAnswer = answer_text.replace(/\D/g, '');
-            validationResult = validateTextType(revisedAnswer);
-            if (validationResult.isValid) {
-                validator_response.answer_text_revised = revisedAnswer;
-            }
-            break;
         case 'residence_category':
         case 'family_structure_spouse':
         case 'purchaser_category':
@@ -110,6 +102,8 @@ export function basicInfoValidator(user: User, answer_text: string): ValidatorRe
         case 'borrowed_money':
         case 'deposit':
         case 'other_assets':
+        case 'postal_code':
+        case 'phone_number':
             validationResult = validateNumberType(answer_text);
             break;
         default:

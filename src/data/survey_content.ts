@@ -69,7 +69,7 @@ export const survey_contents: SurveyContents = {
                 },
                 {
                     id: 'postal_code',
-                    text: 'お客様のお住まいの郵便番号をお教えください。',
+                    text: 'お客様のお住まいの郵便番号をお教えください。（数字のみ）',
                     type: 'text',
                     next: 'address',
                     related_table: db_data.tables.users.name, // Added related_table property
@@ -119,7 +119,7 @@ export const survey_contents: SurveyContents = {
                 },
                 {
                     id: 'phone_number',
-                    text: 'お客様の電話番号をお教えください。',
+                    text: 'お客様の電話番号をお教えください。（数字のみ）',
                     type: 'text',
                     next: 'workplace_name',
                     related_table: db_data.tables.users.name, // Added related_table property
