@@ -122,6 +122,13 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
                 } as Message;
             }
         }
+        console.log('Storing the user to database.'); // Log message
+        try {
+            updateUserInDatabase(user);
+        } catch (err) {
+            console.error('Error updating user in database: ', err);
+            // Handle the error appropriately
+        }
         return user;
     } else {
         console.log('Answer is not valid. Returning user object from validator.'); // Log message
@@ -162,13 +169,6 @@ function handleNextStep(user: User, answer_text: string) {
         } else {
             throw new Error('Current action does not have steps.');
         }
-    }
-    console.log('Storing the user to database.'); // Log message
-    try {
-        updateUserInDatabase(user);
-    } catch (err) {
-        console.error('Error updating user in database: ', err);
-        // Handle the error appropriately
     }
 }
 

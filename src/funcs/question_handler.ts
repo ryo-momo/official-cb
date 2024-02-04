@@ -47,6 +47,7 @@ export function handleMultipleChoiceQuestion(
         //if the number of the answers reach the maximum, store those to DB
         //if not, have the user select another answer
         if (answers_to_go === 0) {
+            user.current_answers = null;
             return {
                 user_object: user,
                 storeValueToDB: true,

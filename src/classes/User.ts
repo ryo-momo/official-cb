@@ -7,6 +7,7 @@ import { db_data } from '../data/config';
 const users_columns = db_data.tables.users.columns;
 
 export interface UserData {
+    [key: string]: any;
     user_id: string | null;
     user_line_id: string;
     major_state_id: string | null;
@@ -15,7 +16,7 @@ export interface UserData {
     current_survey_id: string | null;
     current_step_id: string | null;
     current_question_id: string | null;
-    current_answers: string[] | null;
+    current_answers: string[] | string | null;
 }
 
 export interface UserResponse {
@@ -70,7 +71,11 @@ export class User implements UserProperty {
         this.current_survey_id = user_property.current_survey_id || null;
         this.current_step_id = user_property.current_step_id || null;
         this.current_question_id = user_property.current_question_id || null;
-        this.current_answers = user_property.current_answers || [];
+        this.current_answers = Array.isArray(user_property.current_answers)
+            ? user_property.current_answers
+            : user_property.current_answers
+            ? [user_property.current_answers]
+            : [];
         this.response = response || {
             shouldReply: false,
         };

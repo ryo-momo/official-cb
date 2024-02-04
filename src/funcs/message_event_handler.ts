@@ -81,6 +81,7 @@ async function handleExistingUser(
     let user_property;
     try {
         user_property = await dbc.getUserByLineId(event.user_line_id);
+        console.log('🚀 ~ file: message_event_handler.ts:84 ~ user_property:', user_property);
         if (user_property === null) {
             throw new Error('User does not exist in the database');
         }

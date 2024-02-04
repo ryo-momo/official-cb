@@ -1,7 +1,6 @@
 import mysql, { Connection } from 'mysql';
 import { UserTableColumns, DbData, db_data } from '../data/config';
-import { User, db_references } from './User';
-import { UserData } from './User';
+import { User, db_references, UserData } from './User';
 import { UserInfo, user_info_columns } from '../funcs/get_info_action';
 
 interface DBConnectionData {
@@ -171,6 +170,9 @@ export class DatabaseCommunicator {
         const args = [user_line_id];
         const rows = (await this.query(sql, args)) as UserData[];
         if (rows.length > 0) {
+            if (typeof rows[0].current_answers === 'string') {
+                rows[0].current_answers = [rows[0].current_answers];
+            }
             return rows[0];
         } else {
             return null;
@@ -198,6 +200,12 @@ export class DatabaseCommunicator {
     async insertUser(user: User): Promise<void> {
         await this.connect();
         const user_data = extractUserData(user);
+        // Convert array values in user_data to JSON string
+        for (const key in user_data) {
+            if (Array.isArray(user_data[key])) {
+                user_data[key] = JSON.stringify(user_data[key]);
+            }
+        }
         const table_name = db_data.tables.users.name;
         const columns = db_references;
         const columns_string = Object.keys(columns).toString();
@@ -215,6 +223,12 @@ export class DatabaseCommunicator {
     async updateUser(user: User): Promise<void> {
         await this.connect();
         const user_data = extractUserData(user);
+        // Convert array values in user_data to JSON string
+        for (const key in user_data) {
+            if (Array.isArray(user_data[key])) {
+                user_data[key] = JSON.stringify(user_data[key]);
+            }
+        }
         const table_name = db_data.tables.users.name;
         const updates = Object.keys(user_data)
             .map((column) => `${column} = ?`)
