@@ -201,10 +201,8 @@ async function storeAnswerInDatabase(user: User, answer_text: string) {
             // Add condition to check for matching answer_text in the related column
             const relatedColumnName = current_question.related_column;
             if (user.current_answers !== null && user.current_answers.length >= 2) {
-                console.log('user.current_answers', user.current_answers);
                 for (const current_answer of user.current_answers) {
                     const checkExistenceSql = `SELECT * FROM \`${userDesiredStructuresTableName}\` WHERE user_id = ? AND \`${relatedColumnName}\` = ?`;
-                    console.log('saving answers:', current_answer, 'type:', typeof current_answer);
                     const checkExistenceArgs = [user.user_id, current_answer];
                     const existingRecords = (await dbc.query(
                         checkExistenceSql,
