@@ -1,5 +1,5 @@
 import { basicInfoSurveyHandler, searchConditionSurveyHandler } from '../funcs/survey_handler';
-import { handleGetUserInfoAction } from '../funcs/get_info_action';
+import { handleGetUserInfoAction, handleGetSearchConditionAction } from '../funcs/get_info_action';
 
 export interface MinorState {
     state_id: string;
@@ -254,6 +254,7 @@ export const user_states: UserStates = {
         {
             action_id: 'search_condition_inquiry',
             trigger_text: '>希望物件条件の照会',
+            handler: handleGetSearchConditionAction,
         },
         {
             action_id: 'concierge_message',

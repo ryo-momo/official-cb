@@ -354,8 +354,8 @@ export const survey_contents: SurveyContents = {
                 {
                     id: 'area',
                     type: 'single-choice',
-                    related_table: 'users',
-                    related_column: 'area',
+                    related_table: db_data.tables.users.name,
+                    related_column: db_data.tables.users.columns.desired_area,
                     design: flex_message_contents.find(
                         (flex_message_content) =>
                             flex_message_content.id === 'property_conditions_area'

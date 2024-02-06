@@ -156,22 +156,20 @@ export class DatabaseCommunicator {
         return rows[0].user_exists === 1;
     }
 
-    // Other code...
-
-    // searches user by LINE ID and
-    // returns an object with user class object properties
     // searches user by LINE ID and
     // returns an object with user class object properties
     async getUserByLineId(user_line_id: string): Promise<UserData | null> {
+        await this.connect();
         const table_name = db_data.tables.users.name;
         const columns = db_references;
         const columns_string = Object.keys(columns).toString();
         const sql = `SELECT ${columns_string} FROM \`${table_name}\` WHERE user_line_id = ?`;
         const args = [user_line_id];
         const rows = (await this.query(sql, args)) as UserData[];
+        await this.disconnect();
         if (rows.length > 0) {
             if (typeof rows[0].current_answers === 'string') {
-                rows[0].current_answers = [rows[0].current_answers];
+                rows[0].current_answers = rows[0].current_answers.split(',');
             }
             return rows[0];
         } else {
@@ -179,7 +177,8 @@ export class DatabaseCommunicator {
         }
     }
 
-    // ユーザー情報を取得するメソッド
+    // gets user info by LINE ID and
+    // returns an object with user_info_columns properties
     async getUserInfo(user_line_id: string): Promise<UserInfo | null> {
         await this.connect();
         const table_name = this.db_data.tables.users.name;
@@ -203,16 +202,16 @@ export class DatabaseCommunicator {
         // Convert array values in user_data to JSON string
         for (const key in user_data) {
             if (Array.isArray(user_data[key])) {
-                user_data[key] = JSON.stringify(user_data[key]);
+                user_data[key] = user_data[key].join(',');
             }
         }
-        const table_name = db_data.tables.users.name;
         const columns = db_references;
-        const columns_string = Object.keys(columns).toString();
-        const placeholders = Object.keys(columns)
+        const user_table_name = db_data.tables.users.name;
+        const user_columns_string = Object.keys(columns).toString();
+        const user_placeholders = Object.keys(columns)
             .map(() => '?')
             .join(', ');
-        const sql = `INSERT INTO \`${table_name}\` (${columns_string}) VALUES (${placeholders})`;
+        const sql = `INSERT INTO \`${user_table_name}\` (${user_columns_string}) VALUES (${user_placeholders})`;
         const args = Object.values(user_data);
         await this.query(sql, args);
         console.log('User inserted into the database:', Object.values(user_data).toString());
@@ -226,7 +225,7 @@ export class DatabaseCommunicator {
         // Convert array values in user_data to JSON string
         for (const key in user_data) {
             if (Array.isArray(user_data[key])) {
-                user_data[key] = JSON.stringify(user_data[key]);
+                user_data[key] = user_data[key].join(',');
             }
         }
         const table_name = db_data.tables.users.name;

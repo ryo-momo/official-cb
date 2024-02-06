@@ -51,8 +51,15 @@ interface UserInfoColumns {
     purchaser_category: string;
 }
 
-const users_columns = db_data.tables.users.columns;
+interface SearchCondition {
+    desired_price: string;
+    desired_target: string;
+    desired_area: string;
+    desired_structure: string[];
+    desired_yield: string;
+}
 
+const users_columns = db_data.tables.users.columns;
 export const user_info_columns: UserInfoColumns = {
     user_name: users_columns.user_name,
     user_name_kana: users_columns.user_name_kana,
@@ -116,4 +123,12 @@ export async function handleGetUserInfoAction(user: User, text: string) {
     return user;
 }
 
-// TODO動くかテスト
+// const search_condition_columns: SearchCondition = ;
+
+export function handleGetSearchConditionAction(user: User, text: string) {
+    user.response.message = {
+        type: 'text',
+        text: '検索条件を入力してください',
+    } as Message;
+    return user;
+}

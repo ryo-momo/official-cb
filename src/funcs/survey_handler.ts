@@ -96,14 +96,16 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
         }
 
         // If the answer needs to be stored in the database, connect to the database and update the user's information.
-        console.log('Storing answer to database.'); // Log message
-        try {
-            await storeAnswerInDatabase(user, answer_text);
-        } catch (err) {
-            console.error('Error storing answer in database: ', err); // Log message
-            // Handle the error appropriately
-        }
-        console.log('Answer stored in database successfully.'); // Log message
+        if (process_result.storeValueToDB) {
+            console.log('Storing answer to database.'); // Log message
+            try {
+                await storeAnswerInDatabase(user, answer_text);
+            } catch (err) {
+                console.error('Error storing answer in database: ', err); // Log message
+                // Handle the error appropriately
+            }
+            console.log('Answer stored in database successfully.');
+        } // Log message
         if (process_result.goToNextStep) {
             handleNextStep(user, answer_text);
         } else {
@@ -165,6 +167,7 @@ function handleNextStep(user: User, answer_text: string) {
                 user.current_question_id = next_question.id;
                 setNextQuestion(user, next_question);
             }
+            user.current_answers = null;
             console.log(`Updated the user's step to ${user.current_step_id}`);
         } else {
             throw new Error('Current action does not have steps.');
@@ -193,11 +196,41 @@ async function storeAnswerInDatabase(user: User, answer_text: string) {
     const current_question = user.getCurrentQuestion();
     console.log('現在の質問：', user.current_question_id); // Log message in English
     try {
-        await dbc.update(
-            current_question.related_table,
-            { [current_question.related_column]: answer_text },
-            'user_id = "' + user.user_id + '"'
-        );
+        if (current_question.type === 'multiple-choice') {
+            const userDesiredStructuresTableName = db_data.tables.user_desired_structures.name;
+            // Add condition to check for matching answer_text in the related column
+            const relatedColumnName = current_question.related_column;
+            if (user.current_answers !== null && user.current_answers.length >= 2) {
+                console.log('user.current_answers', user.current_answers);
+                for (const current_answer of user.current_answers) {
+                    const checkExistenceSql = `SELECT * FROM \`${userDesiredStructuresTableName}\` WHERE user_id = ? AND \`${relatedColumnName}\` = ?`;
+                    console.log('saving answers:', current_answer, 'type:', typeof current_answer);
+                    const checkExistenceArgs = [user.user_id, current_answer];
+                    const existingRecords = (await dbc.query(
+                        checkExistenceSql,
+                        checkExistenceArgs
+                    )) as object[];
+                    if (existingRecords.length === 0) {
+                        const insertSql = `INSERT INTO \`${userDesiredStructuresTableName}\` (user_id, desired_structure) VALUES (?, ?)`;
+                        const insertArgs = [user.user_id, current_answer];
+                        await dbc.query(insertSql, insertArgs);
+                        console.log(
+                            'Inserted a new record into the database for user_id:',
+                            user.user_id
+                        ); // Log message in English
+                    }
+                }
+            } else {
+                console.log('user.current_answers', user.current_answers);
+                throw new Error('current_answers is null or has less than 2 elements');
+            }
+        } else {
+            await dbc.update(
+                current_question.related_table,
+                { [current_question.related_column]: answer_text },
+                'user_id = "' + user.user_id + '"'
+            );
+        }
         console.log('Answer save successful'); // Log message in English
     } catch (err) {
         console.error('Error updating user column: ', err); // Log error message in English
