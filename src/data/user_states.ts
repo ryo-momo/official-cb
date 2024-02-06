@@ -59,7 +59,7 @@ export const user_states: UserStates = {
                 {
                     state_id: 'search_condition_added',
                     actions_on_transition: [],
-                    permitted_actions: [],
+                    permitted_actions: ['search_condition_inquiry'],
                     next: 'end',
                 },
             ],

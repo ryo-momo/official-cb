@@ -1,7 +1,7 @@
 import mysql, { Connection } from 'mysql';
 import { UserTableColumns, DbData, db_data } from '../data/config';
 import { User, db_references, UserData } from './User';
-import { UserInfo, user_info_columns } from '../funcs/get_info_action';
+import { UserInfo, DataLocations, user_info_locations, Columns } from '../funcs/get_info_action';
 
 interface DBConnectionData {
     host: string;
@@ -179,17 +179,40 @@ export class DatabaseCommunicator {
 
     // gets user info by LINE ID and
     // returns an object with user_info_columns properties
-    async getUserInfo(user_line_id: string): Promise<UserInfo | null> {
+    async getInfoByUserId(user_id: string, data_locations: DataLocations): Promise<unknown> {
         await this.connect();
-        const table_name = this.db_data.tables.users.name;
-        // Get the column names from user_info_columns
-        const columns = Object.keys(user_info_columns).join(', ');
-        const sql = `SELECT ${columns} FROM \`${table_name}\` WHERE user_line_id = ?`;
-        const args = [user_line_id];
-        const rows = (await this.query(sql, args)) as UserInfo[];
+        const queries = Object.values(data_locations).map(async (location) => {
+            const table_name = location.table_name;
+            const columns = Object.keys(location.columns).join(', ');
+            const sql = `SELECT ${columns} FROM \`${table_name}\` WHERE user_id = ?`;
+            const args = [user_id];
+            return this.query(sql, args) as Promise<UserInfo[]>;
+        });
+        const results = await Promise.all(queries);
         await this.disconnect();
-        if (rows.length > 0) {
-            return rows[0];
+        if (results.flat().length > 0) {
+            // 結果を一つのオブジェクトにまとめる
+            const aggregatedResults = results.flat().reduce((acc: Record<string, any>, row) => {
+                Object.keys(row).forEach((key) => {
+                    if (!acc[key]) {
+                        acc[key] = [];
+                    }
+                    acc[key].push(row[key]);
+                });
+                return acc;
+            }, {});
+            // 各キーの値が配列になっているオブジェクトを返す
+            const finalResult = Object.keys(aggregatedResults).reduce(
+                (acc: Record<string, any>, key: string) => {
+                    acc[key] =
+                        aggregatedResults[key].length === 1
+                            ? aggregatedResults[key][0]
+                            : aggregatedResults[key];
+                    return acc;
+                },
+                {}
+            );
+            return finalResult;
         } else {
             return null;
         }

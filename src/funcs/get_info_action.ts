@@ -3,7 +3,17 @@ import { User } from '../classes/User';
 import { db_data } from '../data/config';
 import { Message } from './message_helper';
 
+export interface DataLocations {
+    [index: number]: Columns;
+}
+
+export interface Columns {
+    table_name: string;
+    columns: object;
+}
+
 export interface UserInfo {
+    [key: string]: any;
     user_name: string;
     user_name_kana: string;
     address_postal_code: string;
@@ -27,30 +37,6 @@ export interface UserInfo {
     purchaser_category: string;
 }
 
-interface UserInfoColumns {
-    user_name: string;
-    user_name_kana: string;
-    address_postal_code: string;
-    address: string;
-    residence_category: string;
-    email_address: string;
-    phone_number: string;
-    workplace_name: string;
-    workplace_address: string;
-    workplace_department: string;
-    workplace_job_category: string;
-    workplace_years_of_service: string;
-    gross_salary_minus_1: string;
-    gross_salary_minus_2: string;
-    gross_salary_minus_3: string;
-    family_structure_spouse: string;
-    family_structure_children: string;
-    borrowed_money: string;
-    deposit: string;
-    other_assets: string;
-    purchaser_category: string;
-}
-
 interface SearchCondition {
     desired_price: string;
     desired_target: string;
@@ -60,35 +46,41 @@ interface SearchCondition {
 }
 
 const users_columns = db_data.tables.users.columns;
-export const user_info_columns: UserInfoColumns = {
-    user_name: users_columns.user_name,
-    user_name_kana: users_columns.user_name_kana,
-    address_postal_code: users_columns.address_postal_code,
-    address: users_columns.address,
-    residence_category: users_columns.residence_category,
-    email_address: users_columns.email_address,
-    phone_number: users_columns.phone_number,
-    workplace_name: users_columns.workplace_name,
-    workplace_address: users_columns.workplace_address,
-    workplace_department: users_columns.workplace_department,
-    workplace_job_category: users_columns.workplace_job_category,
-    workplace_years_of_service: users_columns.workplace_years_of_service,
-    gross_salary_minus_1: users_columns.gross_salary_minus_1,
-    gross_salary_minus_2: users_columns.gross_salary_minus_2,
-    gross_salary_minus_3: users_columns.gross_salary_minus_3,
-    family_structure_spouse: users_columns.family_structure_spouse,
-    family_structure_children: users_columns.family_structure_children,
-    borrowed_money: users_columns.borrowed_money,
-    deposit: users_columns.deposit,
-    other_assets: users_columns.other_assets,
-    purchaser_category: users_columns.purchaser_category,
-};
+export const user_info_locations: DataLocations = [
+    {
+        table_name: db_data.tables.users.name,
+        columns: {
+            user_name: users_columns.user_name,
+            user_name_kana: users_columns.user_name_kana,
+            address_postal_code: users_columns.address_postal_code,
+            address: users_columns.address,
+            residence_category: users_columns.residence_category,
+            email_address: users_columns.email_address,
+            phone_number: users_columns.phone_number,
+            workplace_name: users_columns.workplace_name,
+            workplace_address: users_columns.workplace_address,
+            workplace_department: users_columns.workplace_department,
+            workplace_job_category: users_columns.workplace_job_category,
+            workplace_years_of_service: users_columns.workplace_years_of_service,
+            gross_salary_minus_1: users_columns.gross_salary_minus_1,
+            gross_salary_minus_2: users_columns.gross_salary_minus_2,
+            gross_salary_minus_3: users_columns.gross_salary_minus_3,
+            family_structure_spouse: users_columns.family_structure_spouse,
+            family_structure_children: users_columns.family_structure_children,
+            borrowed_money: users_columns.borrowed_money,
+            deposit: users_columns.deposit,
+            other_assets: users_columns.other_assets,
+            purchaser_category: users_columns.purchaser_category,
+        },
+    },
+];
 
 export async function handleGetUserInfoAction(user: User, text: string) {
     const dbc = new DatabaseCommunicator(db_data);
     let user_info: UserInfo | null = null;
     try {
-        user_info = await dbc.getUserInfo(user.user_line_id);
+        //TODO　user.user_idの型ガードを追加
+        user_info = (await dbc.getInfoByUserId(user.user_id!, user_info_locations)) as UserInfo;
     } catch (err) {
         console.error(err);
     }
@@ -123,12 +115,51 @@ export async function handleGetUserInfoAction(user: User, text: string) {
     return user;
 }
 
+export const search_condition_columns: DataLocations = [
+    {
+        table_name: db_data.tables.users.name,
+        columns: {
+            desired_price: users_columns.desired_price,
+            desired_target: users_columns.desired_target,
+            desired_area: users_columns.desired_area,
+            desired_yield: users_columns.desired_yield,
+        },
+    },
+    {
+        table_name: db_data.tables.user_desired_structures.name,
+        columns: {
+            desired_structure: db_data.tables.user_desired_structures.columns.desired_structure,
+        },
+    },
+];
+
 // const search_condition_columns: SearchCondition = ;
 
-export function handleGetSearchConditionAction(user: User, text: string) {
-    user.response.message = {
-        type: 'text',
-        text: '検索条件を入力してください',
-    } as Message;
+export async function handleGetSearchConditionAction(user: User, text: string) {
+    const dbc = new DatabaseCommunicator(db_data);
+    let search_condition: SearchCondition | null = null;
+    try {
+        //TODO　user.user_idの型ガードを追加
+        search_condition = (await dbc.getInfoByUserId(
+            user.user_id!,
+            search_condition_columns
+        )) as SearchCondition;
+    } catch (err) {
+        console.error(err);
+    }
+    if (search_condition) {
+        user.response.message = {
+            type: 'text',
+            text: `希望価格: ${search_condition.desired_price}\nターゲット層: ${
+                search_condition.desired_target
+            }\n希望エリア: ${
+                search_condition.desired_area
+            }\n構造: ${search_condition.desired_structure.join('、')}\n希望利回り: ${
+                search_condition.desired_yield
+            }\n`,
+        } as Message;
+    } else {
+        throw new Error('No userinfo found');
+    }
     return user;
 }
