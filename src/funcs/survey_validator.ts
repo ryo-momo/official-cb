@@ -93,9 +93,9 @@ export function surveyValidator(user: User, answer_text: string): ValidatorRespo
             }
             break;
         case 'years_of_service':
-        case 'gross_salary_-1':
-        case 'gross_salary_-2':
-        case 'gross_salary_-3':
+        case 'gross_salary_minus_1':
+        case 'gross_salary_minus_2':
+        case 'gross_salary_minus_3':
         case 'family_structure_children':
         case 'borrowed_money':
         case 'deposit':
