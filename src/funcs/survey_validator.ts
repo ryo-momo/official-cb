@@ -1,23 +1,30 @@
 import { User } from '../classes/User';
 import { QuestionOption } from '../data/survey_content';
 
-interface ValidResult {
-    isValid: true;
+interface ValidationResultBase {
+    isValid: boolean;
 }
 
-interface InvalidResult {
+interface ValidResult extends ValidationResultBase {
+    isValid: true;
+    answer_text_revised: string;
+}
+
+interface ValidResponse extends ValidResult {
+    user_object: User;
+}
+
+interface InvalidResult extends ValidationResultBase {
     isValid: false;
     error_message: string;
 }
 
-type ValidationResult = ValidResult | InvalidResult;
-
-interface ValidatorResponse {
-    isValid: boolean;
-    answer_text_revised: string;
+interface InvalidResponse extends InvalidResult {
     user_object: User;
-    error_message: string | null;
 }
+
+type ValidationResult = ValidResult | InvalidResult;
+type ValidationResponse = ValidResponse | InvalidResponse;
 
 const ERROR_MESSAGES = {
     INVALID_TEXT: '回答が無効な形式です。文字列を入力してください。\n\n',
@@ -34,7 +41,7 @@ function validateTextType(answer_text: string): ValidationResult {
             error_message: ERROR_MESSAGES.INVALID_TEXT,
         };
     }
-    return { isValid: true };
+    return { isValid: true, answer_text_revised: answer_text };
 }
 
 function validateChoiceType(answer_text: string, options: QuestionOption[]): ValidationResult {
@@ -44,7 +51,7 @@ function validateChoiceType(answer_text: string, options: QuestionOption[]): Val
             error_message: ERROR_MESSAGES.INVALID_CHOICE,
         };
     }
-    return { isValid: true };
+    return { isValid: true, answer_text_revised: answer_text };
 }
 
 function validateNumberType(answer_text: string): ValidationResult {
@@ -54,23 +61,17 @@ function validateNumberType(answer_text: string): ValidationResult {
             error_message: ERROR_MESSAGES.INVALID_NUMBER,
         };
     }
-    return { isValid: true };
+    return { isValid: true, answer_text_revised: answer_text };
 }
 
-export function surveyValidator(user: User, answer_text: string): ValidatorResponse {
+export function surveyValidator(user: User, answer_text: string): ValidationResponse {
     if (user.current_question_id === null) {
         throw new Error('The current question is undefined.');
     }
-    const validator_response: ValidatorResponse = {
-        isValid: true,
-        //TODO 回答のフォーマッタ関数実装！！！！
-        answer_text_revised: answer_text,
-        user_object: user,
-        error_message: null,
-    };
 
     let validationResult: ValidationResult;
     let current_question = user.getCurrentQuestion();
+
     switch (current_question.id) {
         //basic_info survey
         case 'name_primary':
@@ -130,8 +131,16 @@ export function surveyValidator(user: User, answer_text: string): ValidatorRespo
     }
 
     if (!validationResult.isValid) {
-        validator_response.isValid = false;
-        validator_response.error_message = validationResult.error_message;
+        return {
+            isValid: false,
+            error_message: validationResult.error_message,
+            user_object: user,
+        };
+    } else {
+        return {
+            isValid: true,
+            answer_text_revised: answer_text, // または validationResult.answer_text_revised に基づいて調整する
+            user_object: user,
+        };
     }
-    return validator_response;
 }

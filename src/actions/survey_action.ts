@@ -132,7 +132,7 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
             };
         } = {
             type: 'text',
-            text: validation_result.error_message + '\n' + current_question.text,
+            text: validation_result.error_message + current_question.text,
         };
         if ('options' in current_question) {
             messageContent.quickReply = {
