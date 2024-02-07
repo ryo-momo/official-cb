@@ -405,4 +405,98 @@ export const flex_message_contents = [
             ],
         }`,
     },
+    {
+        id: 'externalProperty_share_method',
+        /* TODO 画像を公式LINEに送れるようにする！
+        "type": "uri",
+        "label": "スクリーンショットを送る",
+        "uri": "https://line.me/R/nv/cameraRoll/multi"
+        */
+        design: `{
+            "type": "bubble",
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "他社提案物件を問い合わせる",
+                  "weight": "bold",
+                  "size": "lg",
+                  "align": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "半額",
+                  "contents": [
+                    {
+                      "type": "span",
+                      "text": "他社から提示された仲介手数料の\n"
+                    },
+                    {
+                      "type": "span",
+                      "text": "『 半額 』",
+                      "weight": "bold"
+                    },
+                    {
+                      "type": "span",
+                      "text": "でお受けいたします。"
+                    }
+                  ],
+                  "wrap": true,
+                  "margin": "lg"
+                },
+                {
+                  "type": "text",
+                  "text": "（スーモ、ホームズ、カナリーなど）",
+                  "size": "xs"
+                }
+              ]
+            },
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "action": {
+                    "type": "message",
+                    "label": "URLを送る",
+                    "text": "URLを送る"
+                  },
+                  "color": "#F09199",
+                  "margin": "none",
+                  "height": "sm"
+                },
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "height": "sm",
+                  "action": {
+                    "type": "message",
+                    "label": "PDFファイルを送る",
+                    "text": "PDFファイルを送る"
+                  },
+                  "color": "#F09199",
+                  "margin": "xl"
+                },
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "height": "sm",
+                  "action": {
+                    "type": "message",
+                    "label": "画像を送る",
+                    "text": "画像を送る"
+                  },
+                  "color": "#F09199",
+                  "margin": "xl"
+                }
+              ],
+              "borderWidth": "none"
+            }
+          }`,
+    },
 ];

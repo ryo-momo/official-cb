@@ -1,5 +1,9 @@
-import { basicInfoSurveyHandler, searchConditionSurveyHandler } from '../funcs/survey_handler';
-import { handleGetUserInfoAction, handleGetSearchConditionAction } from '../funcs/get_info_action';
+import { basicInfoSurveyHandler, searchConditionSurveyHandler } from '../actions/survey_action';
+import {
+    handleGetUserInfoAction,
+    handleGetSearchConditionAction,
+} from '../actions/get_info_action';
+import { externalPropertyAction } from '../actions/general_action';
 
 export interface MinorState {
     state_id: string;
@@ -53,13 +57,17 @@ export const user_states: UserStates = {
                 {
                     state_id: 'basic_info_registered',
                     actions_on_transition: [],
-                    permitted_actions: ['basic_info_inquiry', 'search_condition'],
+                    permitted_actions: [
+                        'basic_info_inquiry',
+                        'search_condition',
+                        'external_property',
+                    ],
                     next: 'search_condition_added',
                 },
                 {
                     state_id: 'search_condition_added',
                     actions_on_transition: [],
-                    permitted_actions: ['search_condition_inquiry'],
+                    permitted_actions: ['search_condition_inquiry', 'external_property'],
                     next: 'end',
                 },
             ],
@@ -263,8 +271,30 @@ export const user_states: UserStates = {
         },
         {
             action_id: 'external_property',
-            steps: [],
+            steps: [
+                {
+                    step_id: 'select_method',
+                    next: 'unknown',
+                },
+                {
+                    step_id: 'send_url',
+                    next: 'complete',
+                },
+                {
+                    step_id: 'send_image',
+                    next: 'complete',
+                },
+                {
+                    step_id: 'send_pdf',
+                    next: 'complete',
+                },
+                {
+                    step_id: 'complete',
+                    next: 'end',
+                },
+            ],
             trigger_text: '>他サイト物件を問い合わせる',
+            handler: externalPropertyAction,
         },
         {
             action_id: 'user_page',

@@ -3,7 +3,7 @@ import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { User } from '../classes/User';
 import { db_data } from '../data/config';
 import { user_states } from '../data/user_states';
-import { actionInvoker } from './action_handler';
+import { actionInvoker } from '../actions/action_handler';
 import { Action } from '../data/user_states';
 
 interface Event {

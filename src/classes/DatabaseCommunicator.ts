@@ -1,7 +1,7 @@
 import mysql, { Connection } from 'mysql';
 import { UserTableColumns, DbData, db_data } from '../data/config';
 import { User, db_references, UserData } from './User';
-import { UserInfo, DataLocations, user_info_locations, Columns } from '../funcs/get_info_action';
+import { UserInfo, DataLocations, user_info_locations, Columns } from '../actions/get_info_action';
 
 interface DBConnectionData {
     host: string;
@@ -243,22 +243,28 @@ export class DatabaseCommunicator {
 
     // Function to update an existing user
     async updateUser(user: User): Promise<void> {
-        await this.connect();
-        const user_data = extractUserData(user);
-        // Convert array values in user_data to JSON string
-        for (const key in user_data) {
-            if (Array.isArray(user_data[key])) {
-                user_data[key] = user_data[key].join(',');
+        try {
+            await this.connect();
+            const user_data = extractUserData(user);
+            // Convert array values in user_data to JSON string
+            for (const key in user_data) {
+                if (Array.isArray(user_data[key])) {
+                    user_data[key] = user_data[key].join(',');
+                }
             }
+            const table_name = db_data.tables.users.name;
+            const updates = Object.keys(user_data)
+                .map((column) => `${column} = ?`)
+                .join(', ');
+            const sql = `UPDATE \`${table_name}\` SET ${updates} WHERE user_line_id = ?`;
+            const args = [...Object.values(user_data), user.user_line_id];
+            await this.query(sql, args);
+            console.log('User updated in the database:', Object.values(user_data).toString());
+        } catch (err) {
+            console.error('Error updating user column: ', err); // Log error message
+            throw err;
+        } finally {
+            await this.disconnect();
         }
-        const table_name = db_data.tables.users.name;
-        const updates = Object.keys(user_data)
-            .map((column) => `${column} = ?`)
-            .join(', ');
-        const sql = `UPDATE \`${table_name}\` SET ${updates} WHERE user_line_id = ?`;
-        const args = [...Object.values(user_data), user.user_line_id];
-        await this.query(sql, args);
-        console.log('User updated in the database:', Object.values(user_data).toString());
-        await this.disconnect();
     }
 }
