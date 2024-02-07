@@ -1,3 +1,4 @@
+import { FlexContainer } from '@line/bot-sdk';
 import { db_data } from './config';
 import { flex_message_contents } from './flex_message_content';
 
@@ -13,7 +14,7 @@ export interface BaseQuestion {
     next: string | { [key: number]: string };
     related_table: string;
     related_column: string;
-    design?: string;
+    design?: FlexContainer;
 }
 
 export interface TextQuestion extends BaseQuestion {

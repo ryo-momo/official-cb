@@ -8,7 +8,8 @@ import {
 import { surveyValidator } from '../funcs/survey_validator';
 import { User } from '../classes/User';
 import { Step } from '../data/user_states';
-import { Message, FlexMessage, generateQuickReplyItems } from '../funcs/message_helper';
+import { generateQuickReplyItems } from '../funcs/message_helper';
+import { Message, FlexMessage } from '@line/bot-sdk';
 import { Question, Survey } from '../data/survey_content';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
@@ -108,22 +109,26 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
                 current_question.options = current_question.options.filter(
                     (option) => option.text !== answer_text
                 );
-                user.response.message = {
-                    type: 'text',
-                    text: current_question.text,
-                    quickReply: {
-                        items: generateQuickReplyItems(current_question.options),
+                user.response.message = [
+                    {
+                        type: 'text',
+                        text: current_question.text,
+                        quickReply: {
+                            items: generateQuickReplyItems(current_question.options),
+                        },
                     },
-                } as Message;
+                ] as Message[];
             }
         }
         return user;
     } else {
         console.log('Answer is not valid. Returning user object from validator.'); // Log message
-        user.response.message = {
-            type: 'text',
-            text: validation_result.error_message,
-        } as Message;
+        user.response.message = [
+            {
+                type: 'text',
+                text: validation_result.error_message,
+            },
+        ] as Message[];
         return user;
     }
 }
@@ -216,41 +221,47 @@ function endAction(user: User) {
     user.current_question_id = null;
     user.current_answers = null;
     user.response.shouldReply = true;
-    user.response.message = {
-        type: 'text',
-        text: '質問は以上です、お疲れさまでした！担当が対応いたしますのでしばらくお待ちくださいませ。',
-    } as Message;
+    user.response.message = [
+        {
+            type: 'text',
+            text: '質問は以上です、お疲れさまでした！担当が対応いたしますのでしばらくお待ちくださいませ。',
+        },
+    ] as Message[];
 }
 
 function setNextQuestion(user: User, current_question: Question) {
     // Initialize message explicitly
-    let message: Message | FlexMessage;
+    let message: Message[] | FlexMessage[];
 
     if (current_question.design) {
         // Flex message
-        message = {
-            type: 'flex',
-            altText: '次の質問をご確認ください。',
-            contents: current_question.design,
-            ...('options' in current_question && {
-                // 型ガードを使用してoptionsの存在をチェック
-                quickReply: {
-                    items: generateQuickReplyItems(current_question.options),
-                },
-            }),
-        } as FlexMessage;
+        message = [
+            {
+                type: 'flex',
+                altText: '次の質問をご確認ください。',
+                contents: current_question.design,
+                ...('options' in current_question && {
+                    // 型ガードを使用してoptionsの存在をチェック
+                    quickReply: {
+                        items: generateQuickReplyItems(current_question.options),
+                    },
+                }),
+            },
+        ] as FlexMessage[];
     } else {
         // Text message with conditional quickReply, using type guard
-        message = {
-            type: 'text',
-            text: current_question.text || '質問のテキストが設定されていません。',
-            ...('options' in current_question && {
-                // 型ガードを使用してoptionsの存在をチェック
-                quickReply: {
-                    items: generateQuickReplyItems(current_question.options),
-                },
-            }),
-        } as Message;
+        message = [
+            {
+                type: 'text',
+                text: current_question.text || '質問のテキストが設定されていません。',
+                ...('options' in current_question && {
+                    // 型ガードを使用してoptionsの存在をチェック
+                    quickReply: {
+                        items: generateQuickReplyItems(current_question.options),
+                    },
+                }),
+            },
+        ] as Message[];
     }
 
     // update user response

@@ -1,6 +1,9 @@
 import { messageEventHandler } from './message_event_handler';
 import { WebhookRequestBody, WebhookEvent } from '@line/bot-sdk';
 import { User } from '../classes/User';
+import { MessageSender } from './message_sender';
+import { YOUR_CHANNEL_ACCESS_TOKEN } from '../../unified_test';
+import { userInfo } from 'os';
 
 //example of LINE event
 
@@ -30,16 +33,32 @@ import { User } from '../classes/User';
 //     ]
 // }
 
-async function eventResultHandler(result: object) {
-    //TODO　reply送信など
+interface Result {
+    user: User | null;
+    succeed: boolean;
+}
+
+async function eventResultHandler(result: Result, reply_token: string) {
+    const ms = new MessageSender(YOUR_CHANNEL_ACCESS_TOKEN);
+    if (result.user) {
+        if (result.user.response.message) {
+            ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
+        }
+    }
 }
 
 export async function webhookHandler(request_body: WebhookRequestBody) {
     const promises = request_body.events.map(async (event) => {
         try {
-            const result = await webhookEventHandler(event);
-            // eventResultHandler(result);
-            return result;
+            if ('replyToken' in event) {
+                const result = await webhookEventHandler(event);
+                //enable when testing on lambda
+                // await eventResultHandler(result, event.replyToken);
+                return result;
+            } else {
+                console.log('Event does not have a replyToken:', event);
+                return false;
+            }
         } catch (error) {
             console.error('Error in webhookEventHandler:', error);
             return false;
@@ -67,40 +86,36 @@ export async function webhookHandler(request_body: WebhookRequestBody) {
 
 export async function webhookEventHandler(
     event: WebhookEvent
-): Promise<{ user: User | null; succeed: boolean } | boolean> {
+): Promise<{ user: User | null; succeed: boolean }> {
     // Check if the event type is "message"
     if (event.type === 'message') {
         if (event.source.type === 'user') {
             if ('text' in event.message && event.message.text) {
                 console.log('User Message event received');
                 try {
-                    const result = await messageEventHandler(
-                        {
-                            user_line_id: event.source.userId,
-                            text: event.message.text,
-                            timestamp: event.timestamp,
-                            reply_token: event.replyToken,
-                        },
-                        event.replyToken
-                    );
+                    const result = await messageEventHandler({
+                        user_line_id: event.source.userId,
+                        text: event.message.text,
+                        timestamp: event.timestamp,
+                    });
                     return result;
                 } catch (error) {
                     console.error('Error in messageEventHandler:', error);
-                    return false;
+                    return { user: null, succeed: false };
                 }
             } else {
                 console.log(
                     'User Message event received but no text, perhaps an StickerMessageEvent'
                 );
-                return false;
+                return { user: null, succeed: false };
             }
         } else {
             console.log('Non-user event received');
-            return false;
+            return { user: null, succeed: false };
         }
     } else {
         // TODO: Handle non-message event
         console.log('Non-message event received');
-        return false;
+        return { user: null, succeed: false };
     }
 }

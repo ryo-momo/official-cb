@@ -1,4 +1,4 @@
-import { messagingApi, Message, ReplyableEvent } from '@line/bot-sdk';
+import { messagingApi, Message, MessageAPIResponseBase } from '@line/bot-sdk';
 
 export class MessageSender {
     private client: messagingApi.MessagingApiClient;
@@ -7,26 +7,27 @@ export class MessageSender {
         this.client = new messagingApi.MessagingApiClient({ channelAccessToken });
     }
 
-    async validateMessage(replyToken: string, messages: Message[]): Promise<void> {
-        const validationResponse = await this.client.validateReply({
-            messages: messages,
-        });
-
-        if (!validationResponse) {
-            // Log: Invalid message format
-            console.error('Invalid message format. Messages:', messages);
-            throw new Error('Invalid message format. Messages: ' + JSON.stringify(messages));
+    async isValidMessage(messages: Message[]): Promise<MessageAPIResponseBase> {
+        try {
+            const validationResponse = await this.client.validateReply({
+                messages: messages,
+            });
+            console.log('Validation response:', validationResponse);
+            return validationResponse;
+        } catch (error: unknown) {
+            console.error('Error validating message:', (error as Error).message);
+            throw new Error('Error validating message: ' + (error as Error).message);
         }
     }
 
-    async sendReplyMessage(
+    async validateAndSendReplyMessage(
         replyToken: string,
         messages: Message[],
         notificationDisabled = false
     ): Promise<void> {
         try {
             // Validate the messages before sending
-            await this.validateMessage(replyToken, messages);
+            await this.isValidMessage(messages);
 
             const response = await this.client.replyMessage({
                 replyToken: replyToken,

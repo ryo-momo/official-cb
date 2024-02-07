@@ -1,7 +1,7 @@
 import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { User } from '../classes/User';
 import { db_data } from '../data/config';
-import { Message } from '../funcs/message_helper';
+import { Message } from '@line/bot-sdk';
 
 export interface DataLocations {
     [index: number]: Columns;
@@ -85,30 +85,32 @@ export async function handleGetUserInfoAction(user: User, text: string) {
         console.error(err);
     }
     if (user_info) {
-        user.response.message = {
-            type: 'text',
-            text: `名前: ${user_info.user_name}\n名前(カナ): ${
-                user_info.user_name_kana
-            }\n郵便番号: ${user_info.address_postal_code}\n住所: ${user_info.address}\n居住形態: ${
-                user_info.residence_category
-            }\nメールアドレス: ${user_info.email_address}\n電話番号: ${
-                user_info.phone_number
-            }\n職場名: ${user_info.workplace_name}\n職場住所: ${
-                user_info.workplace_address
-            }\n職場部署: ${user_info.workplace_department}\n職種: ${
-                user_info.workplace_job_category
-            }\n勤続年数: ${user_info.workplace_years_of_service}年\n前年度収入: ${
-                user_info.gross_salary_minus_1
-            }万円\n前々年度収入: ${user_info.gross_salary_minus_2}万円\n前々々年度収入: ${
-                user_info.gross_salary_minus_3
-            }万円\n配偶者の有無: ${
-                user_info.family_structure_spouse ? 'あり' : 'なし'
-            }\n子供の人数: ${user_info.family_structure_children}人\n借入金: ${
-                user_info.borrowed_money
-            }万円\n預金: ${user_info.deposit}万円\nその他資産: ${
-                user_info.other_assets
-            }万円\n購入者区分: ${user_info.purchaser_category}\n`,
-        } as Message;
+        user.response.message = [
+            {
+                type: 'text',
+                text: `名前: ${user_info.user_name}\n名前(カナ): ${
+                    user_info.user_name_kana
+                }\n郵便番号: ${user_info.address_postal_code}\n住所: ${
+                    user_info.address
+                }\n居住形態: ${user_info.residence_category}\nメールアドレス: ${
+                    user_info.email_address
+                }\n電話番号: ${user_info.phone_number}\n職場名: ${
+                    user_info.workplace_name
+                }\n職場住所: ${user_info.workplace_address}\n職場部署: ${
+                    user_info.workplace_department
+                }\n職種: ${user_info.workplace_job_category}\n勤続年数: ${
+                    user_info.workplace_years_of_service
+                }年\n前年度収入: ${user_info.gross_salary_minus_1}万円\n前々年度収入: ${
+                    user_info.gross_salary_minus_2
+                }万円\n前々々年度収入: ${user_info.gross_salary_minus_3}万円\n配偶者の有無: ${
+                    user_info.family_structure_spouse ? 'あり' : 'なし'
+                }\n子供の人数: ${user_info.family_structure_children}人\n借入金: ${
+                    user_info.borrowed_money
+                }万円\n預金: ${user_info.deposit}万円\nその他資産: ${
+                    user_info.other_assets
+                }万円\n購入者区分: ${user_info.purchaser_category}\n`,
+            },
+        ] as Message[];
     } else {
         throw new Error('No userinfo found');
     }
@@ -148,16 +150,18 @@ export async function handleGetSearchConditionAction(user: User, text: string) {
         console.error(err);
     }
     if (search_condition) {
-        user.response.message = {
-            type: 'text',
-            text: `希望価格: ${search_condition.desired_price}\nターゲット層: ${
-                search_condition.desired_target
-            }\n希望エリア: ${
-                search_condition.desired_area
-            }\n構造: ${search_condition.desired_structure.join('、')}\n希望利回り: ${
-                search_condition.desired_yield
-            }\n`,
-        } as Message;
+        user.response.message = [
+            {
+                type: 'text',
+                text: `希望価格: ${search_condition.desired_price}\nターゲット層: ${
+                    search_condition.desired_target
+                }\n希望エリア: ${
+                    search_condition.desired_area
+                }\n構造: ${search_condition.desired_structure.join('、')}\n希望利回り: ${
+                    search_condition.desired_yield
+                }\n`,
+            },
+        ] as Message[];
     } else {
         throw new Error('No userinfo found');
     }

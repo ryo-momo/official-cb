@@ -10,7 +10,6 @@ interface Event {
     user_line_id: string;
     text: string;
     timestamp: number;
-    reply_token: string;
 }
 
 // Return the action if a match is found, otherwise return null
@@ -34,10 +33,7 @@ export function isActionAllowedInCurrentState(user: User, text: string): boolean
     return isAllowed;
 }
 
-async function handleNewUser(
-    event: Event,
-    reply_token: string
-): Promise<{ user: User; succeed: boolean }> {
+async function handleNewUser(event: Event): Promise<{ user: User; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     console.log('User is a brand new user');
@@ -55,7 +51,6 @@ async function handleNewUser(
         },
         {
             shouldReply: true,
-            reply_token: reply_token,
         }
     );
     // Assuming the rest of the code is unchanged and the DatabaseCommunicator instance is already created and connected.
@@ -71,10 +66,7 @@ async function handleNewUser(
     }
 }
 
-async function handleExistingUser(
-    event: Event,
-    reply_token: string
-): Promise<{ user: User | null; succeed: boolean }> {
+async function handleExistingUser(event: Event): Promise<{ user: User | null; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     console.log('User is an existing user');
@@ -86,7 +78,6 @@ async function handleExistingUser(
         }
         let user = new User(user_property, {
             shouldReply: true,
-            reply_token: reply_token,
         });
 
         const triggered_action = findActionByTrigger(event.text);
@@ -132,8 +123,7 @@ async function handleExistingUser(
 }
 
 export async function messageEventHandler(
-    event: Event,
-    reply_token: string
+    event: Event
 ): Promise<{ user: User | null; succeed: boolean }> {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
@@ -141,10 +131,10 @@ export async function messageEventHandler(
         const userExists = await dbc.userExists(event.user_line_id);
         if (!userExists) {
             // this user is a brand new user
-            return handleNewUser(event, reply_token);
+            return handleNewUser(event);
         } else {
             // user is an existing user
-            return handleExistingUser(event, reply_token);
+            return handleExistingUser(event);
         }
     } catch (err) {
         console.error('Error checking if user exists: ', err);

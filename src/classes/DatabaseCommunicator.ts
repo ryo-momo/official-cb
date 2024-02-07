@@ -259,7 +259,7 @@ export class DatabaseCommunicator {
             const sql = `UPDATE \`${table_name}\` SET ${updates} WHERE user_line_id = ?`;
             const args = [...Object.values(user_data), user.user_line_id];
             await this.query(sql, args);
-            console.log('User updated in the database:', Object.values(user_data).toString());
+            console.log('User updated in the database');
         } catch (err) {
             console.error('Error updating user column: ', err); // Log error message
             throw err;

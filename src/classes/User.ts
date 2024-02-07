@@ -1,8 +1,8 @@
 import { user_states, MajorState, MinorState, Action, Step } from '../data/user_states';
 import { survey_contents, Survey } from '../data/survey_content';
-import { Message, FlexMessage } from '../funcs/message_helper';
 import { Question } from '../data/survey_content';
 import { db_data } from '../data/config';
+import { messagingApi, Message, ReplyableEvent } from '@line/bot-sdk';
 
 const users_columns = db_data.tables.users.columns;
 
@@ -22,7 +22,7 @@ export interface UserData {
 export interface UserResponse {
     shouldReply: boolean;
     reply_token?: string;
-    message?: Message | FlexMessage;
+    message?: Message[];
 }
 
 export interface UserProperty {
