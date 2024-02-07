@@ -3,7 +3,7 @@ import {
     handleGetUserInfoAction,
     handleGetSearchConditionAction,
 } from '../actions/get_info_action';
-import { externalPropertyAction } from '../actions/general_action';
+import { externalPropertyAction, messageToConcierge } from '../actions/general_action';
 
 export interface MinorState {
     state_id: string;
@@ -51,7 +51,7 @@ export const user_states: UserStates = {
                 {
                     state_id: 'added',
                     actions_on_transition: [],
-                    permitted_actions: ['basic_info_registration'],
+                    permitted_actions: ['basic_info_registration', 'concierge_message'],
                     next: 'basic_info_registered',
                 },
                 {
@@ -61,13 +61,18 @@ export const user_states: UserStates = {
                         'basic_info_inquiry',
                         'search_condition',
                         'external_property',
+                        'concierge_message',
                     ],
                     next: 'search_condition_added',
                 },
                 {
                     state_id: 'search_condition_added',
                     actions_on_transition: [],
-                    permitted_actions: ['search_condition_inquiry', 'external_property'],
+                    permitted_actions: [
+                        'search_condition_inquiry',
+                        'external_property',
+                        'concierge_message',
+                    ],
                     next: 'end',
                 },
             ],
@@ -268,6 +273,7 @@ export const user_states: UserStates = {
             action_id: 'concierge_message',
             steps: [],
             trigger_text: '>担当者にメッセージ',
+            handler: messageToConcierge,
         },
         {
             action_id: 'external_property',

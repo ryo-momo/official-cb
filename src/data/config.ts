@@ -128,3 +128,5 @@ export const db_data: DbData = {
         },
     },
 };
+
+export const address_url = 'https://www.google.com';

@@ -1,5 +1,6 @@
 import { User } from '../classes/User';
 import { flex_message_contents } from '../data/flex_message_content';
+import { address_url } from '../data/config';
 import z from 'zod';
 
 export function externalPropertyAction(user: User, text: string): User {
@@ -74,5 +75,14 @@ export function externalPropertyAction(user: User, text: string): User {
         user.current_action_id = null;
         user.current_step_id = null;
     }
+    return user;
+}
+
+export function messageToConcierge(user: User, text: string): User {
+    user.response.message = {
+        type: 'text',
+        text: `お問い合わせありがとうございます、こちらのURLより担当者とのトーク画面に遷移できます。\n\n${address_url}`,
+    };
+    user.current_action_id = null;
     return user;
 }
