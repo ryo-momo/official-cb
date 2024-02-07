@@ -79,8 +79,11 @@ export async function handleGetUserInfoAction(user: User, text: string) {
     const dbc = new DatabaseCommunicator(db_data);
     let user_info: UserInfo | null = null;
     try {
-        //TODO　user.user_idの型ガードを追加
-        user_info = (await dbc.getInfoByUserId(user.user_id!, user_info_locations)) as UserInfo;
+        if (user.user_id) {
+            user_info = (await dbc.getInfoByUserId(user.user_id, user_info_locations)) as UserInfo;
+        } else {
+            throw new Error('User id is not found');
+        }
     } catch (err) {
         console.error(err);
     }
@@ -141,11 +144,14 @@ export async function handleGetSearchConditionAction(user: User, text: string) {
     const dbc = new DatabaseCommunicator(db_data);
     let search_condition: SearchCondition | null = null;
     try {
-        //TODO　user.user_idの型ガードを追加
-        search_condition = (await dbc.getInfoByUserId(
-            user.user_id!,
-            search_condition_columns
-        )) as SearchCondition;
+        if (user.user_id) {
+            search_condition = (await dbc.getInfoByUserId(
+                user.user_id!,
+                search_condition_columns
+            )) as SearchCondition;
+        } else {
+            throw new Error('User id is not found');
+        }
     } catch (err) {
         console.error(err);
     }

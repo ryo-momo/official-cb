@@ -123,12 +123,23 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
         return user;
     } else {
         console.log('Answer is not valid. Returning user object from validator.'); // Log message
-        user.response.message = [
-            {
-                type: 'text',
-                text: validation_result.error_message,
-            },
-        ] as Message[];
+        const current_question = user.getCurrentQuestion();
+        const messageContent: {
+            type: 'text';
+            text: string;
+            quickReply?: {
+                items: ReturnType<typeof generateQuickReplyItems>;
+            };
+        } = {
+            type: 'text',
+            text: validation_result.error_message + '\n' + current_question.text,
+        };
+        if ('options' in current_question) {
+            messageContent.quickReply = {
+                items: generateQuickReplyItems(current_question.options),
+            };
+        }
+        user.response.message = [messageContent] as Message[];
         return user;
     }
 }

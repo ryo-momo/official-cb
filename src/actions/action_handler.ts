@@ -11,7 +11,7 @@ async function invokeAction(user: User, text: string, action: Action): Promise<U
     console.log('Invoking action');
     user.current_action_id = action.action_id;
     if (action.handler) {
-        user = action.handler(user, text);
+        user = await action.handler(user, text);
         console.log('Storing the user to database.'); // Log message
         try {
             let dbc = new DatabaseCommunicator(db_data);

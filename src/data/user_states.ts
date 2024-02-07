@@ -58,6 +58,7 @@ export const user_states: UserStates = {
                     state_id: 'basic_info_registered',
                     actions_on_transition: [],
                     permitted_actions: [
+                        'basic_info_registration',
                         'basic_info_inquiry',
                         'search_condition',
                         'external_property',
@@ -69,6 +70,9 @@ export const user_states: UserStates = {
                     state_id: 'search_condition_added',
                     actions_on_transition: [],
                     permitted_actions: [
+                        'basic_info_registration',
+                        'basic_info_inquiry',
+                        'search_condition',
                         'search_condition_inquiry',
                         'external_property',
                         'concierge_message',
@@ -176,6 +180,10 @@ export const user_states: UserStates = {
                 },
                 {
                     step_id: 'department',
+                    next: 'job_category',
+                },
+                {
+                    step_id: 'job_category',
                     next: 'length_of_service',
                 },
                 {

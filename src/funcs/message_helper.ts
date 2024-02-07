@@ -1,3 +1,4 @@
+import { QuickReplyItem } from '@line/bot-sdk';
 import { QuestionOption } from '../data/survey_content';
 
 export interface QuickReplyOption {
@@ -38,7 +39,7 @@ export function createSimpleMessage(text: string): Message {
 }
 
 // Generate quick reply items
-export function generateQuickReplyItems(options: QuestionOption[]): QuickReplyOption[] {
+export function generateQuickReplyItems(options: QuestionOption[]): QuickReplyItem[] {
     return options.map((option) => ({
         type: 'action',
         action: {

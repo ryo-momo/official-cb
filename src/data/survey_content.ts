@@ -155,13 +155,13 @@ export const survey_contents: SurveyContents = {
                     id: 'job_category',
                     text: 'お客様の職種をお教えください。',
                     type: 'text',
-                    next: 'length_of_service',
+                    next: 'years_of_service',
                     related_table: db_data.tables.users.name, // Added related_table property
                     related_column: user_columns.workplace_job_category,
                 },
                 {
                     id: 'years_of_service',
-                    text: 'お客様の現在の勤続年数をお教えください。',
+                    text: 'お客様の現在の勤続年数をお教えください。（数字のみ）',
                     type: 'text',
                     next: 'gross_salary_minus_1',
                     related_table: db_data.tables.users.name, // Added related_table property
