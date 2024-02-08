@@ -38,7 +38,7 @@ export class MessageSender {
             console.log('Message sent successfully:', response);
         } catch (error: unknown) {
             // Log: Error sending message
-            console.error('Error sending message:', (error as Error).message);
+            console.error();
             throw new Error('Error sending message: ' + (error as Error).message);
         }
     }

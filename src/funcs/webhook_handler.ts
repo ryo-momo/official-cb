@@ -2,8 +2,9 @@ import { messageEventHandler } from './message_event_handler';
 import { WebhookRequestBody, WebhookEvent } from '@line/bot-sdk';
 import { User } from '../classes/User';
 import { MessageSender } from './message_sender';
-import { YOUR_CHANNEL_ACCESS_TOKEN } from '../../unified_test';
-import { userInfo } from 'os';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 //example of LINE event
 
@@ -39,10 +40,15 @@ interface Result {
 }
 
 async function eventResultHandler(result: Result, reply_token: string) {
-    const ms = new MessageSender(YOUR_CHANNEL_ACCESS_TOKEN);
+    const ms = new MessageSender(process.env.CHANNEL_ACCESS_TOKEN!);
     if (result.user) {
         if (result.user.response.message) {
-            ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
+            try {
+                console.log('sending user a response');
+                await ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
+            } catch (err) {
+                console.error('Error in sending message:', err);
+            }
         }
     }
 }
@@ -53,7 +59,7 @@ export async function webhookHandler(request_body: WebhookRequestBody) {
             if ('replyToken' in event) {
                 const result = await webhookEventHandler(event);
                 //enable when testing on lambda
-                // await eventResultHandler(result, event.replyToken);
+                await eventResultHandler(result, event.replyToken);
                 return result;
             } else {
                 console.log('Event does not have a replyToken:', event);

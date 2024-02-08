@@ -237,7 +237,6 @@ export class DatabaseCommunicator {
         const sql = `INSERT INTO \`${user_table_name}\` (${user_columns_string}) VALUES (${user_placeholders})`;
         const args = Object.values(user_data);
         await this.query(sql, args);
-        console.log('User inserted into the database:', Object.values(user_data).toString());
         await this.disconnect();
     }
 

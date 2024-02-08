@@ -3,8 +3,19 @@
         "target": "es6",
         "module": "commonjs",
         "strict": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "outDir": "./dist"
     },
     "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"]
+    "exclude": [
+        "node_modules",
+        "dist",
+        "tests/unified_test.ts",
+        "tempCodeRunnerFile.ts",
+        "tests",
+        ".vscode",
+        ".prettierrc",
+        "mock_db",
+        "legacy_files"
+    ]
 }
