@@ -1,9 +1,9 @@
-import { basicInfoSurveyHandler, searchConditionSurveyHandler } from '../actions/survey_action';
+import { basicInfoSurveyHandler, searchConditionSurveyHandler } from '../actions/survey_actions';
 import {
     handleGetUserInfoAction,
     handleGetSearchConditionAction,
-} from '../actions/get_info_action';
-import { externalPropertyAction, messageToConcierge } from '../actions/general_action';
+} from '../actions/get_info_actions';
+import { externalPropertyAction, messageToConcierge } from '../actions/general_actions';
 
 export interface MinorState {
     state_id: string;

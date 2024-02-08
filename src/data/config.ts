@@ -69,7 +69,6 @@ export const db_data: DbData = {
     password: process.env.DB_PASSWORD!,
     database: process.env.DB_NAME!,
 
-
     tables: {
         users: {
             name: 'users',
@@ -123,4 +122,4 @@ export const db_data: DbData = {
     },
 };
 
-export const address_url = 'https://www.google.com';
+export const address_url = 'https://line.me/ti/p/HXmjosw19K';

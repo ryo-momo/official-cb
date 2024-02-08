@@ -7,7 +7,7 @@ import {
 } from '../funcs/question_handler';
 import { surveyValidator } from '../funcs/survey_validator';
 import { User } from '../classes/User';
-import { Step } from '../data/user_states';
+import { Step, user_states } from '../data/user_states';
 import { generateQuickReplyItems } from '../funcs/message_helper';
 import { Message, FlexMessage } from '@line/bot-sdk';
 import { Question, Survey } from '../data/survey_content';
@@ -153,7 +153,7 @@ function handleNextStep(user: User, answer_text: string) {
     if (!next_question) {
         //it was the last question
         console.log('This was the last step, ending the action'); // Log message
-        endAction(user);
+        endAction(user, current_survey.id);
     } else {
         //there's more question to go.
         console.log('Going to next step.'); // Log message
@@ -225,7 +225,18 @@ async function storeAnswerInDatabase(user: User, answer_text: string) {
     }
 }
 
-function endAction(user: User) {
+function endAction(user: User, current_survey_id: string) {
+    //--------いずれminor_state遷移のトリガー処理を追加！！
+    switch (current_survey_id) {
+        case 'basic_info':
+            user.minor_state_id = 'basic_info_registered';
+            break;
+        case 'property_conditions':
+            user.minor_state_id = 'search_condition_added';
+            break;
+        default:
+    }
+    //--------------------------------------------------------
     user.current_action_id = null;
     user.current_survey_id = null;
     user.current_step_id = null;

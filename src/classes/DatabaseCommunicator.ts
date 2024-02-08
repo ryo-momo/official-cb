@@ -1,7 +1,7 @@
 import mysql, { Connection } from 'mysql';
 import { UserTableColumns, DbData, db_data } from '../data/config';
 import { User, db_references, UserData } from './User';
-import { UserInfo, DataLocations, user_info_locations, Columns } from '../actions/get_info_action';
+import { UserInfo, DataLocations, user_info_locations, Columns } from '../actions/get_info_actions';
 
 interface DBConnectionData {
     host: string;
