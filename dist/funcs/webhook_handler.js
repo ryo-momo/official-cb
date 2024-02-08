@@ -21,9 +21,7 @@ function eventResultHandler(result, reply_token) {
     return __awaiter(this, void 0, void 0, function* () {
         const ms = new message_sender_1.MessageSender(process.env.CHANNEL_ACCESS_TOKEN);
         if (result.user) {
-            console.log('🚀 ~ file: webhook_handler.ts:46 ~ eventResultHandler ~ user:', result.user);
             if (result.user.response.message) {
-                console.log('🚀 ~ file: webhook_handler.ts:48 ~ eventResultHandler ~ result:', result.user.response.message);
                 try {
                     console.log('sending user a response');
                     yield ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
@@ -41,7 +39,6 @@ function webhookHandler(request_body) {
             try {
                 if ('replyToken' in event) {
                     const result = yield webhookEventHandler(event);
-                    console.log('🚀 ~ file: webhook_handler.ts:62 ~ promises ~ result:', result);
                     //enable when testing on lambda
                     yield eventResultHandler(result, event.replyToken);
                     return result;

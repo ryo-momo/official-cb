@@ -45,7 +45,7 @@ class MessageSender {
             }
             catch (error) {
                 // Log: Error sending message
-                console.error('Error sending message:', error.message);
+                console.error();
                 throw new Error('Error sending message: ' + error.message);
             }
         });

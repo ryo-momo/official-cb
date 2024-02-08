@@ -58,4 +58,4 @@ exports.db_data = {
         },
     },
 };
-exports.address_url = 'https://www.google.com';
+exports.address_url = 'https://line.me/ti/p/HXmjosw19K';

@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.user_states = void 0;
-const survey_action_1 = require("../actions/survey_action");
-const get_info_action_1 = require("../actions/get_info_action");
-const general_action_1 = require("../actions/general_action");
+const survey_actions_1 = require("../actions/survey_actions");
+const get_info_actions_1 = require("../actions/get_info_actions");
+const general_actions_1 = require("../actions/general_actions");
 exports.user_states = {
     major_states: [
         {
@@ -194,12 +194,12 @@ exports.user_states = {
                 },
             ],
             trigger_text: '>お客様情報の登録/変更',
-            handler: survey_action_1.basicInfoSurveyHandler,
+            handler: survey_actions_1.basicInfoSurveyHandler,
         },
         {
             action_id: 'basic_info_inquiry',
             trigger_text: '>お客様情報の照会',
-            handler: get_info_action_1.handleGetUserInfoAction,
+            handler: get_info_actions_1.handleGetUserInfoAction,
         },
         {
             action_id: 'search_condition',
@@ -231,18 +231,18 @@ exports.user_states = {
                 },
             ],
             trigger_text: '>希望物件条件の登録/更新',
-            handler: survey_action_1.searchConditionSurveyHandler,
+            handler: survey_actions_1.searchConditionSurveyHandler,
         },
         {
             action_id: 'search_condition_inquiry',
             trigger_text: '>希望物件条件の照会',
-            handler: get_info_action_1.handleGetSearchConditionAction,
+            handler: get_info_actions_1.handleGetSearchConditionAction,
         },
         {
             action_id: 'concierge_message',
             steps: [],
             trigger_text: '>担当者にメッセージ',
-            handler: general_action_1.messageToConcierge,
+            handler: general_actions_1.messageToConcierge,
         },
         {
             action_id: 'external_property',
@@ -269,7 +269,7 @@ exports.user_states = {
                 },
             ],
             trigger_text: '>他サイト物件を問い合わせる',
-            handler: general_action_1.externalPropertyAction,
+            handler: general_actions_1.externalPropertyAction,
         },
         {
             action_id: 'user_page',

@@ -106,6 +106,7 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
             //set the current question to the user response again, except deleting the already selected option from options.
             const current_question = user.getCurrentQuestion();
             if ('options' in current_question) {
+                //for multiple choice questions, delete the already selected option from options.
                 current_question.options = current_question.options.filter(
                     (option) => option.text !== answer_text
                 );
@@ -262,14 +263,8 @@ function setNextQuestion(user: User, current_question: Question) {
                 type: 'flex',
                 altText: '次の質問をご確認ください。',
                 contents: current_question.design,
-                ...('options' in current_question && {
-                    // 型ガードを使用してoptionsの存在をチェック
-                    quickReply: {
-                        items: generateQuickReplyItems(current_question.options),
-                    },
-                }),
             },
-        ] as FlexMessage[];
+        ];
     } else {
         // Text message with conditional quickReply, using type guard
         message = [
@@ -283,7 +278,7 @@ function setNextQuestion(user: User, current_question: Question) {
                     },
                 }),
             },
-        ] as Message[];
+        ];
     }
 
     // update user response
