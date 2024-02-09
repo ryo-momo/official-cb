@@ -8,7 +8,7 @@ const ERROR_MESSAGES = {
 };
 
 async function invokeAction(user: User, text: string, action: Action): Promise<User> {
-    console.log('Invoking action');
+    console.log('Invoking action:', action.action_id);
     user.current_action_id = action.action_id;
     if (action.handler) {
         user = await action.handler(user, text);
@@ -31,7 +31,6 @@ export async function actionInvoker(
     text: string,
     action?: Action | null
 ): Promise<User> {
-    console.log('🚀 ~ file: action_handler.ts:34 ~ user:', user.current_question_id);
     try {
         if (action) {
             return await invokeAction(user, text, action);

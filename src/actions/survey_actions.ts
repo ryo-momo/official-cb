@@ -162,7 +162,7 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
     }
 }
 
-export function handleBasicInfoUpdateOrReference(user: User) {
+export function handleBasicInfoUpdateOrReference(user: User): User {
     user.response.message = [
         {
             type: 'text',
@@ -197,9 +197,10 @@ export function handleBasicInfoUpdateOrReference(user: User) {
             },
         },
     ];
+    return user;
 }
 
-export function handleSearchConditionUpdateOrReference(user: User) {
+export function handleSearchConditionUpdateOrReference(user: User): User {
     user.response.message = [
         {
             type: 'text',
@@ -234,6 +235,7 @@ export function handleSearchConditionUpdateOrReference(user: User) {
             },
         },
     ];
+    return user;
 }
 
 function handleNextStep(user: User, answer_text: string) {

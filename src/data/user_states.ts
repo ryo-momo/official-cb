@@ -62,15 +62,21 @@ const user_states_base: UserStates = {
                 {
                     state_id: 'added',
                     actions_on_transition: [],
-                    permitted_actions: ['basic_info_registration', 'concierge_message'],
+                    permitted_actions: [
+                        'basic_info_update_or_reference',
+                        'basic_info_registration',
+                        'concierge_message',
+                    ],
                     next: 'basic_info_registered',
                 },
                 {
                     state_id: 'basic_info_registered',
                     actions_on_transition: [],
                     permitted_actions: [
+                        'basic_info_update_or_reference',
                         'basic_info_registration',
                         'basic_info_inquiry',
+                        'search_condition_update_or_reference',
                         'search_condition',
                         'external_property',
                         'concierge_message',
@@ -81,8 +87,10 @@ const user_states_base: UserStates = {
                     state_id: 'search_condition_added',
                     actions_on_transition: [],
                     permitted_actions: [
+                        'basic_info_update_or_reference',
                         'basic_info_registration',
                         'basic_info_inquiry',
+                        'search_condition_update_or_reference',
                         'search_condition',
                         'search_condition_inquiry',
                         'external_property',
@@ -266,7 +274,7 @@ const user_states_base: UserStates = {
             handler: handleGetUserInfoAction,
         },
         {
-            action_id: 'basic_info_update_or_reference',
+            action_id: 'search_condition_update_or_reference',
             trigger_text: ['>希望物件条件'],
             handler: handleSearchConditionUpdateOrReference,
         },

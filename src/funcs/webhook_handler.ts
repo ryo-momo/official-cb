@@ -59,7 +59,7 @@ export async function webhookHandler(request_body: WebhookRequestBody) {
             if ('replyToken' in event) {
                 const result = await webhookEventHandler(event);
                 //enable when testing on lambda
-                // await eventResultHandler(result, event.replyToken);
+                await eventResultHandler(result, event.replyToken);
                 return result;
             } else {
                 console.log('Event does not have a replyToken:', event);

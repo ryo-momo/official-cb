@@ -17,7 +17,7 @@ const ERROR_MESSAGES = {
 };
 function invokeAction(user, text, action) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('Invoking action');
+        console.log('Invoking action:', action.action_id);
         user.current_action_id = action.action_id;
         if (action.handler) {
             user = yield action.handler(user, text);
@@ -39,7 +39,6 @@ function invokeAction(user, text, action) {
 }
 function actionInvoker(user, text, action) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('🚀 ~ file: action_handler.ts:34 ~ user:', user.current_question_id);
         try {
             if (action) {
                 return yield invokeAction(user, text, action);

@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.user_states = void 0;
+exports.user_states = exports.global_permitted_actions = void 0;
 const survey_actions_1 = require("../actions/survey_actions");
 const get_info_actions_1 = require("../actions/get_info_actions");
 const general_actions_1 = require("../actions/general_actions");
-exports.user_states = {
+exports.global_permitted_actions = ['terminate_action'];
+const user_states_base = {
     major_states: [
         {
             state_id: 'property_searching',
@@ -12,15 +13,21 @@ exports.user_states = {
                 {
                     state_id: 'added',
                     actions_on_transition: [],
-                    permitted_actions: ['basic_info_registration', 'concierge_message'],
+                    permitted_actions: [
+                        'basic_info_update_or_reference',
+                        'basic_info_registration',
+                        'concierge_message',
+                    ],
                     next: 'basic_info_registered',
                 },
                 {
                     state_id: 'basic_info_registered',
                     actions_on_transition: [],
                     permitted_actions: [
+                        'basic_info_update_or_reference',
                         'basic_info_registration',
                         'basic_info_inquiry',
+                        'search_condition_update_or_reference',
                         'search_condition',
                         'external_property',
                         'concierge_message',
@@ -31,8 +38,10 @@ exports.user_states = {
                     state_id: 'search_condition_added',
                     actions_on_transition: [],
                     permitted_actions: [
+                        'basic_info_update_or_reference',
                         'basic_info_registration',
                         'basic_info_inquiry',
+                        'search_condition_update_or_reference',
                         'search_condition',
                         'search_condition_inquiry',
                         'external_property',
@@ -100,9 +109,23 @@ exports.user_states = {
     ],
     actions: [
         {
+            action_id: 'terminate_action',
+            trigger_text: ['>キャンセル'],
+            handler: general_actions_1.terminateAction,
+        },
+        {
+            action_id: 'basic_info_update_or_reference',
+            trigger_text: ['>お客様情報'],
+            handler: survey_actions_1.handleBasicInfoUpdateOrReference,
+        },
+        {
             action_id: 'basic_info_registration',
             survey_id: 'basic_info',
             steps: [
+                {
+                    step_id: 'update_or_reference',
+                    next: 'unknown',
+                },
                 {
                     step_id: 'name_primary',
                     next: 'name_kana',
@@ -193,18 +216,27 @@ exports.user_states = {
                     text: 'お客様情報の登録が完了いたしました、お疲れさまでした。',
                 },
             ],
-            trigger_text: '>お客様情報の登録/変更',
+            trigger_text: ['>お客様情報の登録/更新'],
             handler: survey_actions_1.basicInfoSurveyHandler,
         },
         {
             action_id: 'basic_info_inquiry',
-            trigger_text: '>お客様情報の照会',
+            trigger_text: ['>お客様情報の参照'],
             handler: get_info_actions_1.handleGetUserInfoAction,
+        },
+        {
+            action_id: 'search_condition_update_or_reference',
+            trigger_text: ['>希望物件条件'],
+            handler: survey_actions_1.handleSearchConditionUpdateOrReference,
         },
         {
             action_id: 'search_condition',
             survey_id: 'property_conditions',
             steps: [
+                {
+                    step_id: 'update_or_reference',
+                    next: 'unknown',
+                },
                 {
                     step_id: 'price',
                     next: 'target',
@@ -230,18 +262,18 @@ exports.user_states = {
                     next: 'end',
                 },
             ],
-            trigger_text: '>希望物件条件の登録/更新',
+            trigger_text: ['>希望物件条件の登録/更新'],
             handler: survey_actions_1.searchConditionSurveyHandler,
         },
         {
             action_id: 'search_condition_inquiry',
-            trigger_text: '>希望物件条件の照会',
+            trigger_text: ['>希望物件条件の参照'],
             handler: get_info_actions_1.handleGetSearchConditionAction,
         },
         {
             action_id: 'concierge_message',
             steps: [],
-            trigger_text: '>担当者にメッセージ',
+            trigger_text: ['>担当者にメッセージ'],
             handler: general_actions_1.messageToConcierge,
         },
         {
@@ -268,33 +300,43 @@ exports.user_states = {
                     next: 'end',
                 },
             ],
-            trigger_text: '>他サイト物件を問い合わせる',
+            trigger_text: ['>他サイト物件を問い合わせる'],
             handler: general_actions_1.externalPropertyAction,
         },
         {
             action_id: 'user_page',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'purchase_confirmation',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'bank_sounding',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'contract',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'payment_prep',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
     ],
 };
+function getUserStates() {
+    user_states_base.major_states.forEach((major_state) => {
+        major_state.minor_states.forEach((minor_state) => {
+            minor_state.permitted_actions =
+                minor_state.permitted_actions.concat(exports.global_permitted_actions);
+        });
+    });
+    return user_states_base;
+}
+exports.user_states = getUserStates();

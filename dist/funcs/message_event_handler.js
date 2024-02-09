@@ -18,13 +18,13 @@ const user_states_1 = require("../data/user_states");
 const action_handler_1 = require("../actions/action_handler");
 // Return the action if a match is found, otherwise return null
 function findActionByTrigger(text) {
-    const action = user_states_1.user_states.actions.find((action) => action.trigger_text === text);
+    const action = user_states_1.user_states.actions.find((action) => { var _a; return (_a = action.trigger_text) === null || _a === void 0 ? void 0 : _a.includes(text); });
     return action || null;
 }
 // Check if the action triggered by the text is allowed in the current minor state of the user
 function isActionAllowedInCurrentState(user, text) {
     // First, identify the action invoked by the search for user_states.actions.trigger_text with text
-    const action = user_states_1.user_states.actions.find((action) => action.trigger_text === text);
+    const action = user_states_1.user_states.actions.find((action) => { var _a; return (_a = action.trigger_text) === null || _a === void 0 ? void 0 : _a.includes(text); });
     // If the action does not exist, it is not allowed
     if (!action)
         return false;
@@ -85,14 +85,14 @@ function handleExistingUser(event) {
             const triggered_action = findActionByTrigger(event.text);
             if (triggered_action !== null) {
                 if (isActionAllowedInCurrentState(user, event.text)) {
-                    if (user.current_action_id !== null) {
+                    if (user.current_action_id !== null &&
+                        user_states_1.global_permitted_actions.includes(event.text)) {
                         console.log('User is trying to start a new action while in the middle of another action');
                         return { user, succeed: false };
                     }
                     else {
                         console.log("User's is not in the middle of an action, and is starting a new one");
                         user.current_action_id = triggered_action.action_id;
-                        console.log('🚀 ~ file: message_event_handler.ts:96 ~ handleExistingUser ~ current_action_id:', user.current_question_id);
                         user = yield (0, action_handler_1.actionInvoker)(user, event.text, triggered_action);
                         return { user: user, succeed: true };
                     }
