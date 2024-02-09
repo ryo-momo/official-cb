@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { User } from '../classes/User';
 import { db_data } from '../data/config';
-import { user_states } from '../data/user_states';
+import { user_states, global_permitted_actions } from '../data/user_states';
 import { actionInvoker } from '../actions/action_handler';
 import { Action } from '../data/user_states';
 
@@ -14,14 +14,18 @@ interface Event {
 
 // Return the action if a match is found, otherwise return null
 function findActionByTrigger(text: string): Action | null {
-    const action = user_states.actions.find((action: Action) => action.trigger_text === text);
+    const action = user_states.actions.find((action: Action) =>
+        action.trigger_text?.includes(text)
+    );
     return action || null;
 }
 
 // Check if the action triggered by the text is allowed in the current minor state of the user
 export function isActionAllowedInCurrentState(user: User, text: string): boolean {
     // First, identify the action invoked by the search for user_states.actions.trigger_text with text
-    const action = user_states.actions.find((action: Action) => action.trigger_text === text);
+    const action = user_states.actions.find((action: Action) =>
+        action.trigger_text?.includes(text)
+    );
     // If the action does not exist, it is not allowed
     if (!action) return false;
     // Get the current minor state of the user
@@ -83,7 +87,10 @@ async function handleExistingUser(event: Event): Promise<{ user: User | null; su
         const triggered_action = findActionByTrigger(event.text);
         if (triggered_action !== null) {
             if (isActionAllowedInCurrentState(user, event.text)) {
-                if (user.current_action_id !== null) {
+                if (
+                    user.current_action_id !== null &&
+                    global_permitted_actions.includes(event.text)
+                ) {
                     console.log(
                         'User is trying to start a new action while in the middle of another action'
                     );
@@ -93,10 +100,6 @@ async function handleExistingUser(event: Event): Promise<{ user: User | null; su
                         "User's is not in the middle of an action, and is starting a new one"
                     );
                     user.current_action_id = triggered_action.action_id;
-                    console.log(
-                        '🚀 ~ file: message_event_handler.ts:96 ~ handleExistingUser ~ current_action_id:',
-                        user.current_question_id
-                    );
                     user = await actionInvoker(user, event.text, triggered_action);
                     return { user: user, succeed: true };
                 }

@@ -31,10 +31,6 @@ export async function searchConditionSurveyHandler(user: User, answer_text: stri
         return await handleInitialStep(user);
     } else {
         try {
-            console.log(
-                '🚀 ~ file: survey_actions.ts:40 ~ searchConditionSurveyHandler ~ user:',
-                user.current_question_id
-            );
             return await handleSubsequentSteps(user, answer_text);
         } catch (err) {
             throw new Error(`Error handling subsequent steps: ${err}`);
@@ -69,10 +65,6 @@ async function handleInitialStep(user: User): Promise<User> {
 async function handleSubsequentSteps(user: User, answer_text: string): Promise<User> {
     let validation_result = surveyValidator(user, answer_text);
     user = validation_result.user_object;
-    console.log(
-        '🚀 ~ file: survey_actions.ts:68 ~ handleSubsequentSteps ~ user:',
-        user.current_question_id
-    );
     if (validation_result.isValid) {
         console.log('Answer is valid.'); // Log message
         answer_text = validation_result.answer_text_revised;
@@ -133,10 +125,6 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
     } else {
         console.log('Answer is not valid. Returning user object from validator.'); // Log message
         const current_question = user.getCurrentQuestion();
-        console.log(
-            '🚀 ~ file: survey_actions.ts:137 ~ handleSubsequentSteps ~ user:',
-            user.current_question_id
-        );
         // Initialize message explicitly
         let message: Message[] | FlexMessage[];
         if (current_question.design) {
@@ -174,6 +162,80 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
     }
 }
 
+export function handleBasicInfoUpdateOrReference(user: User) {
+    user.response.message = [
+        {
+            type: 'text',
+            text: '行いたい操作を選択してください。',
+            quickReply: {
+                items: [
+                    {
+                        type: 'action',
+                        action: {
+                            type: 'message',
+                            label: 'お客様情報の登録/更新',
+                            text: '>お客様情報の登録/更新',
+                        },
+                    },
+                    {
+                        type: 'action',
+                        action: {
+                            type: 'message',
+                            label: 'お客様情報の参照',
+                            text: '>お客様情報の参照',
+                        },
+                    },
+                    {
+                        type: 'action',
+                        action: {
+                            type: 'message',
+                            label: 'キャンセル',
+                            text: '>キャンセル',
+                        },
+                    },
+                ],
+            },
+        },
+    ];
+}
+
+export function handleSearchConditionUpdateOrReference(user: User) {
+    user.response.message = [
+        {
+            type: 'text',
+            text: '行いたい操作を選択してください。',
+            quickReply: {
+                items: [
+                    {
+                        type: 'action',
+                        action: {
+                            type: 'message',
+                            label: '希望物件条件の登録/更新',
+                            text: '>希望物件条件の登録/更新',
+                        },
+                    },
+                    {
+                        type: 'action',
+                        action: {
+                            type: 'message',
+                            label: '希望物件条件の参照',
+                            text: '>希望物件条件の参照',
+                        },
+                    },
+                    {
+                        type: 'action',
+                        action: {
+                            type: 'message',
+                            label: 'キャンセル',
+                            text: '>キャンセル',
+                        },
+                    },
+                ],
+            },
+        },
+    ];
+}
+
 function handleNextStep(user: User, answer_text: string) {
     const current_action = user.getCurrentAction();
     const current_survey = user.getCurrentSurvey();
@@ -183,7 +245,7 @@ function handleNextStep(user: User, answer_text: string) {
     if (!next_question) {
         //it was the last question
         console.log('This was the last step, ending the action'); // Log message
-        endAction(user, current_survey.id);
+        endSurveyAction(user, current_survey.id);
     } else {
         //there's more question to go.
         console.log('Going to next step.'); // Log message
@@ -255,7 +317,7 @@ async function storeAnswerInDatabase(user: User, answer_text: string) {
     }
 }
 
-function endAction(user: User, current_survey_id: string) {
+function endSurveyAction(user: User, current_survey_id: string) {
     //--------いずれminor_state遷移のトリガー処理を追加！！
     switch (current_survey_id) {
         case 'basic_info':

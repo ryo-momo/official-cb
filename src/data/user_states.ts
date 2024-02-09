@@ -1,9 +1,18 @@
-import { basicInfoSurveyHandler, searchConditionSurveyHandler } from '../actions/survey_actions';
+import {
+    basicInfoSurveyHandler,
+    handleBasicInfoUpdateOrReference,
+    handleSearchConditionUpdateOrReference,
+    searchConditionSurveyHandler,
+} from '../actions/survey_actions';
 import {
     handleGetUserInfoAction,
     handleGetSearchConditionAction,
 } from '../actions/get_info_actions';
-import { externalPropertyAction, messageToConcierge } from '../actions/general_actions';
+import {
+    externalPropertyAction,
+    messageToConcierge,
+    terminateAction,
+} from '../actions/general_actions';
 
 export interface MinorState {
     state_id: string;
@@ -26,7 +35,7 @@ export interface Step {
 
 export interface BaseAction {
     action_id: string;
-    trigger_text: string;
+    trigger_text?: string[];
     handler?: Function;
 }
 
@@ -43,7 +52,9 @@ export interface UserStates {
     actions: Action[];
 }
 
-export const user_states: UserStates = {
+export const global_permitted_actions = ['terminate_action'];
+
+const user_states_base: UserStates = {
     major_states: [
         {
             state_id: 'property_searching',
@@ -139,9 +150,23 @@ export const user_states: UserStates = {
     ],
     actions: [
         {
+            action_id: 'terminate_action',
+            trigger_text: ['>キャンセル'],
+            handler: terminateAction,
+        },
+        {
+            action_id: 'basic_info_update_or_reference',
+            trigger_text: ['>お客様情報'],
+            handler: handleBasicInfoUpdateOrReference,
+        },
+        {
             action_id: 'basic_info_registration',
             survey_id: 'basic_info',
             steps: [
+                {
+                    step_id: 'update_or_reference',
+                    next: 'unknown',
+                },
                 {
                     step_id: 'name_primary',
                     next: 'name_kana',
@@ -232,18 +257,27 @@ export const user_states: UserStates = {
                     text: 'お客様情報の登録が完了いたしました、お疲れさまでした。',
                 },
             ],
-            trigger_text: '>お客様情報の登録/変更',
+            trigger_text: ['>お客様情報の登録/更新'],
             handler: basicInfoSurveyHandler,
         },
         {
             action_id: 'basic_info_inquiry',
-            trigger_text: '>お客様情報の照会',
+            trigger_text: ['>お客様情報の参照'],
             handler: handleGetUserInfoAction,
+        },
+        {
+            action_id: 'basic_info_update_or_reference',
+            trigger_text: ['>希望物件条件'],
+            handler: handleSearchConditionUpdateOrReference,
         },
         {
             action_id: 'search_condition',
             survey_id: 'property_conditions',
             steps: [
+                {
+                    step_id: 'update_or_reference',
+                    next: 'unknown',
+                },
                 {
                     step_id: 'price',
                     next: 'target',
@@ -269,18 +303,18 @@ export const user_states: UserStates = {
                     next: 'end',
                 },
             ],
-            trigger_text: '>希望物件条件の登録/更新',
+            trigger_text: ['>希望物件条件の登録/更新'],
             handler: searchConditionSurveyHandler,
         },
         {
             action_id: 'search_condition_inquiry',
-            trigger_text: '>希望物件条件の照会',
+            trigger_text: ['>希望物件条件の参照'],
             handler: handleGetSearchConditionAction,
         },
         {
             action_id: 'concierge_message',
             steps: [],
-            trigger_text: '>担当者にメッセージ',
+            trigger_text: ['>担当者にメッセージ'],
             handler: messageToConcierge,
         },
         {
@@ -307,33 +341,45 @@ export const user_states: UserStates = {
                     next: 'end',
                 },
             ],
-            trigger_text: '>他サイト物件を問い合わせる',
+            trigger_text: ['>他サイト物件を問い合わせる'],
             handler: externalPropertyAction,
         },
         {
             action_id: 'user_page',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'purchase_confirmation',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'bank_sounding',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'contract',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
         {
             action_id: 'payment_prep',
             steps: [],
-            trigger_text: '>',
+            trigger_text: ['>'],
         },
     ],
 };
+
+function getUserStates(): UserStates {
+    user_states_base.major_states.forEach((major_state) => {
+        major_state.minor_states.forEach((minor_state) => {
+            minor_state.permitted_actions =
+                minor_state.permitted_actions.concat(global_permitted_actions);
+        });
+    });
+    return user_states_base;
+}
+
+export const user_states: UserStates = getUserStates();

@@ -3,6 +3,16 @@ import { flex_message_contents } from '../data/flex_message_content';
 import { address_url } from '../data/config';
 import z from 'zod';
 
+export function terminateAction(user: User): User {
+    user.current_action_id = null;
+    user.current_survey_id = null;
+    user.current_step_id = null;
+    user.current_question_id = null;
+    user.current_answers = null;
+    console.log("Terminating current action, progress won't be saved");
+    return user;
+}
+
 export function externalPropertyAction(user: User, text: string): User {
     if (user.current_step_id === null) {
         //user is in an initial step
