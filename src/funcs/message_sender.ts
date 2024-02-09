@@ -12,10 +12,8 @@ export class MessageSender {
             const validationResponse = await this.client.validateReply({
                 messages: messages,
             });
-            console.log('Validation response:', validationResponse);
             return validationResponse;
         } catch (error: unknown) {
-            console.error('Error validating message:', (error as Error).message);
             throw new Error('Error validating message: ' + (error as Error).message);
         }
     }

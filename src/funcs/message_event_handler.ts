@@ -93,6 +93,10 @@ async function handleExistingUser(event: Event): Promise<{ user: User | null; su
                         "User's is not in the middle of an action, and is starting a new one"
                     );
                     user.current_action_id = triggered_action.action_id;
+                    console.log(
+                        '🚀 ~ file: message_event_handler.ts:96 ~ handleExistingUser ~ current_action_id:',
+                        user.current_question_id
+                    );
                     user = await actionInvoker(user, event.text, triggered_action);
                     return { user: user, succeed: true };
                 }

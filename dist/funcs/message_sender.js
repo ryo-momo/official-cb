@@ -21,11 +21,9 @@ class MessageSender {
                 const validationResponse = yield this.client.validateReply({
                     messages: messages,
                 });
-                console.log('Validation response:', validationResponse);
                 return validationResponse;
             }
             catch (error) {
-                console.error('Error validating message:', error.message);
                 throw new Error('Error validating message: ' + error.message);
             }
         });

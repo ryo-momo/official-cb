@@ -286,18 +286,18 @@ exports.survey_contents = {
                 },
                 {
                     id: 'target',
-                    text: '次に、お客様の希望する物件のターゲット層をお教えください。',
+                    text: '次に、お客様の希望する物件のターゲット層をお教えください。 \n※単身者/カップル向け（1R,1K,1DK,1LDK中心）\n※ファミリー向け（2DK以上）',
                     type: 'single-choice',
                     related_table: config_1.db_data.tables.users.name,
                     related_column: config_1.db_data.tables.users.columns.desired_target,
                     options: [
                         {
                             id: 1,
-                            text: '単身者/カップル向け（1R,1K,1DK,1LDK中心）',
+                            text: '単身者/カップル向け',
                         },
                         {
                             id: 2,
-                            text: 'ファミリー向け（2DK以上）',
+                            text: 'ファミリー向け',
                         },
                     ],
                     next: {

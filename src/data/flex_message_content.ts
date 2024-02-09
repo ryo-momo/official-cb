@@ -180,58 +180,127 @@ export const flex_message_contents: FlexMessageContent[] = [
                                 contents: [
                                     {
                                         type: 'span',
-                                        text: '物件の総額範囲を選択してください。（右からもお選びいただけます）',
+                                        text: '物件のエリアを選択してください。（右からもお選びいただけます）\n',
                                         size: 'md',
                                     },
                                 ],
                                 wrap: true,
                                 margin: 'lg',
                             },
-                        ],
-                    },
-                    footer: {
-                        type: 'box',
-                        layout: 'vertical',
-                        spacing: 'sm',
-                        contents: [
                             {
-                                type: 'button',
-                                style: 'primary',
-                                action: {
-                                    type: 'message',
-                                    text: '3000～5000万円',
-                                    label: '3000～5000万円',
-                                },
-                                color: '#F09199',
+                                type: 'text',
+                                contents: [
+                                    {
+                                        type: 'span',
+                                        text: '※城北エリア：文京区、豊島区、板橋区、北区、荒川区、足立区\n',
+                                        size: 'md',
+                                    },
+                                    {
+                                        type: 'span',
+                                        text: '城南エリア：港区、品川区、目黒区、大田区\n',
+                                        size: 'md',
+                                    },
+                                    {
+                                        type: 'span',
+                                        text: '城西エリア：渋谷区、新宿区、世田谷区、中野区、杉並区、練馬区\n',
+                                        size: 'md',
+                                    },
+                                    {
+                                        type: 'span',
+                                        text: '城東エリア：中央区、江東区、台東区、墨田区、葛飾区、江戸川区\n',
+                                        size: 'md',
+                                    },
+                                ],
+                                wrap: true,
                                 margin: 'none',
-                                height: 'sm',
                             },
                             {
-                                type: 'button',
-                                style: 'primary',
-                                height: 'sm',
-                                action: {
-                                    type: 'message',
-                                    label: '5000～7500万円',
-                                    text: '5000～7500万円',
-                                },
-                                color: '#F09199',
-                                margin: 'xl',
-                            },
-                            {
-                                type: 'button',
-                                style: 'primary',
-                                height: 'sm',
-                                action: {
-                                    type: 'message',
-                                    label: '7500万～1億円',
-                                    text: '7500万～1億円',
-                                },
-                                color: '#F09199',
-                                margin: 'xl',
+                                type: 'box',
+                                layout: 'vertical',
+                                spacing: 'none',
+                                contents: [
+                                    {
+                                        type: 'box',
+                                        layout: 'vertical',
+                                        contents: [
+                                            {
+                                                type: 'text',
+                                                text: '東京',
+                                                size: 'xs',
+                                                weight: 'bold',
+                                                decoration: 'none',
+                                                offsetStart: 'lg',
+                                            },
+                                            {
+                                                type: 'separator',
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        action: {
+                                            type: 'message',
+                                            text: '東京都（城北エリア）',
+                                            label: '東京都（城北エリア）',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'md',
+                                        height: 'sm',
+                                    },
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: '東京都（城南エリア）',
+                                            text: '東京都（城南エリア）',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'xl',
+                                    },
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: '東京都（城西エリア）',
+                                            text: '東京都（城西エリア）',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'xl',
+                                    },
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: '東京都（城東エリア）',
+                                            text: '東京都（城東エリア）',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'xl',
+                                    },
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: '東京都（23区外）',
+                                            text: '東京都（23区外）',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'xl',
+                                    },
+                                ],
+                                borderWidth: 'none',
+                                margin: 'none',
                             },
                         ],
-                        borderWidth: 'none',
                     },
                 },
                 {
@@ -242,16 +311,22 @@ export const flex_message_contents: FlexMessageContent[] = [
                         spacing: 'sm',
                         contents: [
                             {
-                                type: 'button',
-                                style: 'primary',
-                                height: 'sm',
-                                action: {
-                                    type: 'message',
-                                    label: '1億～1億5000万円',
-                                    text: '1億～1億5000万円',
-                                },
-                                color: '#F09199',
-                                margin: 'xl',
+                                type: 'box',
+                                layout: 'vertical',
+                                contents: [
+                                    {
+                                        type: 'text',
+                                        text: '埼玉',
+                                        size: 'xs',
+                                        weight: 'bold',
+                                        decoration: 'none',
+                                        offsetStart: 'lg',
+                                    },
+                                    {
+                                        type: 'separator',
+                                    },
+                                ],
+                                margin: 'sm',
                             },
                             {
                                 type: 'button',
@@ -259,11 +334,11 @@ export const flex_message_contents: FlexMessageContent[] = [
                                 height: 'sm',
                                 action: {
                                     type: 'message',
-                                    label: '1億5000万～2億円',
-                                    text: '1億5000万～2億円',
+                                    label: '埼玉県（さいたま市）',
+                                    text: '埼玉県（さいたま市）',
                                 },
                                 color: '#F09199',
-                                margin: 'xl',
+                                margin: 'md',
                             },
                             {
                                 type: 'button',
@@ -271,11 +346,29 @@ export const flex_message_contents: FlexMessageContent[] = [
                                 height: 'sm',
                                 action: {
                                     type: 'message',
-                                    label: '2億円～3億円',
-                                    text: '2億円～3億円',
+                                    label: '埼玉県（さいたま市以外）',
+                                    text: '埼玉県（さいたま市以外）',
                                 },
                                 color: '#F09199',
                                 margin: 'xl',
+                            },
+                            {
+                                type: 'box',
+                                layout: 'vertical',
+                                contents: [
+                                    {
+                                        type: 'text',
+                                        text: '神奈川',
+                                        size: 'xs',
+                                        weight: 'bold',
+                                        decoration: 'none',
+                                        offsetStart: 'lg',
+                                    },
+                                    {
+                                        type: 'separator',
+                                    },
+                                ],
+                                margin: 'lg',
                             },
                             {
                                 type: 'button',
@@ -283,11 +376,11 @@ export const flex_message_contents: FlexMessageContent[] = [
                                 height: 'sm',
                                 action: {
                                     type: 'message',
-                                    label: '3億～5億円',
-                                    text: '3億～5億円',
+                                    label: '神奈川県（横浜市）',
+                                    text: '神奈川県（横浜市）',
                                 },
                                 color: '#F09199',
-                                margin: 'xl',
+                                margin: 'md',
                             },
                             {
                                 type: 'button',
@@ -295,8 +388,50 @@ export const flex_message_contents: FlexMessageContent[] = [
                                 height: 'sm',
                                 action: {
                                     type: 'message',
-                                    label: '5億円以上',
-                                    text: '5億円以上',
+                                    label: '神奈川県（横浜市以外）',
+                                    text: '神奈川県（横浜市以外）',
+                                },
+                                color: '#F09199',
+                                margin: 'xl',
+                            },
+                            {
+                                type: 'box',
+                                layout: 'vertical',
+                                contents: [
+                                    {
+                                        type: 'text',
+                                        text: '千葉',
+                                        size: 'xs',
+                                        weight: 'bold',
+                                        decoration: 'none',
+                                        offsetStart: 'lg',
+                                    },
+                                    {
+                                        type: 'separator',
+                                    },
+                                ],
+                                margin: 'md',
+                            },
+                            {
+                                type: 'button',
+                                style: 'primary',
+                                height: 'sm',
+                                action: {
+                                    type: 'message',
+                                    label: '千葉県（千葉市、船橋市）',
+                                    text: '千葉県（千葉市、船橋市）',
+                                },
+                                color: '#F09199',
+                                margin: 'md',
+                            },
+                            {
+                                type: 'button',
+                                style: 'primary',
+                                height: 'sm',
+                                action: {
+                                    type: 'message',
+                                    label: '千葉県（千葉市、船橋市以外）',
+                                    text: '千葉県（千葉市、船橋市以外）',
                                 },
                                 color: '#F09199',
                                 margin: 'xl',

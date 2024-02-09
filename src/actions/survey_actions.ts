@@ -31,6 +31,10 @@ export async function searchConditionSurveyHandler(user: User, answer_text: stri
         return await handleInitialStep(user);
     } else {
         try {
+            console.log(
+                '🚀 ~ file: survey_actions.ts:40 ~ searchConditionSurveyHandler ~ user:',
+                user.current_question_id
+            );
             return await handleSubsequentSteps(user, answer_text);
         } catch (err) {
             throw new Error(`Error handling subsequent steps: ${err}`);
@@ -51,7 +55,7 @@ async function handleInitialStep(user: User): Promise<User> {
         if (current_step) {
             user.current_step_id = current_step.step_id;
             user.current_question_id = current_question.id;
-            setNextQuestion(user, current_question);
+            setQuestion(user, current_question);
         } else {
             throw new Error('Next step not found.');
         }
@@ -65,6 +69,10 @@ async function handleInitialStep(user: User): Promise<User> {
 async function handleSubsequentSteps(user: User, answer_text: string): Promise<User> {
     let validation_result = surveyValidator(user, answer_text);
     user = validation_result.user_object;
+    console.log(
+        '🚀 ~ file: survey_actions.ts:68 ~ handleSubsequentSteps ~ user:',
+        user.current_question_id
+    );
     if (validation_result.isValid) {
         console.log('Answer is valid.'); // Log message
         answer_text = validation_result.answer_text_revised;
@@ -125,22 +133,43 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
     } else {
         console.log('Answer is not valid. Returning user object from validator.'); // Log message
         const current_question = user.getCurrentQuestion();
-        const messageContent: {
-            type: 'text';
-            text: string;
-            quickReply?: {
-                items: ReturnType<typeof generateQuickReplyItems>;
-            };
-        } = {
-            type: 'text',
-            text: validation_result.error_message + current_question.text,
-        };
-        if ('options' in current_question) {
-            messageContent.quickReply = {
-                items: generateQuickReplyItems(current_question.options),
-            };
+        console.log(
+            '🚀 ~ file: survey_actions.ts:137 ~ handleSubsequentSteps ~ user:',
+            user.current_question_id
+        );
+        // Initialize message explicitly
+        let message: Message[] | FlexMessage[];
+        if (current_question.design) {
+            //flex message question
+            message = [
+                {
+                    type: 'text',
+                    text: validation_result.error_message,
+                },
+                {
+                    type: 'flex',
+                    altText: '次の質問をご確認ください。',
+                    contents: current_question.design,
+                },
+            ];
+        } else {
+            //text message question
+            message = [
+                {
+                    type: 'text',
+                    text:
+                        validation_result.error_message + '\n\n' + current_question.text ||
+                        '問題が発生しました、お手数ですが担当にお問い合わせください。(e001)',
+                    ...('options' in current_question && {
+                        // 型ガードを使用してoptionsの存在をチェック
+                        quickReply: {
+                            items: generateQuickReplyItems(current_question.options),
+                        },
+                    }),
+                },
+            ];
         }
-        user.response.message = [messageContent] as Message[];
+        user.response.message = message;
         return user;
     }
 }
@@ -168,7 +197,7 @@ function handleNextStep(user: User, answer_text: string) {
             if (next_step) {
                 user.current_step_id = next_step.step_id;
                 user.current_question_id = next_question.id;
-                setNextQuestion(user, next_question);
+                setQuestion(user, next_question);
             }
             user.current_answers = null;
             console.log(`Updated the user's step to ${user.current_step_id}`);
@@ -252,7 +281,7 @@ function endAction(user: User, current_survey_id: string) {
     ] as Message[];
 }
 
-function setNextQuestion(user: User, current_question: Question) {
+function setQuestion(user: User, current_question: Question) {
     // Initialize message explicitly
     let message: Message[] | FlexMessage[];
 

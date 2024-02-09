@@ -31,6 +31,7 @@ export async function actionInvoker(
     text: string,
     action?: Action | null
 ): Promise<User> {
+    console.log('🚀 ~ file: action_handler.ts:34 ~ user:', user.current_question_id);
     try {
         if (action) {
             return await invokeAction(user, text, action);

@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.surveyValidator = void 0;
 const ERROR_MESSAGES = {
-    INVALID_TEXT: '回答が無効な形式です。文字列を入力してください。\n\n',
-    INVALID_CHOICE: '回答が無効な形式です。表示される選択肢の中から選択してください。\n\n',
-    INVALID_NUMBER: '回答が無効な形式です。0以上の数字を入力してください。\n\n',
-    NO_OPTIONS: '選択肢が存在しません。\n\n',
-    UNSUPPORTED_QUESTION: '問題が発生しました、お手数ですが担当にご連絡をお願いいたします。\n\n',
+    INVALID_TEXT: '回答が無効な形式です。文字列を入力してください。',
+    INVALID_CHOICE: '回答が無効な形式です。表示される選択肢の中から選択してください。',
+    INVALID_NUMBER: '回答が無効な形式です。0以上の数字を入力してください。',
+    NO_OPTIONS: '選択肢が存在しません。',
+    UNSUPPORTED_QUESTION: '問題が発生しました、お手数ですが担当にご連絡をお願いいたします。',
 };
 function validateTextType(answer_text) {
     if (typeof answer_text !== 'string' || answer_text.trim() === '') {
