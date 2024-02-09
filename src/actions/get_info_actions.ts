@@ -111,7 +111,7 @@ export async function handleGetUserInfoAction(user: User, text: string) {
                     user_info.borrowed_money
                 }万円\n預金: ${user_info.deposit}万円\nその他資産: ${
                     user_info.other_assets
-                }万円\n購入者区分: ${user_info.purchaser_category}\n`,
+                }万円\n購入者区分: ${user_info.purchaser_category}`,
             },
         ] as Message[];
     } else {
@@ -165,7 +165,7 @@ export async function handleGetSearchConditionAction(user: User, text: string) {
                     search_condition.desired_area
                 }\n構造: ${search_condition.desired_structure.join('、')}\n希望利回り: ${
                     search_condition.desired_yield
-                }\n`,
+                }`,
             },
         ] as Message[];
     } else {
