@@ -1,7 +1,12 @@
-import mysql, { Connection } from 'mysql';
-import { UserTableColumns, DbData, db_data } from '../data/config';
-import { User, db_references, UserData } from './User';
-import { UserInfo, DataLocations, user_info_locations, Columns } from '../actions/get_info_actions';
+import mysql, { type Connection } from 'mysql';
+import { UserTableColumns, type DbData, db_data } from '../data/config';
+import { type User, db_references, type UserData } from './User';
+import {
+    type UserInfo,
+    type DataLocations,
+    user_info_locations,
+    Columns,
+} from '../actions/get_info_actions';
 
 interface DBConnectionData {
     host: string;
@@ -11,26 +16,24 @@ interface DBConnectionData {
 }
 
 //basically for database querying
-function extractUserData(user: User): UserData {
-    return {
-        user_id: user.user_id,
-        user_line_id: user.user_line_id,
-        major_state_id: user.major_state_id,
-        minor_state_id: user.minor_state_id,
-        current_action_id: user.current_action_id,
-        current_survey_id: user.current_survey_id,
-        current_step_id: user.current_step_id,
-        current_question_id: user.current_question_id,
-        //null if the answer[] is empty
-        current_answers: user.current_answers?.length ?? -1 > 0 ? user.current_answers : null,
-    };
-}
+const extractUserData = (user: User): UserData => ({
+    user_id: user.user_id,
+    user_line_id: user.user_line_id,
+    major_state_id: user.major_state_id,
+    minor_state_id: user.minor_state_id,
+    current_action_id: user.current_action_id,
+    current_survey_id: user.current_survey_id,
+    current_step_id: user.current_step_id,
+    current_question_id: user.current_question_id,
+    //null if the answer[] is empty
+    current_answers: user.current_answers?.length ?? -1 > 0 ? user.current_answers : null,
+});
 
 export class DatabaseCommunicator {
     private connection: Connection | null;
-    private db_data: DbData = db_data;
+    private readonly db_data: DbData = db_data;
 
-    constructor(private db_connection_data: DBConnectionData) {
+    constructor(private readonly db_connection_data: DBConnectionData) {
         this.connection = null;
     }
 
@@ -192,27 +195,29 @@ export class DatabaseCommunicator {
         await this.disconnect();
         if (results.flat().length > 0) {
             // 結果を一つのオブジェクトにまとめる
-            const aggregatedResults = results.flat().reduce((acc: Record<string, any>, row) => {
-                Object.keys(row).forEach((key) => {
-                    if (!acc[key]) {
-                        acc[key] = [];
-                    }
-                    acc[key].push(row[key]);
-                });
-                return acc;
-            }, {});
+            const aggregated_results = results
+                .flat()
+                .reduce((acc: Record<string, (string | number | boolean)[]>, row) => {
+                    Object.keys(row).forEach((key) => {
+                        if (!acc[key]) {
+                            acc[key] = [];
+                        }
+                        acc[key].push(row[key]);
+                    });
+                    return acc;
+                }, {});
             // 各キーの値が配列になっているオブジェクトを返す
-            const finalResult = Object.keys(aggregatedResults).reduce(
-                (acc: Record<string, any>, key: string) => {
+            const final_result = Object.keys(aggregated_results).reduce(
+                (acc: Record<string, (string | number | boolean)[]>, key: string) => {
                     acc[key] =
-                        aggregatedResults[key].length === 1
-                            ? aggregatedResults[key][0]
-                            : aggregatedResults[key];
+                        aggregated_results[key].length === 1
+                            ? [aggregated_results[key][0]]
+                            : aggregated_results[key];
                     return acc;
                 },
                 {}
             );
-            return finalResult;
+            return final_result;
         } else {
             return null;
         }
@@ -224,8 +229,9 @@ export class DatabaseCommunicator {
         const user_data = extractUserData(user);
         // Convert array values in user_data to JSON string
         for (const key in user_data) {
-            if (Array.isArray(user_data[key])) {
-                user_data[key] = user_data[key].join(',');
+            const item = user_data[key];
+            if (Array.isArray(item)) {
+                user_data[key] = item.join(',');
             }
         }
         const columns = db_references;
@@ -247,8 +253,9 @@ export class DatabaseCommunicator {
             const user_data = extractUserData(user);
             // Convert array values in user_data to JSON string
             for (const key in user_data) {
-                if (Array.isArray(user_data[key])) {
-                    user_data[key] = user_data[key].join(',');
+                const item = user_data[key];
+                if (Array.isArray(item)) {
+                    user_data[key] = item.join(',');
                 }
             }
             const table_name = db_data.tables.users.name;

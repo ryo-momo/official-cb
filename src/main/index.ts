@@ -1,19 +1,14 @@
 import https from 'https';
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { WebhookRequestBody, WebhookEvent } from '@line/bot-sdk';
+import { APIGatewayProxyEvent, APIGatewayProxyResult, type Context } from 'aws-lambda';
+import { type WebhookRequestBody, WebhookEvent } from '@line/bot-sdk';
 import { webhookHandler } from '../funcs/webhook_handler';
 
-
-
-
-
-export const LambdaHandler = async (event: WebhookRequestBody, context: Context) => {
+export const lambdaHandler = async (event: WebhookRequestBody, context: Context): Promise<void> => {
     try {
         console.log('Received event:', JSON.stringify(event));
 
-        await webhookHandler(event as WebhookRequestBody);
-
+        await webhookHandler(event);
     } catch (error) {
         console.error('Error occurred:', error);
     }
-}
+};

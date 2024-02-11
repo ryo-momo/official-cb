@@ -1,5 +1,5 @@
-import { QuickReplyItem } from '@line/bot-sdk';
-import { QuestionOption } from '../data/survey_content';
+import { type QuickReplyItem } from '@line/bot-sdk';
+import { type QuestionOption } from '../data/survey_content';
 
 export interface QuickReplyOption {
     type: string;
@@ -28,7 +28,7 @@ export interface FlexMessage {
 }
 
 // Simple message object
-export function createSimpleMessage(text: string): Message {
+export const createSimpleMessage = (text: string): Message => {
     if (typeof text !== 'string') {
         throw new Error('Invalid argument: text must be a string');
     }
@@ -36,11 +36,11 @@ export function createSimpleMessage(text: string): Message {
         type: 'text',
         text: text,
     };
-}
+};
 
 // Generate quick reply items
-export function generateQuickReplyItems(options: QuestionOption[]): QuickReplyItem[] {
-    return options.map((option) => ({
+export const generateQuickReplyItems = (options: QuestionOption[]): QuickReplyItem[] =>
+    options.map((option) => ({
         type: 'action',
         action: {
             type: 'message',
@@ -48,10 +48,13 @@ export function generateQuickReplyItems(options: QuestionOption[]): QuickReplyIt
             text: option.text,
         },
     }));
-}
 
 // Flex message object
-export function createFlexMessage(altText: string, contents: string, text?: string): FlexMessage {
+export const createFlexMessage = (
+    altText: string,
+    contents: string,
+    text?: string
+): FlexMessage => {
     if (typeof altText !== 'string') {
         throw new Error('Invalid argument: altText must be a string');
     }
@@ -63,13 +66,13 @@ export function createFlexMessage(altText: string, contents: string, text?: stri
         altText: altText,
         contents: contents,
     };
-}
+};
 
 // Add quick reply items to a message object
-export function addQuickReplyItems(
+export const addQuickReplyItems = (
     message: Message | FlexMessage,
     quickReplyItems: QuickReplyOption[]
-): Message | FlexMessage {
+): Message | FlexMessage => {
     if (typeof message !== 'object') {
         throw new Error('Invalid argument: message must be an object');
     }
@@ -85,26 +88,26 @@ export function addQuickReplyItems(
         console.log('No items provided for quick reply, generating a simple text object');
     }
     return message;
-}
+};
 
 // Create a message object with quick reply
-export function createMessageWithQuickReplies(
+export const createMessageWithQuickReplies = (
     text: string,
     quickReplyItems: QuickReplyOption[]
-): Message {
+): Message => {
     const message: Message = {
         type: 'text',
         text: text,
     };
     return addQuickReplyItems(message, quickReplyItems) as Message;
-}
+};
 
 // Generate Flex Message with Quick Replies
-export function createFlexMessageWithQuickReplies(
+export const createFlexMessageWithQuickReplies = (
     altText: string,
     contents: string,
     quickReplyItems: QuickReplyOption[]
-): FlexMessage {
-    const flexMessage = createFlexMessage(altText, contents);
-    return addQuickReplyItems(flexMessage, quickReplyItems) as FlexMessage;
-}
+): FlexMessage => {
+    const flex_message = createFlexMessage(altText, contents);
+    return addQuickReplyItems(flex_message, quickReplyItems) as FlexMessage;
+};

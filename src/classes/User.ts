@@ -1,13 +1,19 @@
-import { user_states, MajorState, MinorState, Action, Step } from '../data/user_states';
-import { survey_contents, Survey } from '../data/survey_content';
-import { Question } from '../data/survey_content';
+import {
+    user_states,
+    type MajorState,
+    type MinorState,
+    type Action,
+    type Step,
+} from '../data/user_states';
+import { survey_contents, type Survey } from '../data/survey_content';
+import { type Question } from '../data/survey_content';
 import { db_data } from '../data/config';
-import { messagingApi, Message, ReplyableEvent } from '@line/bot-sdk';
+import { messagingApi, type Message, ReplyableEvent } from '@line/bot-sdk';
 
 const users_columns = db_data.tables.users.columns;
 
 export interface UserData {
-    [key: string]: any;
+    [key: string]: string | string[] | null;
     user_id: string | null;
     user_line_id: string;
     major_state_id: string | null;
@@ -74,8 +80,8 @@ export class User implements UserProperty {
         this.current_answers = Array.isArray(user_property.current_answers)
             ? user_property.current_answers
             : user_property.current_answers
-            ? [user_property.current_answers]
-            : [];
+              ? [user_property.current_answers]
+              : [];
         this.response = response || {
             shouldReply: false,
         };
@@ -86,29 +92,29 @@ export class User implements UserProperty {
     }
 
     getCurrentMajorState(): MajorState {
-        const majorState = user_states.major_states.find(
+        const major_state = user_states.major_states.find(
             (major_state) => major_state.state_id === this.major_state_id
         );
-        if (!majorState) {
+        if (!major_state) {
             throw new Error(`Major state with id ${this.major_state_id} not found`);
         }
-        return majorState;
+        return major_state;
     }
 
     getCurrentMinorState(): MinorState {
-        const majorState = user_states.major_states.find(
+        const major_state = user_states.major_states.find(
             (major_state) => major_state.state_id === this.major_state_id
         );
-        if (!majorState) {
+        if (!major_state) {
             throw new Error(`Major state with id ${this.major_state_id} not found`);
         }
-        const minorState = majorState.minor_states.find(
+        const minor_state = major_state.minor_states.find(
             (minor_state) => minor_state.state_id === this.minor_state_id
         );
-        if (!minorState) {
+        if (!minor_state) {
             throw new Error(`Minor state with id ${this.minor_state_id} not found`);
         }
-        return minorState;
+        return minor_state;
     }
 
     getCurrentAction(): Action {

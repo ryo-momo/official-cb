@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { User } from '../classes/User';
 import { db_data } from '../data/config';
-import { user_states, global_permitted_actions } from '../data/user_states';
+import { user_states, globally_permitted_actions } from '../data/user_states';
 import { actionInvoker } from '../actions/action_handler';
-import { Action } from '../data/user_states';
+import { type Action } from '../data/user_states';
 
 interface Event {
     user_line_id: string;
@@ -13,15 +13,15 @@ interface Event {
 }
 
 // Return the action if a match is found, otherwise return null
-function findActionByTrigger(text: string): Action | null {
+const findActionByTrigger = (text: string): Action | null => {
     const action = user_states.actions.find((action: Action) =>
         action.trigger_text?.includes(text)
     );
     return action || null;
-}
+};
 
 // Check if the action triggered by the text is allowed in the current minor state of the user
-export function isActionAllowedInCurrentState(user: User, text: string): boolean {
+export const isActionAllowedInCurrentState = (user: User, text: string): boolean => {
     // First, identify the action invoked by the search for user_states.actions.trigger_text with text
     const action = user_states.actions.find((action: Action) =>
         action.trigger_text?.includes(text)
@@ -29,15 +29,15 @@ export function isActionAllowedInCurrentState(user: User, text: string): boolean
     // If the action does not exist, it is not allowed
     if (!action) return false;
     // Get the current minor state of the user
-    const currentMinorState = user.getCurrentMinorState();
+    const current_minor_state = user.getCurrentMinorState();
     // Determine if it is allowed by the action ID
-    const isAllowed = currentMinorState.permitted_actions.some(
+    const isAllowed = current_minor_state.permitted_actions.some(
         (permittedAction) => permittedAction === action.action_id
     );
     return isAllowed;
-}
+};
 
-async function handleNewUser(event: Event): Promise<{ user: User; succeed: boolean }> {
+const handleNewUser = async (event: Event): Promise<{ user: User; succeed: boolean }> => {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     console.log('User is a brand new user');
@@ -68,9 +68,11 @@ async function handleNewUser(event: Event): Promise<{ user: User; succeed: boole
     } finally {
         await dbc.disconnect();
     }
-}
+};
 
-async function handleExistingUser(event: Event): Promise<{ user: User | null; succeed: boolean }> {
+const handleExistingUser = async (
+    event: Event
+): Promise<{ user: User | null; succeed: boolean }> => {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     console.log('User is an existing user');
@@ -89,7 +91,7 @@ async function handleExistingUser(event: Event): Promise<{ user: User | null; su
             if (isActionAllowedInCurrentState(user, event.text)) {
                 if (
                     user.current_action_id !== null &&
-                    global_permitted_actions.includes(event.text)
+                    globally_permitted_actions.includes(event.text)
                 ) {
                     console.log(
                         'User is trying to start a new action while in the middle of another action'
@@ -127,11 +129,11 @@ async function handleExistingUser(event: Event): Promise<{ user: User | null; su
     } finally {
         await dbc.disconnect();
     }
-}
+};
 
-export async function messageEventHandler(
+export const messageEventHandler = async (
     event: Event
-): Promise<{ user: User | null; succeed: boolean }> {
+): Promise<{ user: User | null; succeed: boolean }> => {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     try {
@@ -149,4 +151,4 @@ export async function messageEventHandler(
     } finally {
         await dbc.disconnect();
     }
-}
+};

@@ -1,4 +1,4 @@
-import { FlexContainer } from '@line/bot-sdk';
+import { type FlexContainer } from '@line/bot-sdk';
 import { db_data } from './config';
 import { flex_message_contents } from './flex_message_content';
 

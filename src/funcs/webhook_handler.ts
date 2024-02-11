@@ -1,6 +1,6 @@
 import { messageEventHandler } from './message_event_handler';
-import { WebhookRequestBody, WebhookEvent } from '@line/bot-sdk';
-import { User } from '../classes/User';
+import { type WebhookRequestBody, type WebhookEvent } from '@line/bot-sdk';
+import { type User } from '../classes/User';
 import { MessageSender } from './message_sender';
 import dotenv from 'dotenv';
 
@@ -39,7 +39,7 @@ interface Result {
     succeed: boolean;
 }
 
-async function eventResultHandler(result: Result, reply_token: string) {
+const eventResultHandler = async (result: Result, reply_token: string): Promise<void> => {
     const ms = new MessageSender(process.env.CHANNEL_ACCESS_TOKEN!);
     if (result.user) {
         if (result.user.response.message) {
@@ -51,10 +51,10 @@ async function eventResultHandler(result: Result, reply_token: string) {
             }
         }
     }
-}
+};
 
-export async function webhookHandler(request_body: WebhookRequestBody) {
-    const promises = request_body.events.map(async (event) => {
+export const webhookHandler = async (request_body: WebhookRequestBody): Promise<void> => {
+    const promises = request_body.events.map(async (event: WebhookEvent) /*:Promise<Result>*/ => {
         try {
             if ('replyToken' in event) {
                 const result = await webhookEventHandler(event);
@@ -63,15 +63,15 @@ export async function webhookHandler(request_body: WebhookRequestBody) {
                 return result;
             } else {
                 console.log('Event does not have a replyToken:', event);
-                return false;
+                return { user: null, succeed: false };
             }
         } catch (error) {
             console.error('Error in webhookEventHandler:', error);
-            return false;
+            return { user: null, succeed: false };
         }
     });
 
-    const results: Array<any> = [];
+    const results: Array<Result> = [];
     try {
         for (const promise of promises) {
             try {
@@ -88,11 +88,9 @@ export async function webhookHandler(request_body: WebhookRequestBody) {
         'Results of all promises including nested objects:',
         JSON.stringify(results, null, 2)
     );
-}
+};
 
-export async function webhookEventHandler(
-    event: WebhookEvent
-): Promise<{ user: User | null; succeed: boolean }> {
+export const webhookEventHandler = async (event: WebhookEvent): Promise<Result> => {
     // Check if the event type is "message"
     if (event.type === 'message') {
         if (event.source.type === 'user') {
@@ -124,4 +122,4 @@ export async function webhookEventHandler(
         console.log('Non-message event received');
         return { user: null, succeed: false };
     }
-}
+};

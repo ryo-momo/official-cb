@@ -6,16 +6,15 @@
         "esModuleInterop": true,
         "outDir": "./dist"
     },
-    "include": ["src/**/*.ts"],
+    "include": ["tests/*.ts", "src/**/*.ts", ".eslintrc.js"],
     "exclude": [
         "node_modules",
         "dist",
-        "tests/unified_test.ts",
         "tempCodeRunnerFile.ts",
-        "tests",
         ".vscode",
         ".prettierrc",
         "mock_db",
-        "legacy_files"
+        "legacy_files",
+        "tests/User.test.ts"
     ]
 }

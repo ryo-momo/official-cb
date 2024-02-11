@@ -13,6 +13,7 @@ import {
     messageToConcierge,
     terminateAction,
 } from '../actions/general_actions';
+import { type User } from '../classes/User';
 
 export interface MinorState {
     state_id: string;
@@ -36,23 +37,28 @@ export interface Step {
 export interface BaseAction {
     action_id: string;
     trigger_text?: string[];
-    handler?: Function;
+    handler?: (user: User, text: string) => User | Promise<User>;
+}
+
+export interface GeneralAction extends BaseAction {
+    steps: Step[];
+    handler?: (user: User) => User;
 }
 
 export interface SurveyAction extends BaseAction {
-    survey_id: string;
     steps: Step[];
-    handler: Function;
+    survey_id: string;
+    handler: (user: User, text: string) => Promise<User>;
 }
 
-export type Action = BaseAction | SurveyAction;
+export type Action = BaseAction | SurveyAction | GeneralAction;
 
 export interface UserStates {
     major_states: MajorState[];
     actions: Action[];
 }
 
-export const global_permitted_actions = ['terminate_action'];
+export const globally_permitted_actions = ['terminate_action'];
 
 const user_states_base: UserStates = {
     major_states: [
@@ -160,12 +166,12 @@ const user_states_base: UserStates = {
         {
             action_id: 'terminate_action',
             trigger_text: ['>キャンセル'],
-            handler: terminateAction,
+            handler: handleGetUserInfoAction,
         },
         {
             action_id: 'basic_info_update_or_reference',
             trigger_text: ['>お客様情報'],
-            handler: handleBasicInfoUpdateOrReference,
+            handler: handleBasicInfoUpdateOrReference, // `user`は適切な`User`型の変数に置き換えてください。
         },
         {
             action_id: 'basic_info_registration',
@@ -380,14 +386,15 @@ const user_states_base: UserStates = {
     ],
 };
 
-function getUserStates(): UserStates {
+const getUserStates = (): UserStates => {
     user_states_base.major_states.forEach((major_state) => {
         major_state.minor_states.forEach((minor_state) => {
-            minor_state.permitted_actions =
-                minor_state.permitted_actions.concat(global_permitted_actions);
+            minor_state.permitted_actions = minor_state.permitted_actions.concat(
+                globally_permitted_actions
+            );
         });
     });
     return user_states_base;
-}
+};
 
 export const user_states: UserStates = getUserStates();

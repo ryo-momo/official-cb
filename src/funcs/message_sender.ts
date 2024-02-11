@@ -1,20 +1,20 @@
-import { messagingApi, Message, MessageAPIResponseBase } from '@line/bot-sdk';
+import { messagingApi, type Message, type MessageAPIResponseBase } from '@line/bot-sdk';
 
 export class MessageSender {
-    private client: messagingApi.MessagingApiClient;
+    private readonly client: messagingApi.MessagingApiClient;
 
-    constructor(channelAccessToken: string) {
+    constructor(private readonly channelAccessToken: string) {
         this.client = new messagingApi.MessagingApiClient({ channelAccessToken });
     }
 
     async isValidMessage(messages: Message[]): Promise<MessageAPIResponseBase> {
         try {
-            const validationResponse = await this.client.validateReply({
+            const validation_response = await this.client.validateReply({
                 messages: messages,
             });
-            return validationResponse;
+            return validation_response;
         } catch (error: unknown) {
-            throw new Error('Error validating message: ' + (error as Error).message);
+            throw new Error(`Error validating message: ${(error as Error).message}`);
         }
     }
 
@@ -37,7 +37,7 @@ export class MessageSender {
         } catch (error: unknown) {
             // Log: Error sending message
             console.error();
-            throw new Error('Error sending message: ' + (error as Error).message);
+            throw new Error(`Error sending message: ${(error as Error).message}`);
         }
     }
 }

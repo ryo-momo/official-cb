@@ -1,4 +1,4 @@
-import { FlexContainer } from '@line/bot-sdk';
+import { type FlexContainer } from '@line/bot-sdk';
 
 interface FlexMessageContent {
     id: string;

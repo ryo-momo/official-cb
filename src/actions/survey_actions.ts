@@ -6,14 +6,14 @@ import {
     handleMultipleChoiceQuestion,
 } from '../funcs/question_handler';
 import { surveyValidator } from '../funcs/survey_validator';
-import { User } from '../classes/User';
-import { Step, user_states } from '../data/user_states';
+import { type User } from '../classes/User';
+import { type Step, user_states } from '../data/user_states';
 import { generateQuickReplyItems } from '../funcs/message_helper';
-import { Message, FlexMessage } from '@line/bot-sdk';
-import { Question, Survey } from '../data/survey_content';
+import { type Message, type FlexMessage } from '@line/bot-sdk';
+import { type Question, type Survey } from '../data/survey_content';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
-export async function basicInfoSurveyHandler(user: User, answer_text: string): Promise<User> {
+export const basicInfoSurveyHandler = async (user: User, answer_text: string): Promise<User> => {
     if (user.isInInitialStep()) {
         return await handleInitialStep(user);
     } else {
@@ -24,9 +24,12 @@ export async function basicInfoSurveyHandler(user: User, answer_text: string): P
             // Handle the error appropriately
         }
     }
-}
+};
 
-export async function searchConditionSurveyHandler(user: User, answer_text: string): Promise<User> {
+export const searchConditionSurveyHandler = async (
+    user: User,
+    answer_text: string
+): Promise<User> => {
     if (user.isInInitialStep()) {
         return await handleInitialStep(user);
     } else {
@@ -37,9 +40,9 @@ export async function searchConditionSurveyHandler(user: User, answer_text: stri
             // Handle the error appropriately
         }
     }
-}
+};
 
-async function handleInitialStep(user: User): Promise<User> {
+const handleInitialStep = async (user: User): Promise<User> => {
     let current_action = user.getCurrentAction();
     if ('survey_id' in current_action) {
         console.log('User is in initial step. Setting current survey and question.'); // Log message
@@ -60,9 +63,9 @@ async function handleInitialStep(user: User): Promise<User> {
     } else {
         throw new Error('User is in initial step, but current action is not a survey action.');
     }
-}
+};
 
-async function handleSubsequentSteps(user: User, answer_text: string): Promise<User> {
+const handleSubsequentSteps = async (user: User, answer_text: string): Promise<User> => {
     let validation_result = surveyValidator(user, answer_text);
     user = validation_result.user_object;
     if (validation_result.isValid) {
@@ -146,7 +149,7 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
                 {
                     type: 'text',
                     text:
-                        validation_result.error_message + '\n\n' + current_question.text ||
+                        `${validation_result.error_message}\n\n${current_question.text}` ||
                         '問題が発生しました、お手数ですが担当にお問い合わせください。(e001)',
                     ...('options' in current_question && {
                         // 型ガードを使用してoptionsの存在をチェック
@@ -160,9 +163,9 @@ async function handleSubsequentSteps(user: User, answer_text: string): Promise<U
         user.response.message = message;
         return user;
     }
-}
+};
 
-export function handleBasicInfoUpdateOrReference(user: User): User {
+export const handleBasicInfoUpdateOrReference = (user: User): User => {
     user.response.message = [
         {
             type: 'text',
@@ -198,9 +201,9 @@ export function handleBasicInfoUpdateOrReference(user: User): User {
         },
     ];
     return user;
-}
+};
 
-export function handleSearchConditionUpdateOrReference(user: User): User {
+export const handleSearchConditionUpdateOrReference = (user: User): User => {
     user.response.message = [
         {
             type: 'text',
@@ -236,9 +239,9 @@ export function handleSearchConditionUpdateOrReference(user: User): User {
         },
     ];
     return user;
-}
+};
 
-function handleNextStep(user: User, answer_text: string) {
+const handleNextStep = (user: User, answer_text: string): void => {
     const current_action = user.getCurrentAction();
     const current_survey = user.getCurrentSurvey();
     const current_question = user.getCurrentQuestion();
@@ -269,30 +272,30 @@ function handleNextStep(user: User, answer_text: string) {
             throw new Error('Current action does not have steps.');
         }
     }
-}
+};
 
-async function storeAnswerInDatabase(user: User, answer_text: string) {
+const storeAnswerInDatabase = async (user: User, answer_text: string): Promise<void> => {
     let dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     const current_question = user.getCurrentQuestion();
     console.log('現在の質問：', user.current_question_id); // Log message in English
     try {
         if (current_question.type === 'multiple-choice') {
-            const userDesiredStructuresTableName = db_data.tables.user_desired_structures.name;
+            const user_desired_structures_table_name = db_data.tables.user_desired_structures.name;
             // Add condition to check for matching answer_text in the related column
-            const relatedColumnName = current_question.related_column;
+            const related_column_name = current_question.related_column;
             if (user.current_answers !== null && user.current_answers.length >= 2) {
                 for (const current_answer of user.current_answers) {
-                    const checkExistenceSql = `SELECT * FROM \`${userDesiredStructuresTableName}\` WHERE user_id = ? AND \`${relatedColumnName}\` = ?`;
-                    const checkExistenceArgs = [user.user_id, current_answer];
-                    const existingRecords = (await dbc.query(
-                        checkExistenceSql,
-                        checkExistenceArgs
+                    const check_existence_sql = `SELECT * FROM \`${user_desired_structures_table_name}\` WHERE user_id = ? AND \`${related_column_name}\` = ?`;
+                    const check_existence_args = [user.user_id, current_answer];
+                    const existing_records = (await dbc.query(
+                        check_existence_sql,
+                        check_existence_args
                     )) as object[];
-                    if (existingRecords.length === 0) {
-                        const insertSql = `INSERT INTO \`${userDesiredStructuresTableName}\` (user_id, desired_structure) VALUES (?, ?)`;
-                        const insertArgs = [user.user_id, current_answer];
-                        await dbc.query(insertSql, insertArgs);
+                    if (existing_records.length === 0) {
+                        const insert_sql = `INSERT INTO \`${user_desired_structures_table_name}\` (user_id, desired_structure) VALUES (?, ?)`;
+                        const insert_args = [user.user_id, current_answer];
+                        await dbc.query(insert_sql, insert_args);
                         console.log(
                             'Inserted a new record into the database for user_id:',
                             user.user_id
@@ -307,7 +310,7 @@ async function storeAnswerInDatabase(user: User, answer_text: string) {
             await dbc.update(
                 current_question.related_table,
                 { [current_question.related_column]: answer_text },
-                'user_id = "' + user.user_id + '"'
+                `user_id = "${user.user_id}"`
             );
         }
         console.log('Answer save successful'); // Log message in English
@@ -317,9 +320,9 @@ async function storeAnswerInDatabase(user: User, answer_text: string) {
     } finally {
         await dbc.disconnect();
     }
-}
+};
 
-function endSurveyAction(user: User, current_survey_id: string) {
+const endSurveyAction = (user: User, current_survey_id: string): void => {
     //--------いずれminor_state遷移のトリガー処理を追加！！
     switch (current_survey_id) {
         case 'basic_info':
@@ -343,9 +346,9 @@ function endSurveyAction(user: User, current_survey_id: string) {
             text: '質問は以上です、お疲れさまでした！担当が対応いたしますのでしばらくお待ちくださいませ。',
         },
     ] as Message[];
-}
+};
 
-function setQuestion(user: User, current_question: Question) {
+const setQuestion = (user: User, current_question: Question): void => {
     // Initialize message explicitly
     let message: Message[] | FlexMessage[];
 
@@ -376,13 +379,13 @@ function setQuestion(user: User, current_question: Question) {
 
     // update user response
     user.response.message = message;
-}
+};
 
-function getNextQuestion(
+const getNextQuestion = (
     answer_text: string,
     current_question: Question,
     current_survey: Survey
-): Question | undefined {
+): Question | undefined => {
     let next_question;
     // Check if current_question.next is a string or an object
     if (current_question.type !== 'single-choice') {
@@ -402,4 +405,4 @@ function getNextQuestion(
         }
     }
     return next_question;
-}
+};

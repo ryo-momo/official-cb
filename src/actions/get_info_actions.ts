@@ -1,7 +1,7 @@
 import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
-import { User } from '../classes/User';
+import { type User } from '../classes/User';
 import { db_data } from '../data/config';
-import { Message } from '@line/bot-sdk';
+import { type Message } from '@line/bot-sdk';
 
 export interface DataLocations {
     [index: number]: Columns;
@@ -13,7 +13,7 @@ export interface Columns {
 }
 
 export interface UserInfo {
-    [key: string]: any;
+    [key: string]: string | number | boolean;
     user_name: string;
     user_name_kana: string;
     address_postal_code: string;
@@ -75,7 +75,7 @@ export const user_info_locations: DataLocations = [
     },
 ];
 
-export async function handleGetUserInfoAction(user: User, text: string) {
+export const handleGetUserInfoAction = async (user: User, text: string): Promise<User> => {
     const dbc = new DatabaseCommunicator(db_data);
     let user_info: UserInfo | null = null;
     try {
@@ -118,7 +118,7 @@ export async function handleGetUserInfoAction(user: User, text: string) {
         throw new Error('No userinfo found');
     }
     return user;
-}
+};
 
 export const search_condition_columns: DataLocations = [
     {
@@ -140,13 +140,13 @@ export const search_condition_columns: DataLocations = [
 
 // const search_condition_columns: SearchCondition = ;
 
-export async function handleGetSearchConditionAction(user: User, text: string) {
+export const handleGetSearchConditionAction = async (user: User, text: string): Promise<User> => {
     const dbc = new DatabaseCommunicator(db_data);
     let search_condition: SearchCondition | null = null;
     try {
         if (user.user_id) {
             search_condition = (await dbc.getInfoByUserId(
-                user.user_id!,
+                user.user_id,
                 search_condition_columns
             )) as SearchCondition;
         } else {
@@ -172,4 +172,4 @@ export async function handleGetSearchConditionAction(user: User, text: string) {
         throw new Error('No userinfo found');
     }
     return user;
-}
+};

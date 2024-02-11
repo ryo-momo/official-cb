@@ -1,4 +1,4 @@
-import { User } from '../classes/User';
+import { type User } from '../classes/User';
 import { SingleChoiceQuestion, MultipleChoiceQuestion } from '../data/survey_content';
 
 interface QuestionHandlerResult {
@@ -13,21 +13,16 @@ const ERROR_MESSAGES = {
     NEGATIVE_ANSWERS: 'ERROR: answers_to_go has gone less than zero',
 };
 
-export function handleQuestion(user: User, answer_text: string): QuestionHandlerResult {
-    return {
+export const handleQuestion = (user: User, answer_text: string): QuestionHandlerResult => ({
         user_object: user,
         storeValueToDB: true,
         goToNextStep: true,
-    };
-}
+    });
 
 export const handleTextQuestion = handleQuestion;
 export const handleSingleChoiceQuestion = handleQuestion;
 
-export function handleMultipleChoiceQuestion(
-    user: User,
-    answer_text: string
-): QuestionHandlerResult {
+export const handleMultipleChoiceQuestion = (user: User, answer_text: string): QuestionHandlerResult => {
     const current_question = user.getCurrentQuestion();
     if (user.current_answers && current_question) {
         //add the answer to the current answer array
@@ -65,4 +60,4 @@ export function handleMultipleChoiceQuestion(
     } else {
         throw new Error(ERROR_MESSAGES.NULL_QUESTION);
     }
-}
+};
