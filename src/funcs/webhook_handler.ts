@@ -40,16 +40,22 @@ interface Result {
 }
 
 const eventResultHandler = async (result: Result, reply_token: string): Promise<void> => {
-    const ms = new MessageSender(process.env.CHANNEL_ACCESS_TOKEN!);
-    if (result.user) {
-        if (result.user.response.message) {
-            try {
-                console.log('sending user a response');
-                await ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
-            } catch (err) {
-                console.error('Error in sending message:', err);
+    if (process.env.CHANNEL_ACCESS_TOKEN) {
+        const ms = new MessageSender(process.env.CHANNEL_ACCESS_TOKEN);
+        if (result.user) {
+            if (result.user.response.message) {
+                try {
+                    console.log('sending user a response');
+                    await ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
+                } catch (err) {
+                    console.error('Error in sending message:', err);
+                }
             }
+        } else {
+            console.log('No user object found in result');
         }
+    } else {
+        console.log('No channel access token found');
     }
 };
 

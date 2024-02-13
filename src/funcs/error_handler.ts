@@ -12,6 +12,7 @@ export const errorHandler = (error: ErrorEvent, user: User): User => {
     //get user error message
     const user_error_msg = error.USER_ERROR;
 
+    //out put errors
     console.error(internal_error_msg);
     user.response.message = [
         {
