@@ -4,6 +4,7 @@ import { Readable } from 'stream';
 import https from 'https';
 import { type WebhookRequestBody, type MessageEvent, type ImageEventMessage } from '@line/bot-sdk';
 import { type User } from '../classes/User';
+import dotenv from 'dotenv';
 
 // //just for testing
 // export const handler = async (event: WebhookRequestBody): Promise<void> => {
@@ -16,6 +17,8 @@ import { type User } from '../classes/User';
 //         }
 //     }
 // };
+
+dotenv.config();
 
 //handler to handle image message event
 export const imageMessageHandler = async (

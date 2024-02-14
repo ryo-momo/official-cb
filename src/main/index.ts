@@ -1,6 +1,5 @@
-import https from 'https';
-import { APIGatewayProxyEvent, APIGatewayProxyResult, type Context } from 'aws-lambda';
-import { type WebhookRequestBody, WebhookEvent } from '@line/bot-sdk';
+import { type Context } from 'aws-lambda';
+import { type WebhookRequestBody } from '@line/bot-sdk';
 import { webhookHandler } from '../funcs/webhook_handler';
 
 export const lambdaHandler = async (event: WebhookRequestBody, context: Context): Promise<void> => {
@@ -11,3 +10,5 @@ export const lambdaHandler = async (event: WebhookRequestBody, context: Context)
         console.error('Error occurred:', error);
     }
 };
+
+//TODO 5分ごとに起動するやつ実装

@@ -166,7 +166,7 @@ const user_states_base: UserStates = {
         {
             action_id: 'terminate_action',
             trigger_text: ['>キャンセル'],
-            handler: handleGetUserInfoAction,
+            handler: terminateAction,
         },
         {
             action_id: 'basic_info_update_or_reference',

@@ -94,8 +94,10 @@ const handleExistingUser = async (
                     user.current_action_id !== null &&
                     globally_permitted_actions.includes(event.text)
                 ) {
-                    console.log(
-                        'User is trying to start a new action while in the middle of another action'
+                    user = errorHandler(
+                        'NEW_ACTION_WHILE_IN_PROGRESS',
+                        'NEW_ACTION_WHILE_IN_PROGRESS',
+                        user
                     );
                     return { user, succeed: false };
                 } else {
@@ -112,8 +114,10 @@ const handleExistingUser = async (
             }
         } else {
             if (user.current_action_id === null) {
-                console.log(
-                    'User is sending a message that is not a trigger but user is not in the middle of an action either'
+                user = errorHandler(
+                    'NON_TRIGGER_MESSAGE_NO_ACTION',
+                    'NON_TRIGGER_MESSAGE_NO_ACTION',
+                    user
                 );
                 return { user: user, succeed: false };
             } else {
@@ -130,7 +134,7 @@ const handleExistingUser = async (
     }
 };
 
-export const messageEventHandler = async (
+export const textMessageEventHandler = async (
     event: Event
 ): Promise<{ user: User | null; succeed: boolean }> => {
     const dbc = new DatabaseCommunicator(db_data);
@@ -142,7 +146,8 @@ export const messageEventHandler = async (
             return handleNewUser(event);
         } else {
             // user is an existing user
-            return handleExistingUser(event);
+            const result = await handleExistingUser(event);
+            return result;
         }
     } catch (err) {
         console.error('Error checking if user exists: ', err);

@@ -81,7 +81,7 @@ const webhookHandler = (request_body) => __awaiter(void 0, void 0, void 0, funct
             if ('replyToken' in event) {
                 const result = yield (0, exports.webhookEventHandler)(event);
                 //enable when testing on lambda
-                // await eventResultHandler(result, event.replyToken);
+                yield eventResultHandler(result, event.replyToken);
                 return result;
             }
             else {

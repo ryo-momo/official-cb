@@ -1,38 +1,10 @@
-import { messageEventHandler } from './text_message_event_handler';
+import { textMessageEventHandler } from './text_message_event_handler';
 import { type WebhookRequestBody, type WebhookEvent } from '@line/bot-sdk';
 import { type User } from '../classes/User';
 import { MessageSender } from './message_sender';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-//example of LINE event
-
-// {
-//     "destination": "Ude07b1faacabdf9fc4971644c94fd76d",
-//     "events": [
-//         {
-//             "type": "message",
-//             "message": {
-//                 "type": "text",
-//                 "id": "489235210962207227",
-//                 "quoteToken": "L9RsBpEYLH9GOcYH7b0Jf3tFzFuqmihcOFK6-SIgxjkfY6JVfw3cthFToNt02REUPD6zDOZ-iYIZdv3nhuAowKIcx19e6uEMDxzrObD4hy3TfMSS-B0bIaNXC7Ty2X4Dte2KRe37IvR5_bx75ehEnQ",
-//                 "text": "Aaa"
-//             },
-//             "webhookEventId": "01HKC6YB99P4X1WA0GQHMZQPMQ",
-//             "deliveryContext": {
-//                 "isRedelivery": false
-//             },
-//             "timestamp": 1704438213713,
-//             "source": {
-//                 "type": "user",
-//                 "userId": "Ue478ad4286f7e7b0d2baf5e39bdb9908"
-//             },
-//             "replyToken": "c76fd232a2104b689cc90a38a75defe3",
-//             "mode": "active"
-//         }
-//     ]
-// }
 
 interface Result {
     user: User | null;
@@ -66,7 +38,7 @@ export const webhookEventHandler = async (event: WebhookEvent): Promise<Result> 
             if ('text' in event.message && event.message.text) {
                 console.log('User Message event received');
                 try {
-                    const result = await messageEventHandler({
+                    const result = await textMessageEventHandler({
                         user_line_id: event.source.userId,
                         text: event.message.text,
                         timestamp: event.timestamp,
@@ -99,7 +71,7 @@ export const webhookHandler = async (request_body: WebhookRequestBody): Promise<
             if ('replyToken' in event) {
                 const result = await webhookEventHandler(event);
                 //enable when testing on lambda
-                // await eventResultHandler(result, event.replyToken);
+                await eventResultHandler(result, event.replyToken);
                 return result;
             } else {
                 // TODO need to send message to the user
