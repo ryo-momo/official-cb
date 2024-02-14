@@ -4,26 +4,7 @@ import { Readable } from 'stream';
 import https from 'https';
 import { type WebhookRequestBody, type MessageEvent } from '@line/bot-sdk';
 
-const s3 = new S3();
-const lineAPIToken =
-    'JtMKGIsp5JJvfWrZUvqSruC7TEvVfhgTC6wFOQtmXtNmA5gZrgefZlw4gIUznwDeVuqTnqYOn+Hd7XwXIkm/A2/XKSOO7hXnlpFI2PagAVJQH1ni8kGXUFc96rsleA5qpbp3Jfa3EGO2NV+ZcpwZKgdB04t89/1O/w1cDnyilFU=';
-const s3Bucket = 'official-cb-imagestorage-staging';
-const forward_image_to_line_id = 'Ue478ad4286f7e7b0d2baf5e39bdb9908';
-
-// export const handler = async (event: unknown): Promise<Buffer> => {
-//     console.log('event received is: ', JSON.stringify(event));
-//     //const userId = event.events[0].source.userId;
-//     const userId = 'U1d84e21f92e1f17b23c6100f4e53d226';
-//     //const imageId = event.events[0].message.id;
-//     const imageId = '494875572301201955';
-//     //const imageUrl = await storeImageToS3(userId,imageId);
-//     //const imageUrl = "https://trialbucketforimage.s3.ap-northeast-1.amazonaws.com/U1d84e21f92e1f17b23c6100f4e53d226/494875572301201955.jpg"
-//     //return await sendImageToUser(userId,imageUrl);
-//     //return imageUrl;
-//     const image = await getImageFromS3(userId, imageId);
-//     return image;
-// };
-
+//just for testing
 export const handler = async (event: WebhookRequestBody): Promise<void> => {
     const messageEvent = event.events[0];
     if (messageEvent.type === 'message') {
@@ -35,7 +16,9 @@ export const handler = async (event: WebhookRequestBody): Promise<void> => {
     }
 };
 
+//handler to handle image message event
 export const imageMessageHandler = async (event: MessageEvent): Promise<void> => {
+    const forward_image_to_line_id = process.env.STAFF_LINE_ID;
     console.log('event received: ', JSON.stringify(event));
     if (event.message.type === 'image') {
         const user_line_id = event.source.userId;
@@ -51,28 +34,37 @@ export const imageMessageHandler = async (event: MessageEvent): Promise<void> =>
             if (image_url) {
                 // image_urlが空でないことを確認
                 try {
-                    await sendImageToUser(forward_image_to_line_id, image_url);
+                    if (forward_image_to_line_id) {
+                        await sendImageToUser(forward_image_to_line_id, image_url);
+                    }
                     console.log('send image to user success');
                 } catch (err) {
                     console.log('Error sending image to user:', err);
                 }
+            } else {
+                console.error('image url is empty');
             }
+        } else {
+            console.error('no line id found in message event');
         }
     }
 };
 
 const storeImageToS3 = async (lineId: string, imageId: string): Promise<string> => {
+    const s3 = new S3();
+    const s3Bucket = process.env.IMAGE_STORE_BUCKET;
+    const channel_access_token = process.env.CHANNEL_ACCESS_TOKEN;
     const options = {
         hostname: 'api-data.line.me',
         path: `/v2/bot/message/${imageId}/content`,
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${lineAPIToken}`,
+            Authorization: `Bearer ${channel_access_token}`,
         },
     };
 
     try {
-        const { data: imageData, contentType } = await httpsRequestforimage(options);
+        const { data: imageData, contentType } = await httpsRequestForImage(options);
         console.log('ContentType: ', contentType);
         console.log('Image data length', imageData.length);
         const params = {
@@ -85,9 +77,6 @@ const storeImageToS3 = async (lineId: string, imageId: string): Promise<string> 
             },
         };
 
-        // const uploadResult = await s3.upload(params).promise();
-        // console.log('Image uploaded successfully:', uploadResult.Location);
-        // return uploadResult.Location;
         await s3.putObject(params);
         console.log(
             'Image uploaded successfully:',
@@ -101,6 +90,8 @@ const storeImageToS3 = async (lineId: string, imageId: string): Promise<string> 
 };
 
 const getImageFromS3 = async (lineId: string, imageId: string): Promise<Buffer> => {
+    const s3 = new S3();
+    const s3Bucket = process.env.IMAGE_STORE_BUCKET;
     const params = {
         Bucket: s3Bucket,
         Key: `${lineId}/${imageId}.jpg`,
@@ -128,6 +119,7 @@ const getImageFromS3 = async (lineId: string, imageId: string): Promise<Buffer> 
 };
 
 const sendImageToUser = async (lineId: string, imageUrl: string): Promise<string> => {
+    const channel_access_token = process.env.CHANNEL_ACCESS_TOKEN;
     const message = {
         type: 'image',
         originalContentUrl: imageUrl,
@@ -145,7 +137,7 @@ const sendImageToUser = async (lineId: string, imageUrl: string): Promise<string
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${lineAPIToken}`,
+            Authorization: `Bearer ${channel_access_token}`,
         },
     };
 
@@ -196,7 +188,7 @@ const sendImageToUser = async (lineId: string, imageUrl: string): Promise<string
     }
 };
 
-const httpsRequestforimage = async (
+const httpsRequestForImage = async (
     options: RequestOptions
 ): Promise<{ data: Buffer; contentType: string }> =>
     new Promise<{ data: Buffer; contentType: string }>((resolve, reject) => {
