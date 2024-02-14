@@ -7,7 +7,7 @@
         "outDir": "./dist",
         "noErrorTruncation": true
     },
-    "include": ["tests/*.ts", "src/**/*.ts", ".eslintrc.js"],
+    "include": ["tests/unified_test.ts", "src/**/*.ts", ".eslintrc.js"],
     "exclude": [
         "node_modules",
         "dist",

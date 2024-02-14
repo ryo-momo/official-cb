@@ -36,10 +36,7 @@ const externalPropertyAction = (user, text) => {
                 user.current_step_id = 'select_method';
             }
             else {
-                user = (0, error_handler_1.errorHandler)({
-                    INTERNAL_ERROR: error_handler_1.ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
-                    USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
-                }, user);
+                user = (0, error_handler_1.errorHandler)('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
             }
             break;
         }
@@ -76,10 +73,7 @@ const externalPropertyAction = (user, text) => {
                     //TODO 画像を直接送れるようにする
                     break;
                 default:
-                    user = (0, error_handler_1.errorHandler)({
-                        INTERNAL_ERROR: error_handler_1.ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
-                        USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
-                    }, user);
+                    user = (0, error_handler_1.errorHandler)('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
             }
             break;
         }
@@ -99,18 +93,12 @@ const externalPropertyAction = (user, text) => {
                 user.current_step_id = 'complete';
             }
             else {
-                user = (0, error_handler_1.errorHandler)({
-                    INTERNAL_ERROR: error_handler_1.ERROR_LOGS.INVALID_URL,
-                    USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INVALID_URL,
-                }, user);
+                user = (0, error_handler_1.errorHandler)('INVALID_URL', 'INVALID_URL', user);
             }
             break;
         }
         default: {
-            user = (0, error_handler_1.errorHandler)({
-                INTERNAL_ERROR: error_handler_1.ERROR_LOGS.INVALID_CURRENT_STEP,
-                USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
-            }, user);
+            user = (0, error_handler_1.errorHandler)('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user);
         }
     }
     if (user.current_step_id === 'complete') {

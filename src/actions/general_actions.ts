@@ -33,13 +33,7 @@ export const externalPropertyAction = (user: User, text: string): User => {
                 ];
                 user.current_step_id = 'select_method';
             } else {
-                user = errorHandler(
-                    {
-                        INTERNAL_ERROR: ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
-                        USER_ERROR: USER_ERROR_MESSAGES.INTERNAL_ERROR,
-                    },
-                    user
-                );
+                user = errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
             }
 
             break;
@@ -77,13 +71,7 @@ export const externalPropertyAction = (user: User, text: string): User => {
                     //TODO 画像を直接送れるようにする
                     break;
                 default:
-                    user = errorHandler(
-                        {
-                            INTERNAL_ERROR: ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
-                            USER_ERROR: USER_ERROR_MESSAGES.INTERNAL_ERROR,
-                        },
-                        user
-                    );
+                    user = errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
             }
             break;
         }
@@ -104,23 +92,16 @@ export const externalPropertyAction = (user: User, text: string): User => {
                 user.current_step_id = 'complete';
             } else {
                 user = errorHandler(
-                    {
-                        INTERNAL_ERROR: ERROR_LOGS.INVALID_URL,
-                        USER_ERROR: USER_ERROR_MESSAGES.INVALID_URL,
-                    },
+                    'INVALID_URL',
+                    'INVALID_URL',
+
                     user
                 );
             }
             break;
         }
         default: {
-            user = errorHandler(
-                {
-                    INTERNAL_ERROR: ERROR_LOGS.INVALID_CURRENT_STEP,
-                    USER_ERROR: USER_ERROR_MESSAGES.INTERNAL_ERROR,
-                },
-                user
-            );
+            user = errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user);
         }
     }
     if (user.current_step_id === 'complete') {

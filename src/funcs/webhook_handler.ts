@@ -102,10 +102,12 @@ export const webhookHandler = async (request_body: WebhookRequestBody): Promise<
                 // await eventResultHandler(result, event.replyToken);
                 return result;
             } else {
+                // TODO need to send message to the user
                 console.log('Event does not have a replyToken:', event);
                 return { user: null, succeed: false };
             }
         } catch (error) {
+            //TODO need to send message to the user
             console.error('Error in webhookEventHandler:', error);
             return { user: null, succeed: false };
         }

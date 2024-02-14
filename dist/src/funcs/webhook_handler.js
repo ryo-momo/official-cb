@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.webhookHandler = exports.webhookEventHandler = void 0;
-const message_event_handler_1 = require("./message_event_handler");
+const text_message_event_handler_1 = require("./text_message_event_handler");
 const message_sender_1 = require("./message_sender");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -46,7 +46,7 @@ const webhookEventHandler = (event) => __awaiter(void 0, void 0, void 0, functio
             if ('text' in event.message && event.message.text) {
                 console.log('User Message event received');
                 try {
-                    const result = yield (0, message_event_handler_1.messageEventHandler)({
+                    const result = yield (0, text_message_event_handler_1.messageEventHandler)({
                         user_line_id: event.source.userId,
                         text: event.message.text,
                         timestamp: event.timestamp,
@@ -85,11 +85,13 @@ const webhookHandler = (request_body) => __awaiter(void 0, void 0, void 0, funct
                 return result;
             }
             else {
+                // TODO need to send message to the user
                 console.log('Event does not have a replyToken:', event);
                 return { user: null, succeed: false };
             }
         }
         catch (error) {
+            //TODO need to send message to the user
             console.error('Error in webhookEventHandler:', error);
             return { user: null, succeed: false };
         }

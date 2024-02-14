@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.actionInvoker = void 0;
+exports.actionHandler = void 0;
 const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
 const config_1 = require("../data/config");
 const error_handler_1 = require("../funcs/error_handler");
@@ -24,21 +24,16 @@ const invokeAction = (user, text, action) => __awaiter(void 0, void 0, void 0, f
             yield dbc.updateUser(user);
         }
         catch (err) {
-            user = (0, error_handler_1.errorHandler)({
-                INTERNAL_ERROR: error_handler_1.ERROR_LOGS.DATABASE_UPDATE_FAILED,
-                USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
-            }, user);
+            const errorInstance = err instanceof Error ? err : new Error(`Unknown error: ${err}`);
+            return (0, error_handler_1.errorHandler)('DATABASE_UPDATE_FAILED', 'INTERNAL_ERROR', user, errorInstance);
         }
     }
     else {
-        user = (0, error_handler_1.errorHandler)({
-            INTERNAL_ERROR: error_handler_1.ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
-            USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
-        }, user);
+        return (0, error_handler_1.errorHandler)('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
     }
     return user;
 });
-const actionInvoker = (user, text, action) => __awaiter(void 0, void 0, void 0, function* () {
+const actionHandler = (user, text, action) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (action) {
             return yield invokeAction(user, text, action);
@@ -48,10 +43,9 @@ const actionInvoker = (user, text, action) => __awaiter(void 0, void 0, void 0, 
             return yield invokeAction(user, text, current_action);
         }
     }
-    catch (error) {
-        console.error('Error in actionInvoker: ', error);
-        // 必要に応じてエラーを再び投げるか、適切なエラー処理を行う
-        throw error;
+    catch (err) {
+        const errorInstance = err instanceof Error ? err : new Error(`Unknown error: ${err}`);
+        throw (0, error_handler_1.errorHandler)('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user, errorInstance);
     }
 });
-exports.actionInvoker = actionInvoker;
+exports.actionHandler = actionHandler;

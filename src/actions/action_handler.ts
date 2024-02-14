@@ -14,27 +14,16 @@ const invokeAction = async (user: User, text: string, action: Action): Promise<U
             const dbc = new DatabaseCommunicator(db_data);
             await dbc.updateUser(user);
         } catch (err) {
-            user = errorHandler(
-                {
-                    INTERNAL_ERROR: ERROR_LOGS.DATABASE_UPDATE_FAILED,
-                    USER_ERROR: USER_ERROR_MESSAGES.INTERNAL_ERROR,
-                },
-                user
-            );
+            const errorInstance = err instanceof Error ? err : new Error(`Unknown error: ${err}`);
+            return errorHandler('DATABASE_UPDATE_FAILED', 'INTERNAL_ERROR', user, errorInstance);
         }
     } else {
-        user = errorHandler(
-            {
-                INTERNAL_ERROR: ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
-                USER_ERROR: USER_ERROR_MESSAGES.INTERNAL_ERROR,
-            },
-            user
-        );
+        return errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
     }
     return user;
 };
 
-export const actionInvoker = async (
+export const actionHandler = async (
     user: User,
     text: string,
     action?: Action | null
@@ -46,9 +35,8 @@ export const actionInvoker = async (
             const current_action = user.getCurrentAction();
             return await invokeAction(user, text, current_action);
         }
-    } catch (error) {
-        console.error('Error in actionInvoker: ', error);
-        // 必要に応じてエラーを再び投げるか、適切なエラー処理を行う
-        throw error;
+    } catch (err) {
+        const errorInstance = err instanceof Error ? err : new Error(`Unknown error: ${err}`);
+        throw errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user, errorInstance);
     }
 };

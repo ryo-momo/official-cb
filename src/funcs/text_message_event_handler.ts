@@ -3,8 +3,9 @@ import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { User } from '../classes/User';
 import { db_data } from '../data/config';
 import { user_states, globally_permitted_actions } from '../data/user_states';
-import { actionInvoker } from '../actions/action_handler';
+import { actionHandler } from '../actions/action_handler';
 import { type Action } from '../data/user_states';
+import { errorHandler } from './error_handler';
 
 interface Event {
     user_line_id: string;
@@ -102,13 +103,11 @@ const handleExistingUser = async (
                         "User's is not in the middle of an action, and is starting a new one"
                     );
                     user.current_action_id = triggered_action.action_id;
-                    user = await actionInvoker(user, event.text, triggered_action);
-                    return { user: user, succeed: true };
+                    const result = await actionHandler(user, event.text, triggered_action);
+                    return { user: result, succeed: true };
                 }
             } else {
-                console.log(
-                    'User is trying to do an action that is not allowed in the current state'
-                );
+                user = errorHandler('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user);
                 return { user: user, succeed: false };
             }
         } else {
@@ -119,7 +118,7 @@ const handleExistingUser = async (
                 return { user: user, succeed: false };
             } else {
                 console.log('User is in the middle of an action');
-                user = await actionInvoker(user, event.text);
+                user = await actionHandler(user, event.text);
                 return { user: user, succeed: true };
             }
         }
