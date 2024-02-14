@@ -2,29 +2,34 @@ import { S3 } from '@aws-sdk/client-s3';
 import { type RequestOptions } from 'https';
 import { Readable } from 'stream';
 import https from 'https';
-import { type WebhookRequestBody, type MessageEvent } from '@line/bot-sdk';
+import { type WebhookRequestBody, type MessageEvent, type ImageEventMessage } from '@line/bot-sdk';
+import { type User } from '../classes/User';
 
-//just for testing
-export const handler = async (event: WebhookRequestBody): Promise<void> => {
-    const messageEvent = event.events[0];
-    if (messageEvent.type === 'message') {
-        try {
-            await imageMessageHandler(messageEvent);
-        } catch (err) {
-            console.error(err);
-        }
-    }
-};
+// //just for testing
+// export const handler = async (event: WebhookRequestBody): Promise<void> => {
+//     const messageEvent = event.events[0];
+//     if (messageEvent.type === 'message') {
+//         try {
+//             await imageMessageHandler(messageEvent, user_line_id);
+//         } catch (err) {
+//             console.error(err);
+//         }
+//     }
+// };
 
 //handler to handle image message event
-export const imageMessageHandler = async (event: MessageEvent): Promise<void> => {
+export const imageMessageHandler = async (
+    message: ImageEventMessage,
+    user: User
+): Promise<void> => {
     const forward_image_to_line_id = process.env.STAFF_LINE_ID;
-    console.log('event received: ', JSON.stringify(event));
-    if (event.message.type === 'image') {
-        const user_line_id = event.source.userId;
-        const image_id = event.message.id;
+    console.log('event received: ', JSON.stringify(message));
+    if (message.type === 'image') {
+        const image_id = message.id;
+        const user_line_id = user.user_line_id;
         if (user_line_id) {
-            let image_url = ''; // image_urlの定義を追加
+            let image_url = '';
+            // store the image sent to S3
             try {
                 image_url = await storeImageToS3(user_line_id, image_id); // image_urlに値を代入
                 console.log('store image to s3 success');
@@ -39,7 +44,7 @@ export const imageMessageHandler = async (event: MessageEvent): Promise<void> =>
                     }
                     console.log('send image to user success');
                 } catch (err) {
-                    console.log('Error sending image to user:', err);
+                    console.error('Error sending image to user:', err);
                 }
             } else {
                 console.error('image url is empty');

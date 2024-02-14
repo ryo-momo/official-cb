@@ -1,4 +1,4 @@
-import { messageEventHandler } from './message_event_handler';
+import { messageEventHandler } from './text_message_event_handler';
 import { type WebhookRequestBody, type WebhookEvent } from '@line/bot-sdk';
 import { type User } from '../classes/User';
 import { MessageSender } from './message_sender';
