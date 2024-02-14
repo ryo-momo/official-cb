@@ -12,62 +12,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.webhookEventHandler = exports.webhookHandler = void 0;
+exports.webhookHandler = exports.webhookEventHandler = void 0;
 const message_event_handler_1 = require("./message_event_handler");
 const message_sender_1 = require("./message_sender");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const eventResultHandler = (result, reply_token) => __awaiter(void 0, void 0, void 0, function* () {
-    const ms = new message_sender_1.MessageSender(process.env.CHANNEL_ACCESS_TOKEN);
-    if (result.user) {
-        if (result.user.response.message) {
-            try {
-                console.log('sending user a response');
-                yield ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
-            }
-            catch (err) {
-                console.error('Error in sending message:', err);
+    if (process.env.CHANNEL_ACCESS_TOKEN) {
+        const ms = new message_sender_1.MessageSender(process.env.CHANNEL_ACCESS_TOKEN);
+        if (result.user) {
+            if (result.user.response.message) {
+                try {
+                    console.log('sending user a response');
+                    yield ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
+                }
+                catch (err) {
+                    console.error('Error in sending message:', err);
+                }
             }
         }
+        else {
+            console.log('No user object found in result');
+        }
+    }
+    else {
+        console.log('No channel access token found');
     }
 });
-const webhookHandler = (request_body) => __awaiter(void 0, void 0, void 0, function* () {
-    const promises = request_body.events.map((event) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            if ('replyToken' in event) {
-                const result = yield (0, exports.webhookEventHandler)(event);
-                //enable when testing on lambda
-                yield eventResultHandler(result, event.replyToken);
-                return result;
-            }
-            else {
-                console.log('Event does not have a replyToken:', event);
-                return { user: null, succeed: false };
-            }
-        }
-        catch (error) {
-            console.error('Error in webhookEventHandler:', error);
-            return { user: null, succeed: false };
-        }
-    }));
-    const results = [];
-    try {
-        for (const promise of promises) {
-            try {
-                const result = yield promise;
-                results.push(result);
-            }
-            catch (error) {
-                console.error('Error in promise:', error);
-            }
-        }
-    }
-    catch (error) {
-        console.error('Error in processing promises:', error);
-    }
-    console.log('Results of all promises including nested objects:', JSON.stringify(results, null, 2));
-});
-exports.webhookHandler = webhookHandler;
 const webhookEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the event type is "message"
     if (event.type === 'message') {
@@ -104,3 +75,40 @@ const webhookEventHandler = (event) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.webhookEventHandler = webhookEventHandler;
+const webhookHandler = (request_body) => __awaiter(void 0, void 0, void 0, function* () {
+    const promises = request_body.events.map((event) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            if ('replyToken' in event) {
+                const result = yield (0, exports.webhookEventHandler)(event);
+                //enable when testing on lambda
+                // await eventResultHandler(result, event.replyToken);
+                return result;
+            }
+            else {
+                console.log('Event does not have a replyToken:', event);
+                return { user: null, succeed: false };
+            }
+        }
+        catch (error) {
+            console.error('Error in webhookEventHandler:', error);
+            return { user: null, succeed: false };
+        }
+    }));
+    const results = [];
+    try {
+        for (const promise of promises) {
+            try {
+                const result = yield promise;
+                results.push(result);
+            }
+            catch (error) {
+                console.error('Error in promise:', error);
+            }
+        }
+    }
+    catch (error) {
+        console.error('Error in processing promises:', error);
+    }
+    console.log('Results of all promises including nested objects:', JSON.stringify(results, null, 2));
+});
+exports.webhookHandler = webhookHandler;

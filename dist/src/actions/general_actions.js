@@ -7,6 +7,7 @@ exports.messageToConcierge = exports.externalPropertyAction = exports.terminateA
 const flex_message_content_1 = require("../data/flex_message_content");
 const config_1 = require("../data/config");
 const zod_1 = __importDefault(require("zod"));
+const error_handler_1 = require("../funcs/error_handler");
 const terminateAction = (user, text) => {
     user.current_action_id = null;
     user.current_survey_id = null;
@@ -35,7 +36,10 @@ const externalPropertyAction = (user, text) => {
                 user.current_step_id = 'select_method';
             }
             else {
-                throw new Error('flex message not found');
+                user = (0, error_handler_1.errorHandler)({
+                    INTERNAL_ERROR: error_handler_1.ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
+                    USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
+                }, user);
             }
             break;
         }
@@ -72,7 +76,10 @@ const externalPropertyAction = (user, text) => {
                     //TODO 画像を直接送れるようにする
                     break;
                 default:
-                    throw new Error('invalid message');
+                    user = (0, error_handler_1.errorHandler)({
+                        INTERNAL_ERROR: error_handler_1.ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
+                        USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
+                    }, user);
             }
             break;
         }
@@ -92,17 +99,18 @@ const externalPropertyAction = (user, text) => {
                 user.current_step_id = 'complete';
             }
             else {
-                user.response.message = [
-                    {
-                        type: 'text',
-                        text: '正しいURLを送信してください。',
-                    },
-                ];
+                user = (0, error_handler_1.errorHandler)({
+                    INTERNAL_ERROR: error_handler_1.ERROR_LOGS.INVALID_URL,
+                    USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INVALID_URL,
+                }, user);
             }
             break;
         }
         default: {
-            throw new Error('invalid step');
+            user = (0, error_handler_1.errorHandler)({
+                INTERNAL_ERROR: error_handler_1.ERROR_LOGS.INVALID_CURRENT_STEP,
+                USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
+            }, user);
         }
     }
     if (user.current_step_id === 'complete') {

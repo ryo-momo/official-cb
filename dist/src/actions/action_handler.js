@@ -12,9 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.actionInvoker = void 0;
 const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
 const config_1 = require("../data/config");
-const ERROR_MESSAGES = {
-    HANDLER_NOT_FOUND: 'Handler not found in action',
-};
+const error_handler_1 = require("../funcs/error_handler");
 const invokeAction = (user, text, action) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('Invoking action:', action.action_id);
     user.current_action_id = action.action_id;
@@ -26,12 +24,17 @@ const invokeAction = (user, text, action) => __awaiter(void 0, void 0, void 0, f
             yield dbc.updateUser(user);
         }
         catch (err) {
-            console.error('Error updating user in database: ', err);
-            // Handle the error appropriately
+            user = (0, error_handler_1.errorHandler)({
+                INTERNAL_ERROR: error_handler_1.ERROR_LOGS.DATABASE_UPDATE_FAILED,
+                USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
+            }, user);
         }
     }
     else {
-        throw new Error(ERROR_MESSAGES.HANDLER_NOT_FOUND);
+        user = (0, error_handler_1.errorHandler)({
+            INTERNAL_ERROR: error_handler_1.ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
+            USER_ERROR: error_handler_1.USER_ERROR_MESSAGES.INTERNAL_ERROR,
+        }, user);
     }
     return user;
 });
@@ -47,7 +50,7 @@ const actionInvoker = (user, text, action) => __awaiter(void 0, void 0, void 0, 
     }
     catch (error) {
         console.error('Error in actionInvoker: ', error);
-        // 必要に応じてエラーを再投げるか、適切なエラー処理を行う
+        // 必要に応じてエラーを再び投げるか、適切なエラー処理を行う
         throw error;
     }
 });

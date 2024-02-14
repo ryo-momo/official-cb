@@ -50,14 +50,6 @@ module.exports = {
                 modifiers: ['requiresQuotes'],
             },
             {
-                selector: 'default',
-                format: ['snake_case', 'UPPER_CASE', 'camelCase'],
-            },
-            {
-                selector: 'variable',
-                format: ['snake_case', 'UPPER_CASE'],
-            },
-            {
                 selector: 'variable',
                 format: ['camelCase'],
                 types: ['function', 'boolean'],

@@ -59,6 +59,40 @@ const eventResultHandler = async (result: Result, reply_token: string): Promise<
     }
 };
 
+export const webhookEventHandler = async (event: WebhookEvent): Promise<Result> => {
+    // Check if the event type is "message"
+    if (event.type === 'message') {
+        if (event.source.type === 'user') {
+            if ('text' in event.message && event.message.text) {
+                console.log('User Message event received');
+                try {
+                    const result = await messageEventHandler({
+                        user_line_id: event.source.userId,
+                        text: event.message.text,
+                        timestamp: event.timestamp,
+                    });
+                    return result;
+                } catch (error) {
+                    console.error('Error in messageEventHandler:', error);
+                    return { user: null, succeed: false };
+                }
+            } else {
+                console.log(
+                    'User Message event received but no text, perhaps an StickerMessageEvent'
+                );
+                return { user: null, succeed: false };
+            }
+        } else {
+            console.log('Non-user event received');
+            return { user: null, succeed: false };
+        }
+    } else {
+        // TODO: Handle non-message event
+        console.log('Non-message event received');
+        return { user: null, succeed: false };
+    }
+};
+
 export const webhookHandler = async (request_body: WebhookRequestBody): Promise<void> => {
     const promises = request_body.events.map(async (event: WebhookEvent) /*:Promise<Result>*/ => {
         try {
@@ -94,38 +128,4 @@ export const webhookHandler = async (request_body: WebhookRequestBody): Promise<
         'Results of all promises including nested objects:',
         JSON.stringify(results, null, 2)
     );
-};
-
-export const webhookEventHandler = async (event: WebhookEvent): Promise<Result> => {
-    // Check if the event type is "message"
-    if (event.type === 'message') {
-        if (event.source.type === 'user') {
-            if ('text' in event.message && event.message.text) {
-                console.log('User Message event received');
-                try {
-                    const result = await messageEventHandler({
-                        user_line_id: event.source.userId,
-                        text: event.message.text,
-                        timestamp: event.timestamp,
-                    });
-                    return result;
-                } catch (error) {
-                    console.error('Error in messageEventHandler:', error);
-                    return { user: null, succeed: false };
-                }
-            } else {
-                console.log(
-                    'User Message event received but no text, perhaps an StickerMessageEvent'
-                );
-                return { user: null, succeed: false };
-            }
-        } else {
-            console.log('Non-user event received');
-            return { user: null, succeed: false };
-        }
-    } else {
-        // TODO: Handle non-message event
-        console.log('Non-message event received');
-        return { user: null, succeed: false };
-    }
 };

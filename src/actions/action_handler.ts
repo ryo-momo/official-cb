@@ -2,10 +2,7 @@ import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { type User } from '../classes/User';
 import { db_data } from '../data/config';
 import { type Action } from '../data/user_states';
-
-const ERROR_MESSAGES = {
-    HANDLER_NOT_FOUND: 'Handler not found in action',
-};
+import { errorHandler, ERROR_LOGS, USER_ERROR_MESSAGES } from '../funcs/error_handler';
 
 const invokeAction = async (user: User, text: string, action: Action): Promise<User> => {
     console.log('Invoking action:', action.action_id);
@@ -17,11 +14,22 @@ const invokeAction = async (user: User, text: string, action: Action): Promise<U
             const dbc = new DatabaseCommunicator(db_data);
             await dbc.updateUser(user);
         } catch (err) {
-            console.error('Error updating user in database: ', err);
-            // Handle the error appropriately
+            user = errorHandler(
+                {
+                    INTERNAL_ERROR: ERROR_LOGS.DATABASE_UPDATE_FAILED,
+                    USER_ERROR: USER_ERROR_MESSAGES.INTERNAL_ERROR,
+                },
+                user
+            );
         }
     } else {
-        throw new Error(ERROR_MESSAGES.HANDLER_NOT_FOUND);
+        user = errorHandler(
+            {
+                INTERNAL_ERROR: ERROR_LOGS.ACTION_HANDLER_NOT_FOUND,
+                USER_ERROR: USER_ERROR_MESSAGES.INTERNAL_ERROR,
+            },
+            user
+        );
     }
     return user;
 };
@@ -40,7 +48,7 @@ export const actionInvoker = async (
         }
     } catch (error) {
         console.error('Error in actionInvoker: ', error);
-        // 必要に応じてエラーを再投げるか、適切なエラー処理を行う
+        // 必要に応じてエラーを再び投げるか、適切なエラー処理を行う
         throw error;
     }
 };

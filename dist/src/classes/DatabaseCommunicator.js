@@ -52,7 +52,6 @@ class DatabaseCommunicator {
                 // Add error handling for connection
                 this.connection.connect((err) => {
                     if (err) {
-                        console.error('Error connecting to the database: ', err);
                         reject(err);
                     }
                     else {

@@ -21,7 +21,7 @@ const request_body = {
                 type: 'text',
                 id: '489235210962207227',
                 quoteToken: 'L9RsBpEYLH9GOcYH7b0Jf3tFzFuqmihcOFK6-SIgxjkfY6JVfw3cthFToNt02REUPD6zDOZ-iYIZdv3nhuAowKIcx19e6uEMDxzrObD4hy3TfMSS-B0bIaNXC7Ty2X4Dte2KRe37IvR5_bx75ehEnQ',
-                text: '>お客様情報',
+                text: '>キャンセル',
             },
             webhookEventId: '01HKC6YB99P4X1WA0GQHMZQPMQ',
             deliveryContext: {
@@ -37,12 +37,12 @@ const request_body = {
         },
     ],
 };
-await (() => __awaiter(void 0, void 0, void 0, function* () {
+void (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, index_1.lambdaHandler)(request_body, null);
     }
     catch (err) {
-        console.error('Error in webhookHandler: ', err);
+        console.error('Error in lambda handler: ', err);
     }
 }))();
 //TODO 郵便番号が'1j'で通った^^;
