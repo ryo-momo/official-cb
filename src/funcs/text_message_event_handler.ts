@@ -56,6 +56,9 @@ const handleNewUser = async (event: Event): Promise<{ user: User; succeed: boole
         },
         {
             shouldReply: true,
+            reply_token: null,
+            //この時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
+            message: [],
         }
     );
     // Assuming the rest of the code is unchanged and the DatabaseCommunicator instance is already created and connected.
@@ -85,6 +88,8 @@ const handleExistingUser = async (
         }
         let user = new User(user_property, {
             shouldReply: true,
+            reply_token: null,
+            message: [],
         });
 
         const triggered_action = findActionByTrigger(event.text);
@@ -94,10 +99,12 @@ const handleExistingUser = async (
                     user.current_action_id !== null &&
                     globally_permitted_actions.includes(event.text)
                 ) {
-                    user = errorHandler(
-                        'NEW_ACTION_WHILE_IN_PROGRESS',
-                        'NEW_ACTION_WHILE_IN_PROGRESS',
-                        user
+                    user.response.message.push(
+                        errorHandler(
+                            'NEW_ACTION_WHILE_IN_PROGRESS',
+                            'NEW_ACTION_WHILE_IN_PROGRESS',
+                            user
+                        )
                     );
                     return { user, succeed: false };
                 } else {
@@ -109,15 +116,19 @@ const handleExistingUser = async (
                     return { user: result, succeed: true };
                 }
             } else {
-                user = errorHandler('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user);
+                user.response.message?.push(
+                    errorHandler('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user)
+                );
                 return { user: user, succeed: false };
             }
         } else {
             if (user.current_action_id === null) {
-                user = errorHandler(
-                    'NON_TRIGGER_MESSAGE_NO_ACTION',
-                    'NON_TRIGGER_MESSAGE_NO_ACTION',
-                    user
+                user.response.message.push(
+                    errorHandler(
+                        'NON_TRIGGER_MESSAGE_NO_ACTION',
+                        'NON_TRIGGER_MESSAGE_NO_ACTION',
+                        user
+                    )
                 );
                 return { user: user, succeed: false };
             } else {

@@ -1,3 +1,4 @@
+import { type Message } from '@line/bot-sdk';
 import { type User } from '../classes/User';
 
 export interface ErrorEvent {
@@ -18,6 +19,7 @@ export const ERROR_LOGS: { [key: string]: string } = {
         'User is trying to start a new action while in the middle of another action',
     NON_TRIGGER_MESSAGE_NO_ACTION:
         'User is sending a message that is not a trigger but user is not in the middle of an action either',
+    UNKNOWN_ERROR: 'The reason is unknown, please investigate ASAP!!!',
 };
 
 export const USER_ERROR_MESSAGES: { [key: string]: string } = {
@@ -33,14 +35,14 @@ export const USER_ERROR_MESSAGES: { [key: string]: string } = {
 export const errorHandler = (
     internal_error_code: string,
     user_error_code: string,
-    user: User,
-    detailedError?: Error
-): User => {
+    user?: User,
+    error?: unknown
+): Message => {
     const internal_error_msgs = ERROR_LOGS;
     const user_error_msgs = USER_ERROR_MESSAGES;
     // エラーの詳細をログに記録
-    if (detailedError) {
-        console.error('Detailed error: ', detailedError);
+    if (error) {
+        console.error('Detailed error: ', error);
     }
 
     // 内部エラーログを取得
@@ -53,13 +55,11 @@ export const errorHandler = (
     console.error(`ERROR:${internal_error_msg}`);
 
     // ユーザーに返すメッセージを設定
-    user.response.message = [
-        {
-            type: 'text',
-            text: `${user_error_msg}${addCustomErrorMsg(user, internal_error_code)}`,
-        },
-    ];
-    return user;
+    const message: Message = {
+        type: 'text',
+        text: `${user_error_msg}${user ? addCustomErrorMsg(user, internal_error_code) : ''}`,
+    };
+    return message;
 };
 
 const addCustomErrorMsg = (user: User, internal_error_code: string): string => {

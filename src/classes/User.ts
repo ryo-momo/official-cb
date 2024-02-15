@@ -8,7 +8,7 @@ import {
 import { survey_contents, type Survey } from '../data/survey_content';
 import { type Question } from '../data/survey_content';
 import { db_data } from '../data/config';
-import { messagingApi, type Message, ReplyableEvent } from '@line/bot-sdk';
+import { messagingApi, type Message } from '@line/bot-sdk';
 
 const users_columns = db_data.tables.users.columns;
 
@@ -27,8 +27,8 @@ export interface UserData {
 
 export interface UserResponse {
     shouldReply: boolean;
-    reply_token?: string;
-    message?: Message[];
+    reply_token: string | null;
+    message: Message[];
 }
 
 export interface UserProperty {
@@ -84,6 +84,8 @@ export class User implements UserProperty {
               : [];
         this.response = response || {
             shouldReply: false,
+            reply_token: null,
+            message: [],
         };
     }
 
