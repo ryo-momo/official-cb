@@ -33,6 +33,8 @@ class User {
                 : [];
         this.response = response || {
             shouldReply: false,
+            reply_token: null,
+            message: [],
         };
     }
     isInInitialStep() {

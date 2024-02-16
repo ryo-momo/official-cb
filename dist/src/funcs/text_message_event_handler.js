@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.messageEventHandler = exports.isActionAllowedInCurrentState = void 0;
+exports.textMessageEventHandler = exports.isActionAllowedInCurrentState = void 0;
 const uuid_1 = require("uuid");
 const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
 const User_1 = require("../classes/User");
@@ -17,6 +17,11 @@ const config_1 = require("../data/config");
 const user_states_1 = require("../data/user_states");
 const action_handler_1 = require("../actions/action_handler");
 const error_handler_1 = require("./error_handler");
+// interface Event {
+//     user_line_id: string;
+//     text: string;
+//     timestamp: number;
+// }
 // Return the action if a match is found, otherwise return null
 const findActionByTrigger = (text) => {
     const action = user_states_1.user_states.actions.find((action) => { var _a; return (_a = action.trigger_text) === null || _a === void 0 ? void 0 : _a.includes(text); });
@@ -42,7 +47,7 @@ const handleNewUser = (event) => __awaiter(void 0, void 0, void 0, function* () 
     console.log('User is a brand new user');
     let user = new User_1.User({
         user_id: (0, uuid_1.v4)(),
-        user_line_id: event.user_line_id,
+        user_line_id: event.source.userId,
         major_state_id: user_states_1.user_states.major_states[0].state_id,
         minor_state_id: user_states_1.user_states.major_states[0].minor_states[0].state_id,
         current_action_id: null,
@@ -52,6 +57,9 @@ const handleNewUser = (event) => __awaiter(void 0, void 0, void 0, function* () 
         current_answers: null,
     }, {
         shouldReply: true,
+        reply_token: null,
+        //この時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
+        message: [],
     });
     // Assuming the rest of the code is unchanged and the DatabaseCommunicator instance is already created and connected.
     try {
@@ -68,47 +76,56 @@ const handleNewUser = (event) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const dbc = new DatabaseCommunicator_1.DatabaseCommunicator(config_1.db_data);
     yield dbc.connect();
     console.log('User is an existing user');
     let user_property;
+    const text_message = event.message;
     try {
-        user_property = yield dbc.getUserByLineId(event.user_line_id);
+        if (event.source.userId) {
+            user_property = yield dbc.getUserByLineId(event.source.userId);
+        }
+        else {
+            console.log('no user ID in the event, need URGENT fix!!');
+            return { user: null, succeed: false };
+        }
         if (user_property === null) {
             throw new Error('User does not exist in the database');
         }
         let user = new User_1.User(user_property, {
             shouldReply: true,
+            reply_token: null,
+            message: [],
         });
-        const triggered_action = findActionByTrigger(event.text);
+        const triggered_action = findActionByTrigger(text_message.text);
         if (triggered_action !== null) {
-            if ((0, exports.isActionAllowedInCurrentState)(user, event.text)) {
+            if ((0, exports.isActionAllowedInCurrentState)(user, text_message.text)) {
                 if (user.current_action_id !== null &&
-                    user_states_1.globally_permitted_actions.includes(event.text)) {
-                    user = (0, error_handler_1.errorHandler)('NEW_ACTION_WHILE_IN_PROGRESS', 'NEW_ACTION_WHILE_IN_PROGRESS', user);
+                    user_states_1.globally_permitted_actions.includes(text_message.text)) {
+                    user.response.message.push((0, error_handler_1.errorHandler)('NEW_ACTION_WHILE_IN_PROGRESS', 'NEW_ACTION_WHILE_IN_PROGRESS', user));
                     return { user, succeed: false };
                 }
                 else {
                     console.log("User's is not in the middle of an action, and is starting a new one");
                     user.current_action_id = triggered_action.action_id;
-                    const result = yield (0, action_handler_1.actionHandler)(user, event.text, triggered_action);
+                    const result = yield (0, action_handler_1.actionHandler)(user, text_message.text, triggered_action);
                     return { user: result, succeed: true };
                 }
             }
             else {
-                user = (0, error_handler_1.errorHandler)('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user);
-                console.log('🚀 ~ file: text_message_event_handler.ts:113 ~ user:', user);
+                (_a = user.response.message) === null || _a === void 0 ? void 0 : _a.push((0, error_handler_1.errorHandler)('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user));
                 return { user: user, succeed: false };
             }
         }
         else {
             if (user.current_action_id === null) {
-                user = (0, error_handler_1.errorHandler)('NON_TRIGGER_MESSAGE_NO_ACTION', 'NON_TRIGGER_MESSAGE_NO_ACTION', user);
+                user.response.message.push((0, error_handler_1.errorHandler)('NON_TRIGGER_MESSAGE_NO_ACTION', 'NON_TRIGGER_MESSAGE_NO_ACTION', user));
                 return { user: user, succeed: false };
             }
             else {
                 console.log('User is in the middle of an action');
-                user = yield (0, action_handler_1.actionHandler)(user, event.text);
+                user = yield (0, action_handler_1.actionHandler)(user, text_message.text);
                 return { user: user, succeed: true };
             }
         }
@@ -121,27 +138,34 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
         yield dbc.disconnect();
     }
 });
-const messageEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* () {
+const textMessageEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* () {
     const dbc = new DatabaseCommunicator_1.DatabaseCommunicator(config_1.db_data);
     yield dbc.connect();
-    try {
-        const userExists = yield dbc.userExists(event.user_line_id);
-        if (!userExists) {
-            // this user is a brand new user
-            return handleNewUser(event);
+    const user_id = event.source.userId;
+    if (user_id) {
+        try {
+            const userExists = yield dbc.userExists(user_id);
+            if (!userExists) {
+                // this user is a brand new user
+                return handleNewUser(event);
+            }
+            else {
+                // user is an existing user
+                const result = yield handleExistingUser(event);
+                return result;
+            }
         }
-        else {
-            // user is an existing user
-            const result = yield handleExistingUser(event);
-            return result;
+        catch (err) {
+            console.error('Error checking if user exists: ', err);
+            return { user: null, succeed: false };
+        }
+        finally {
+            yield dbc.disconnect();
         }
     }
-    catch (err) {
-        console.error('Error checking if user exists: ', err);
+    else {
+        console.log('received an non-user message');
         return { user: null, succeed: false };
     }
-    finally {
-        yield dbc.disconnect();
-    }
 });
-exports.messageEventHandler = messageEventHandler;
+exports.textMessageEventHandler = textMessageEventHandler;

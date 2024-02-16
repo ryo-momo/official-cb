@@ -14,11 +14,14 @@ const invokeAction = async (user: User, text: string, action: Action): Promise<U
             const dbc = new DatabaseCommunicator(db_data);
             await dbc.updateUser(user);
         } catch (err) {
-            const errorInstance = err instanceof Error ? err : new Error(`Unknown error: ${err}`);
-            return errorHandler('DATABASE_UPDATE_FAILED', 'INTERNAL_ERROR', user, errorInstance);
+            user.response.message.push(
+                errorHandler('DATABASE_UPDATE_FAILED', 'INTERNAL_ERROR', user, err)
+            );
         }
     } else {
-        return errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
+        user.response.message.push(
+            errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user)
+        );
     }
     return user;
 };

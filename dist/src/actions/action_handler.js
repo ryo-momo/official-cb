@@ -24,12 +24,11 @@ const invokeAction = (user, text, action) => __awaiter(void 0, void 0, void 0, f
             yield dbc.updateUser(user);
         }
         catch (err) {
-            const errorInstance = err instanceof Error ? err : new Error(`Unknown error: ${err}`);
-            return (0, error_handler_1.errorHandler)('DATABASE_UPDATE_FAILED', 'INTERNAL_ERROR', user, errorInstance);
+            user.response.message.push((0, error_handler_1.errorHandler)('DATABASE_UPDATE_FAILED', 'INTERNAL_ERROR', user, err));
         }
     }
     else {
-        return (0, error_handler_1.errorHandler)('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
+        user.response.message.push((0, error_handler_1.errorHandler)('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user));
     }
     return user;
 });

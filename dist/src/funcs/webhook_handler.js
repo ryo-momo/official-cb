@@ -16,6 +16,7 @@ exports.webhookHandler = exports.webhookEventHandler = void 0;
 const text_message_event_handler_1 = require("./text_message_event_handler");
 const message_sender_1 = require("./message_sender");
 const dotenv_1 = __importDefault(require("dotenv"));
+const follow_event_handler_1 = require("./follow_event_handler");
 dotenv_1.default.config();
 const eventResultHandler = (result, reply_token) => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.CHANNEL_ACCESS_TOKEN) {
@@ -41,37 +42,35 @@ const eventResultHandler = (result, reply_token) => __awaiter(void 0, void 0, vo
 });
 const webhookEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the event type is "message"
-    if (event.type === 'message') {
-        if (event.source.type === 'user') {
-            if ('text' in event.message && event.message.text) {
-                console.log('User Message event received');
-                try {
-                    const result = yield (0, text_message_event_handler_1.messageEventHandler)({
-                        user_line_id: event.source.userId,
-                        text: event.message.text,
-                        timestamp: event.timestamp,
-                    });
-                    return result;
+    console.log(`Received an event: ${event.type}`);
+    switch (event.type) {
+        case 'message':
+            if (event.source.type === 'user') {
+                if ('text' in event.message && event.message.text) {
+                    console.log('User Message event received');
+                    try {
+                        const result = yield (0, text_message_event_handler_1.textMessageEventHandler)(event);
+                        return result;
+                    }
+                    catch (error) {
+                        console.error('Error in messageEventHandler:', error);
+                        return { user: null, succeed: false };
+                    }
                 }
-                catch (error) {
-                    console.error('Error in messageEventHandler:', error);
+                else {
+                    console.log('User Message event received but no text, perhaps an StickerMessageEvent');
                     return { user: null, succeed: false };
                 }
             }
             else {
-                console.log('User Message event received but no text, perhaps an StickerMessageEvent');
+                console.log('Non-user event received');
                 return { user: null, succeed: false };
             }
-        }
-        else {
-            console.log('Non-user event received');
+        case 'follow':
+            return yield (0, follow_event_handler_1.followEventHandler)(event);
+        default:
+            console.log('Received an unsupported event');
             return { user: null, succeed: false };
-        }
-    }
-    else {
-        // TODO: Handle non-message event
-        console.log('Non-message event received');
-        return { user: null, succeed: false };
     }
 });
 exports.webhookEventHandler = webhookEventHandler;

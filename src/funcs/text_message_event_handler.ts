@@ -6,12 +6,14 @@ import { user_states, globally_permitted_actions } from '../data/user_states';
 import { actionHandler } from '../actions/action_handler';
 import { type Action } from '../data/user_states';
 import { errorHandler } from './error_handler';
+import { type TextEventMessage, type MessageEvent } from '@line/bot-sdk';
+import { type Result } from './webhook_handler';
 
-interface Event {
-    user_line_id: string;
-    text: string;
-    timestamp: number;
-}
+// interface Event {
+//     user_line_id: string;
+//     text: string;
+//     timestamp: number;
+// }
 
 // Return the action if a match is found, otherwise return null
 const findActionByTrigger = (text: string): Action | null => {
@@ -38,14 +40,14 @@ export const isActionAllowedInCurrentState = (user: User, text: string): boolean
     return isAllowed;
 };
 
-const handleNewUser = async (event: Event): Promise<{ user: User; succeed: boolean }> => {
+const handleNewUser = async (event: MessageEvent): Promise<Result> => {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     console.log('User is a brand new user');
     let user = new User(
         {
             user_id: uuidv4(),
-            user_line_id: event.user_line_id,
+            user_line_id: event.source.userId!,
             major_state_id: user_states.major_states[0].state_id,
             minor_state_id: user_states.major_states[0].minor_states[0].state_id,
             current_action_id: null,
@@ -74,15 +76,20 @@ const handleNewUser = async (event: Event): Promise<{ user: User; succeed: boole
     }
 };
 
-const handleExistingUser = async (
-    event: Event
-): Promise<{ user: User | null; succeed: boolean }> => {
+const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     console.log('User is an existing user');
     let user_property;
+    const text_message = event.message as TextEventMessage;
     try {
-        user_property = await dbc.getUserByLineId(event.user_line_id);
+        if (event.source.userId) {
+            user_property = await dbc.getUserByLineId(event.source.userId);
+        } else {
+            console.log('no user ID in the event, need URGENT fix!!');
+            return { user: null, succeed: false };
+        }
+
         if (user_property === null) {
             throw new Error('User does not exist in the database');
         }
@@ -92,12 +99,12 @@ const handleExistingUser = async (
             message: [],
         });
 
-        const triggered_action = findActionByTrigger(event.text);
+        const triggered_action = findActionByTrigger(text_message.text);
         if (triggered_action !== null) {
-            if (isActionAllowedInCurrentState(user, event.text)) {
+            if (isActionAllowedInCurrentState(user, text_message.text)) {
                 if (
                     user.current_action_id !== null &&
-                    globally_permitted_actions.includes(event.text)
+                    globally_permitted_actions.includes(text_message.text)
                 ) {
                     user.response.message.push(
                         errorHandler(
@@ -112,7 +119,7 @@ const handleExistingUser = async (
                         "User's is not in the middle of an action, and is starting a new one"
                     );
                     user.current_action_id = triggered_action.action_id;
-                    const result = await actionHandler(user, event.text, triggered_action);
+                    const result = await actionHandler(user, text_message.text, triggered_action);
                     return { user: result, succeed: true };
                 }
             } else {
@@ -133,7 +140,7 @@ const handleExistingUser = async (
                 return { user: user, succeed: false };
             } else {
                 console.log('User is in the middle of an action');
-                user = await actionHandler(user, event.text);
+                user = await actionHandler(user, text_message.text);
                 return { user: user, succeed: true };
             }
         }
@@ -145,25 +152,29 @@ const handleExistingUser = async (
     }
 };
 
-export const textMessageEventHandler = async (
-    event: Event
-): Promise<{ user: User | null; succeed: boolean }> => {
+export const textMessageEventHandler = async (event: MessageEvent): Promise<Result> => {
     const dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
-    try {
-        const userExists = await dbc.userExists(event.user_line_id);
-        if (!userExists) {
-            // this user is a brand new user
-            return handleNewUser(event);
-        } else {
-            // user is an existing user
-            const result = await handleExistingUser(event);
-            return result;
+    const user_id = event.source.userId;
+    if (user_id) {
+        try {
+            const userExists = await dbc.userExists(user_id);
+            if (!userExists) {
+                // this user is a brand new user
+                return handleNewUser(event);
+            } else {
+                // user is an existing user
+                const result = await handleExistingUser(event);
+                return result;
+            }
+        } catch (err) {
+            console.error('Error checking if user exists: ', err);
+            return { user: null, succeed: false };
+        } finally {
+            await dbc.disconnect();
         }
-    } catch (err) {
-        console.error('Error checking if user exists: ', err);
+    } else {
+        console.log('received an non-user message');
         return { user: null, succeed: false };
-    } finally {
-        await dbc.disconnect();
     }
 };

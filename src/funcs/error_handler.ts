@@ -20,16 +20,17 @@ export const ERROR_LOGS: { [key: string]: string } = {
     NON_TRIGGER_MESSAGE_NO_ACTION:
         'User is sending a message that is not a trigger but user is not in the middle of an action either',
     UNKNOWN_ERROR: 'The reason is unknown, please investigate ASAP!!!',
+    UNSUPPORTED_EVENT: 'Received an unsupported event',
 };
 
 export const USER_ERROR_MESSAGES: { [key: string]: string } = {
     INTERNAL_ERROR: '問題が発生しました。大変お手数ですが担当までお知らせください。',
-    INVALID_URL: 'URLが無効な形式です。もう一度ご確認ください。',
+    INVALID_URL: 'URLが無効な形式です、もう一度ご確認ください。',
     NEW_ACTION_WHILE_IN_PROGRESS:
-        '現在別のプロセスが進行中です。実行中の操作をキャンセルまたは完了してください。',
+        '現在別のプロセスが進行中です。現在の操作をキャンセルまたは完了してください。',
     FORBIDDEN_ACTION: '現在その操作は行うことができません。',
     NON_TRIGGER_MESSAGE_NO_ACTION:
-        '申し訳ございませんが、こちらのチャットでは文章でのお問い合わせは受け付けておりません。担当の方にご連絡をお願いいたします。',
+        '申し訳ございませんが、こちらのチャットでは文章でのお問い合わせは受け付けておりません。担当の方にご連絡をお願いいたします🙇',
 };
 
 export const errorHandler = (

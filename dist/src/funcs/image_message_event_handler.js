@@ -16,6 +16,7 @@ exports.imageMessageHandler = void 0;
 const client_s3_1 = require("@aws-sdk/client-s3");
 const stream_1 = require("stream");
 const https_1 = __importDefault(require("https"));
+const dotenv_1 = __importDefault(require("dotenv"));
 // //just for testing
 // export const handler = async (event: WebhookRequestBody): Promise<void> => {
 //     const messageEvent = event.events[0];
@@ -27,6 +28,7 @@ const https_1 = __importDefault(require("https"));
 //         }
 //     }
 // };
+dotenv_1.default.config();
 //handler to handle image message event
 const imageMessageHandler = (message, user) => __awaiter(void 0, void 0, void 0, function* () {
     const forward_image_to_line_id = process.env.STAFF_LINE_ID;

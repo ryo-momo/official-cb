@@ -3,10 +3,11 @@ import { type WebhookRequestBody, type WebhookEvent } from '@line/bot-sdk';
 import { type User } from '../classes/User';
 import { MessageSender } from './message_sender';
 import dotenv from 'dotenv';
+import { followEventHandler } from './follow_event_handler';
 
 dotenv.config();
 
-interface Result {
+export interface Result {
     user: User | null;
     succeed: boolean;
 }
@@ -33,35 +34,34 @@ const eventResultHandler = async (result: Result, reply_token: string): Promise<
 
 export const webhookEventHandler = async (event: WebhookEvent): Promise<Result> => {
     // Check if the event type is "message"
-    if (event.type === 'message') {
-        if (event.source.type === 'user') {
-            if ('text' in event.message && event.message.text) {
-                console.log('User Message event received');
-                try {
-                    const result = await textMessageEventHandler({
-                        user_line_id: event.source.userId,
-                        text: event.message.text,
-                        timestamp: event.timestamp,
-                    });
-                    return result;
-                } catch (error) {
-                    console.error('Error in messageEventHandler:', error);
+    console.log(`Received an event: ${event.type}`);
+    switch (event.type) {
+        case 'message':
+            if (event.source.type === 'user') {
+                if ('text' in event.message && event.message.text) {
+                    console.log('User Message event received');
+                    try {
+                        const result = await textMessageEventHandler(event);
+                        return result;
+                    } catch (error) {
+                        console.error('Error in messageEventHandler:', error);
+                        return { user: null, succeed: false };
+                    }
+                } else {
+                    console.log(
+                        'User Message event received but no text, perhaps an StickerMessageEvent'
+                    );
                     return { user: null, succeed: false };
                 }
             } else {
-                console.log(
-                    'User Message event received but no text, perhaps an StickerMessageEvent'
-                );
+                console.log('Non-user event received');
                 return { user: null, succeed: false };
             }
-        } else {
-            console.log('Non-user event received');
+        case 'follow':
+            return await followEventHandler(event);
+        default:
+            console.log('Received an unsupported event');
             return { user: null, succeed: false };
-        }
-    } else {
-        // TODO: Handle non-message event
-        console.log('Non-message event received');
-        return { user: null, succeed: false };
     }
 };
 

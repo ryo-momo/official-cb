@@ -5,10 +5,9 @@ import { db_data } from '../data/config';
 import { v4 as uuidv4 } from 'uuid';
 import { user_states } from '../data/user_states';
 import { errorHandler } from './error_handler';
+import { type Result } from './webhook_handler';
 
-export const followEventHandler = async (
-    event: FollowEvent
-): Promise<{ user: User | null; succeed: boolean }> => {
+export const followEventHandler = async (event: FollowEvent): Promise<Result> => {
     const dbc = new DatabaseCommunicator(db_data);
     if (event.source.userId) {
         if (await dbc.userExists(event.source.userId)) {

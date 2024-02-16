@@ -33,7 +33,9 @@ export const externalPropertyAction = (user: User, text: string): User => {
                 ];
                 user.current_step_id = 'select_method';
             } else {
-                user = errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
+                user.response.message.push(
+                    errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user)
+                );
             }
 
             break;
@@ -71,7 +73,9 @@ export const externalPropertyAction = (user: User, text: string): User => {
                     //TODO 画像を直接送れるようにする
                     break;
                 default:
-                    user = errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user);
+                    user.response.message.push(
+                        errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user)
+                    );
             }
             break;
         }
@@ -91,17 +95,14 @@ export const externalPropertyAction = (user: User, text: string): User => {
                 // Move to the next step
                 user.current_step_id = 'complete';
             } else {
-                user = errorHandler(
-                    'INVALID_URL',
-                    'INVALID_URL',
-
-                    user
-                );
+                user.response.message.push(errorHandler('INVALID_URL', 'INVALID_URL', user));
             }
             break;
         }
         default: {
-            user = errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user);
+            user.response.message.push(
+                errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user)
+            );
         }
     }
     if (user.current_step_id === 'complete') {

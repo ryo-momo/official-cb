@@ -14,10 +14,17 @@ const webhook_handler_1 = require("../funcs/webhook_handler");
 const lambdaHandler = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('Received event:', JSON.stringify(event));
-        yield (0, webhook_handler_1.webhookHandler)(event);
+        if ('detail-type' in event) {
+            console.log('Scheduled Invocation');
+        }
+        else {
+            yield (0, webhook_handler_1.webhookHandler)(event);
+        }
     }
     catch (error) {
         console.error('Error occurred:', error);
     }
 });
 exports.lambdaHandler = lambdaHandler;
+//TODO 5分ごとに起動するやつ実装
+//TODO 任意の情報を更新するやつ実装
