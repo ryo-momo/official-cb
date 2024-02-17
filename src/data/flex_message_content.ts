@@ -862,19 +862,45 @@ export const flex_message_contents: FlexMessageContent[] = [
                             {
                                 type: 'box',
                                 layout: 'horizontal',
+                                contents: [
+                                    {
+                                        type: 'text',
+                                        text: '額面給与額',
+                                        margin: 'none',
+                                        weight: 'bold',
+                                    },
+                                ],
+                                margin: 'sm',
+                            },
+                            {
+                                type: 'box',
+                                layout: 'horizontal',
                                 spacing: 'xs',
                                 contents: [
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        action: {
+                                            type: 'message',
+                                            label: 'R5年',
+                                            text: 'R5年 額面給与',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'none',
+                                        adjustMode: 'shrink-to-fit',
+                                        height: 'sm',
+                                    },
                                     {
                                         type: 'button',
                                         style: 'primary',
                                         height: 'sm',
                                         action: {
                                             type: 'message',
-                                            label: 'R5年 額面給与',
-                                            text: 'R5年 額面給与',
+                                            label: 'R4年',
+                                            text: 'R4年 額面給与',
                                         },
                                         color: '#F09199',
-                                        margin: 'none',
+                                        margin: 'sm',
                                         adjustMode: 'shrink-to-fit',
                                     },
                                     {
@@ -883,8 +909,8 @@ export const flex_message_contents: FlexMessageContent[] = [
                                         height: 'sm',
                                         action: {
                                             type: 'message',
-                                            label: 'R4年 額面給与',
-                                            text: 'R4年 額面給与',
+                                            label: 'R3年',
+                                            text: 'R3年 額面給与',
                                         },
                                         color: '#F09199',
                                         margin: 'sm',
@@ -892,7 +918,7 @@ export const flex_message_contents: FlexMessageContent[] = [
                                     },
                                 ],
                                 borderWidth: 'none',
-                                margin: 'xl',
+                                margin: 'none',
                             },
                             {
                                 type: 'box',
@@ -905,8 +931,8 @@ export const flex_message_contents: FlexMessageContent[] = [
                                         height: 'sm',
                                         action: {
                                             type: 'message',
-                                            label: 'R3年 額面給与',
-                                            text: 'R3年 額面給与',
+                                            label: '配偶者の有無',
+                                            text: '配偶者の有無',
                                         },
                                         color: '#F09199',
                                         margin: 'none',
@@ -927,7 +953,7 @@ export const flex_message_contents: FlexMessageContent[] = [
                                     },
                                 ],
                                 borderWidth: 'none',
-                                margin: 'xl',
+                                margin: 'lg',
                             },
                             {
                                 type: 'box',
@@ -960,7 +986,7 @@ export const flex_message_contents: FlexMessageContent[] = [
                                     },
                                 ],
                                 borderWidth: 'none',
-                                margin: 'xl',
+                                margin: 'lg',
                             },
                             {
                                 type: 'box',
@@ -993,7 +1019,7 @@ export const flex_message_contents: FlexMessageContent[] = [
                                     },
                                 ],
                                 borderWidth: 'none',
-                                margin: 'xl',
+                                margin: 'lg',
                             },
                         ],
                     },
