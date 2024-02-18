@@ -2,7 +2,7 @@ import { type User } from '../classes/User';
 import { flex_message_contents } from '../data/flex_message_content';
 import { address_url } from '../data/config';
 import z from 'zod';
-import { ERROR_LOGS, USER_ERROR_MESSAGES, errorHandler } from '../funcs/error_handler';
+import { errorHandler } from '../funcs/error_handler';
 
 export const terminateAction = (user: User, text: string): User => {
     user.current_action_id = null;
