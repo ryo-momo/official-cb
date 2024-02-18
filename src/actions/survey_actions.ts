@@ -456,6 +456,20 @@ const setQuestion = (user: User, current_question: Question): void => {
     user.response.message = message;
 };
 
+const setCancel = (user: User): void => {
+    const quick_reply = user.response.message[-1].quickReply;
+    if (quick_reply) {
+        quick_reply.items.push({
+            type: 'action',
+            action: {
+                type: 'message',
+                label: '中断',
+                text: '>中断',
+            },
+        });
+    }
+};
+
 const getNextQuestion = (
     answer_text: string,
     current_question: Question,
