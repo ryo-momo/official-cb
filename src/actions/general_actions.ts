@@ -12,7 +12,7 @@ export const terminateAction = (user: User, text: string): User => {
     user.current_answers = null;
     user.response.message.push({
         type: 'text',
-        text: '現在のプロセスを終了しました。',
+        text: '現在のプロセスを中断しました。',
     });
     console.log("Terminating current action, progress won't be saved");
     return user;
