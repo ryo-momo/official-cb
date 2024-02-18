@@ -14,6 +14,7 @@ import { type Question, type Survey } from '../data/survey_content';
 import { actionHandler } from './action_handler';
 import { isNullOrUndefined } from 'util';
 import { errorHandler } from '../funcs/error_handler';
+import { array } from 'zod';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
 export const basicInfoSurveyHandler = async (user: User, answer_text: string): Promise<User> => {
@@ -58,6 +59,7 @@ const handleInitialStep = async (user: User): Promise<User> => {
             user.current_step_id = current_step.step_id;
             user.current_question_id = current_question.id;
             setQuestion(user, current_question);
+            setCancel(user);
         } else {
             throw new Error('Next step not found.');
         }
@@ -126,6 +128,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                     },
                 ] as Message[];
             }
+            setCancel(user);
         }
         return user;
     } else {
@@ -163,6 +166,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                 },
             ];
         }
+        setCancel(user);
         user.response.message = message;
         return user;
     }
@@ -327,6 +331,7 @@ const handleNextStep = (user: User, answer_text: string): void => {
                 user.current_step_id = next_step.step_id;
                 user.current_question_id = next_question.id;
                 setQuestion(user, next_question);
+                setCancel(user);
             }
             user.current_answers = null;
             console.log(`Updated the user's step to ${user.current_step_id}`);
@@ -457,16 +462,44 @@ const setQuestion = (user: User, current_question: Question): void => {
 };
 
 const setCancel = (user: User): void => {
-    const quick_reply = user.response.message[-1].quickReply;
-    if (quick_reply) {
-        quick_reply.items.push({
-            type: 'action',
-            action: {
-                type: 'message',
-                label: '中断',
-                text: '>中断',
-            },
-        });
+    const message = user.response.message[user.response.message.length-1];
+    if ('quickReply' in message) {
+        if (message.quickReply !== undefined) {
+            message.quickReply.items.push({
+                type: 'action',
+                action: {
+                    type: 'message',
+                    label: '中断',
+                    text: '>中断',
+                },
+            });
+        } else {
+            message.quickReply = {
+                items: [
+                    {
+                        type: 'action',
+                        action: {
+                            type: 'message',
+                            label: '中断',
+                            text: '>中断',
+                        },
+                    },
+                ],
+            };
+        }
+    } else {
+        message.quickReply = {
+            items: [
+                {
+                    type: 'action',
+                    action: {
+                        type: 'message',
+                        label: '中断',
+                        text: '>中断',
+                    },
+                },
+            ],
+        };
     }
 };
 

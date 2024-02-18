@@ -114,6 +114,7 @@ export const handleGetUserInfoAction = async (user: User, text: string): Promise
                 }万円\n購入者区分: ${user_info.purchaser_category}`,
             },
         ] as Message[];
+        user.current_action_id = null;
     } else {
         throw new Error('No userinfo found');
     }
@@ -168,6 +169,7 @@ export const handleGetSearchConditionAction = async (user: User, text: string): 
                 }`,
             },
         ] as Message[];
+        user.current_action_id = null;
     } else {
         throw new Error('No userinfo found');
     }
