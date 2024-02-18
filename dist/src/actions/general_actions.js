@@ -14,6 +14,10 @@ const terminateAction = (user, text) => {
     user.current_step_id = null;
     user.current_question_id = null;
     user.current_answers = null;
+    user.response.message.push({
+        type: 'text',
+        text: '現在のプロセスを終了しました。',
+    });
     console.log("Terminating current action, progress won't be saved");
     return user;
 };

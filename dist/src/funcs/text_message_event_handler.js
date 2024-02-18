@@ -101,14 +101,23 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
         const triggered_action = findActionByTrigger(text_message.text);
         if (triggered_action !== null) {
             if ((0, exports.isActionAllowedInCurrentState)(user, text_message.text)) {
-                if (user.current_action_id !== null &&
-                    user_states_1.globally_permitted_actions.includes(text_message.text)) {
-                    user.response.message.push((0, error_handler_1.errorHandler)('NEW_ACTION_WHILE_IN_PROGRESS', 'NEW_ACTION_WHILE_IN_PROGRESS', user));
-                    return { user, succeed: false };
+                if (user.current_action_id !== null) {
+                    if (user_states_1.globally_permitted_actions.includes(triggered_action.action_id)) {
+                        console.log('User is trying to invoke a globally permitted action');
+                        user.current_action_id = triggered_action.action_id;
+                        const result = yield (0, action_handler_1.actionHandler)(user, text_message.text, triggered_action);
+                        return { user: result, succeed: true };
+                    }
+                    else {
+                        console.log('User is trying to invoke a non-globally permitted action');
+                        user.response.message.push((0, error_handler_1.errorHandler)('NEW_ACTION_WHILE_IN_PROGRESS', 'NEW_ACTION_WHILE_IN_PROGRESS', user));
+                        return { user, succeed: false };
+                    }
                 }
                 else {
                     console.log("User's is not in the middle of an action, and is starting a new one");
                     user.current_action_id = triggered_action.action_id;
+                    user.current_step_id = null;
                     const result = yield (0, action_handler_1.actionHandler)(user, text_message.text, triggered_action);
                     return { user: result, succeed: true };
                 }

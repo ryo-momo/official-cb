@@ -11,6 +11,9 @@ import { type Step, user_states } from '../data/user_states';
 import { generateQuickReplyItems } from '../funcs/message_helper';
 import { type Message, type FlexMessage } from '@line/bot-sdk';
 import { type Question, type Survey } from '../data/survey_content';
+import { actionHandler } from './action_handler';
+import { isNullOrUndefined } from 'util';
+import { errorHandler } from '../funcs/error_handler';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
 export const basicInfoSurveyHandler = async (user: User, answer_text: string): Promise<User> => {
@@ -165,79 +168,138 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
     }
 };
 
-export const handleBasicInfoUpdateOrReference = (user: User): User => {
-    user.response.message = [
-        {
-            type: 'text',
-            text: '行いたい操作を選択してください。',
-            quickReply: {
-                items: [
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'お客様情報の登録/更新',
-                            text: '>お客様情報の登録/更新',
+export const handleBasicInfoUpdateOrReference = async (user: User, text: string): Promise<User> => {
+    if (user.current_step_id === null) {
+        user.response.message = [
+            {
+                type: 'text',
+                text: '行いたい操作を選択してください。',
+                quickReply: {
+                    items: [
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'お客様情報の登録/更新',
+                                text: 'お客様情報の登録/更新',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'お客様情報の参照',
-                            text: '>お客様情報の参照',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'お客様情報の参照',
+                                text: 'お客様情報の参照',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'キャンセル',
-                            text: '>キャンセル',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'キャンセル',
+                                text: '>キャンセル',
+                            },
                         },
-                    },
-                ],
+                    ],
+                },
             },
-        },
-    ];
+        ];
+        user.current_action_id = 'basic_info_update_or_reference';
+        user.current_step_id = 'update_or_reference';
+    } else {
+        if (user.current_step_id === 'update_or_reference') {
+            switch (text) {
+                case 'お客様情報の登録/更新':
+                    user.current_action_id = 'basic_info_registration';
+                    break;
+                case 'お客様情報の参照':
+                    user.current_action_id = 'basic_info_inquiry';
+                    break;
+                case '>キャンセル':
+                    user.current_action_id = 'terminate_action';
+                    break;
+                default:
+                    user.response.message.push(
+                        errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user)
+                    );
+            }
+            user.current_step_id = null;
+            user = await actionHandler(user, text, user.getCurrentAction());
+        } else {
+            user.response.message.push(
+                errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user)
+            );
+        }
+    }
     return user;
 };
 
-export const handleSearchConditionUpdateOrReference = (user: User): User => {
-    user.response.message = [
-        {
-            type: 'text',
-            text: '行いたい操作を選択してください。',
-            quickReply: {
-                items: [
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: '希望物件条件の登録/更新',
-                            text: '>希望物件条件の登録/更新',
+export const handleSearchConditionUpdateOrReference = async (
+    user: User,
+    text: string
+): Promise<User> => {
+    if (user.current_step_id === null) {
+        user.response.message = [
+            {
+                type: 'text',
+                text: '行いたい操作を選択してください。',
+                quickReply: {
+                    items: [
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: '希望物件条件の登録/更新',
+                                text: '希望物件条件の登録/更新',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: '希望物件条件の参照',
-                            text: '>希望物件条件の参照',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: '希望物件条件の参照',
+                                text: '希望物件条件の参照',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'キャンセル',
-                            text: '>キャンセル',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'キャンセル',
+                                text: '>キャンセル',
+                            },
                         },
-                    },
-                ],
+                    ],
+                },
             },
-        },
-    ];
+        ];
+        user.current_action_id = 'search_condition_update_or_reference';
+        user.current_step_id = 'update_or_reference';
+    } else {
+        if (user.current_step_id === 'update_or_reference') {
+            switch (text) {
+                case '希望物件条件の登録/更新':
+                    user.current_action_id = 'search_condition_registration';
+                    break;
+                case '希望物件条件の参照':
+                    user.current_action_id = 'search_condition_inquiry';
+                    break;
+                case '>キャンセル':
+                    user.current_action_id = 'terminate_action';
+                    break;
+                default:
+                    user.response.message.push(
+                        errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user)
+                    );
+            }
+            user.current_step_id = null;
+            user = await actionHandler(user, text, user.getCurrentAction());
+        } else {
+            user.response.message.push(
+                errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user)
+            );
+        }
+    }
     return user;
 };
 
@@ -278,7 +340,7 @@ const storeAnswerInDatabase = async (user: User, answer_text: string): Promise<v
     let dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     const current_question = user.getCurrentQuestion();
-    console.log('現在の質問：', user.current_question_id); // Log message in English
+    console.log('Current question id:', user.current_question_id); // Log message in English
     try {
         if (current_question.type === 'multiple-choice') {
             const user_desired_structures_table_name = db_data.tables.user_desired_structures.name;

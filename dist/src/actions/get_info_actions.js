@@ -26,7 +26,7 @@ exports.user_info_locations = [
             phone_number: users_columns.phone_number,
             workplace_name: users_columns.workplace_name,
             workplace_address: users_columns.workplace_address,
-            workplace_department: users_columns.workplace_department,
+            workplace_position: users_columns.workplace_position,
             workplace_job_category: users_columns.workplace_job_category,
             workplace_years_of_service: users_columns.workplace_years_of_service,
             gross_salary_minus_1: users_columns.gross_salary_minus_1,
@@ -59,7 +59,7 @@ const handleGetUserInfoAction = (user, text) => __awaiter(void 0, void 0, void 0
         user.response.message = [
             {
                 type: 'text',
-                text: `名前: ${user_info.user_name}\n名前(カナ): ${user_info.user_name_kana}\n郵便番号: ${user_info.address_postal_code}\n住所: ${user_info.address}\n居住形態: ${user_info.residence_category}\nメールアドレス: ${user_info.email_address}\n電話番号: ${user_info.phone_number}\n職場名: ${user_info.workplace_name}\n職場住所: ${user_info.workplace_address}\n職場部署: ${user_info.workplace_department}\n職種: ${user_info.workplace_job_category}\n勤続年数: ${user_info.workplace_years_of_service}年\n前年度収入: ${user_info.gross_salary_minus_1}万円\n前々年度収入: ${user_info.gross_salary_minus_2}万円\n前々々年度収入: ${user_info.gross_salary_minus_3}万円\n配偶者の有無: ${user_info.family_structure_spouse ? 'あり' : 'なし'}\n子供の人数: ${user_info.family_structure_children}人\n借入金: ${user_info.borrowed_money}万円\n預金: ${user_info.deposit}万円\nその他資産: ${user_info.other_assets}万円\n購入者区分: ${user_info.purchaser_category}`,
+                text: `名前: ${user_info.user_name}\n名前(カナ): ${user_info.user_name_kana}\n郵便番号: ${user_info.address_postal_code}\n住所: ${user_info.address}\n居住形態: ${user_info.residence_category}\nメールアドレス: ${user_info.email_address}\n電話番号: ${user_info.phone_number}\n職場名: ${user_info.workplace_name}\n職場住所: ${user_info.workplace_address}\n職場部署: ${user_info.workplace_position}\n職種: ${user_info.workplace_job_category}\n勤続年数: ${user_info.workplace_years_of_service}年\n前年度収入: ${user_info.gross_salary_minus_1}万円\n前々年度収入: ${user_info.gross_salary_minus_2}万円\n前々々年度収入: ${user_info.gross_salary_minus_3}万円\n配偶者の有無: ${user_info.family_structure_spouse ? 'あり' : 'なし'}\n子供の人数: ${user_info.family_structure_children}人\n借入金: ${user_info.borrowed_money}万円\n預金: ${user_info.deposit}万円\nその他資産: ${user_info.other_assets}万円\n購入者区分: ${user_info.purchaser_category}`,
             },
         ];
     }

@@ -15,6 +15,8 @@ const config_1 = require("../data/config");
 const question_handler_1 = require("../funcs/question_handler");
 const survey_validator_1 = require("../funcs/survey_validator");
 const message_helper_1 = require("../funcs/message_helper");
+const action_handler_1 = require("./action_handler");
+const error_handler_1 = require("../funcs/error_handler");
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
 const basicInfoSurveyHandler = (user, answer_text) => __awaiter(void 0, void 0, void 0, function* () {
     if (user.isInInitialStep()) {
@@ -165,81 +167,133 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
         return user;
     }
 });
-const handleBasicInfoUpdateOrReference = (user) => {
-    user.response.message = [
-        {
-            type: 'text',
-            text: '行いたい操作を選択してください。',
-            quickReply: {
-                items: [
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'お客様情報の登録/更新',
-                            text: '>お客様情報の登録/更新',
+const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 0, void 0, function* () {
+    if (user.current_step_id === null) {
+        user.response.message = [
+            {
+                type: 'text',
+                text: '行いたい操作を選択してください。',
+                quickReply: {
+                    items: [
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'お客様情報の登録/更新',
+                                text: 'お客様情報の登録/更新',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'お客様情報の参照',
-                            text: '>お客様情報の参照',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'お客様情報の参照',
+                                text: 'お客様情報の参照',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'キャンセル',
-                            text: '>キャンセル',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'キャンセル',
+                                text: '>キャンセル',
+                            },
                         },
-                    },
-                ],
+                    ],
+                },
             },
-        },
-    ];
+        ];
+        user.current_action_id = 'basic_info_update_or_reference';
+        user.current_step_id = 'update_or_reference';
+    }
+    else {
+        if (user.current_step_id === 'update_or_reference') {
+            switch (text) {
+                case 'お客様情報の登録/更新':
+                    user.current_action_id = 'basic_info_registration';
+                    break;
+                case 'お客様情報の参照':
+                    user.current_action_id = 'basic_info_inquiry';
+                    break;
+                case '>キャンセル':
+                    user.current_action_id = 'terminate_action';
+                    break;
+                default:
+                    user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
+            }
+            user.current_step_id = null;
+            user = yield (0, action_handler_1.actionHandler)(user, text, user.getCurrentAction());
+        }
+        else {
+            user.response.message.push((0, error_handler_1.errorHandler)('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user));
+        }
+    }
     return user;
-};
+});
 exports.handleBasicInfoUpdateOrReference = handleBasicInfoUpdateOrReference;
-const handleSearchConditionUpdateOrReference = (user) => {
-    user.response.message = [
-        {
-            type: 'text',
-            text: '行いたい操作を選択してください。',
-            quickReply: {
-                items: [
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: '希望物件条件の登録/更新',
-                            text: '>希望物件条件の登録/更新',
+const handleSearchConditionUpdateOrReference = (user, text) => __awaiter(void 0, void 0, void 0, function* () {
+    if (user.current_step_id === null) {
+        user.response.message = [
+            {
+                type: 'text',
+                text: '行いたい操作を選択してください。',
+                quickReply: {
+                    items: [
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: '希望物件条件の登録/更新',
+                                text: '希望物件条件の登録/更新',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: '希望物件条件の参照',
-                            text: '>希望物件条件の参照',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: '希望物件条件の参照',
+                                text: '希望物件条件の参照',
+                            },
                         },
-                    },
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: 'キャンセル',
-                            text: '>キャンセル',
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'キャンセル',
+                                text: '>キャンセル',
+                            },
                         },
-                    },
-                ],
+                    ],
+                },
             },
-        },
-    ];
+        ];
+        user.current_action_id = 'search_condition_update_or_reference';
+        user.current_step_id = 'update_or_reference';
+    }
+    else {
+        if (user.current_step_id === 'update_or_reference') {
+            switch (text) {
+                case '希望物件条件の登録/更新':
+                    user.current_action_id = 'search_condition_registration';
+                    break;
+                case '希望物件条件の参照':
+                    user.current_action_id = 'search_condition_inquiry';
+                    break;
+                case '>キャンセル':
+                    user.current_action_id = 'terminate_action';
+                    break;
+                default:
+                    user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
+            }
+            user.current_step_id = null;
+            user = yield (0, action_handler_1.actionHandler)(user, text, user.getCurrentAction());
+        }
+        else {
+            user.response.message.push((0, error_handler_1.errorHandler)('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user));
+        }
+    }
     return user;
-};
+});
 exports.handleSearchConditionUpdateOrReference = handleSearchConditionUpdateOrReference;
 const handleNextStep = (user, answer_text) => {
     const current_action = user.getCurrentAction();
@@ -276,7 +330,7 @@ const storeAnswerInDatabase = (user, answer_text) => __awaiter(void 0, void 0, v
     let dbc = new DatabaseCommunicator_1.DatabaseCommunicator(config_1.db_data);
     yield dbc.connect();
     const current_question = user.getCurrentQuestion();
-    console.log('現在の質問：', user.current_question_id); // Log message in English
+    console.log('Current question id:', user.current_question_id); // Log message in English
     try {
         if (current_question.type === 'multiple-choice') {
             const user_desired_structures_table_name = config_1.db_data.tables.user_desired_structures.name;

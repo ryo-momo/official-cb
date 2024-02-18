@@ -10,7 +10,7 @@ export interface UserTableColumns {
     phone_number: string;
     workplace_name: string;
     workplace_address: string;
-    workplace_department: string;
+    workplace_position: string;
     workplace_job_category: string;
     workplace_years_of_service: string;
     gross_salary_minus_1: string;
@@ -87,7 +87,7 @@ export const db_data: DbData = {
                 phone_number: 'phone_number',
                 workplace_name: 'workplace_name',
                 workplace_address: 'workplace_address',
-                workplace_department: 'workplace_department',
+                workplace_position: 'workplace_position',
                 workplace_job_category: 'workplace_job_category',
                 workplace_years_of_service: 'workplace_years_of_service',
                 gross_salary_minus_1: 'gross_salary_minus_1',

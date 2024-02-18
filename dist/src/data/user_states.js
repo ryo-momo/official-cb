@@ -115,6 +115,12 @@ const user_states_base = {
         },
         {
             action_id: 'basic_info_update_or_reference',
+            steps: [
+                {
+                    step_id: 'update_or_reference',
+                    next: 'end',
+                },
+            ],
             trigger_text: ['>お客様情報'],
             handler: survey_actions_1.handleBasicInfoUpdateOrReference, // `user`は適切な`User`型の変数に置き換えてください。
         },
@@ -122,10 +128,6 @@ const user_states_base = {
             action_id: 'basic_info_registration',
             survey_id: 'basic_info',
             steps: [
-                {
-                    step_id: 'update_or_reference',
-                    next: 'unknown',
-                },
                 {
                     step_id: 'name_primary',
                     next: 'name_kana',
@@ -160,10 +162,10 @@ const user_states_base = {
                 },
                 {
                     step_id: 'workplace_address',
-                    next: 'department',
+                    next: 'position',
                 },
                 {
-                    step_id: 'department',
+                    step_id: 'position',
                     next: 'job_category',
                 },
                 {
@@ -216,16 +218,20 @@ const user_states_base = {
                     text: 'お客様情報の登録が完了いたしました、お疲れさまでした。',
                 },
             ],
-            trigger_text: ['>お客様情報の登録/更新'],
             handler: survey_actions_1.basicInfoSurveyHandler,
         },
         {
             action_id: 'basic_info_inquiry',
-            trigger_text: ['>お客様情報の参照'],
             handler: get_info_actions_1.handleGetUserInfoAction,
         },
         {
             action_id: 'search_condition_update_or_reference',
+            steps: [
+                {
+                    step_id: 'update_or_reference',
+                    next: 'end',
+                },
+            ],
             trigger_text: ['>希望物件条件'],
             handler: survey_actions_1.handleSearchConditionUpdateOrReference,
         },
@@ -233,10 +239,6 @@ const user_states_base = {
             action_id: 'search_condition',
             survey_id: 'property_conditions',
             steps: [
-                {
-                    step_id: 'update_or_reference',
-                    next: 'unknown',
-                },
                 {
                     step_id: 'price',
                     next: 'target',
@@ -262,12 +264,10 @@ const user_states_base = {
                     next: 'end',
                 },
             ],
-            trigger_text: ['>希望物件条件の登録/更新'],
             handler: survey_actions_1.searchConditionSurveyHandler,
         },
         {
             action_id: 'search_condition_inquiry',
-            trigger_text: ['>希望物件条件の参照'],
             handler: get_info_actions_1.handleGetSearchConditionAction,
         },
         {

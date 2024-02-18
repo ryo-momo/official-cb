@@ -21,6 +21,9 @@ export const ERROR_LOGS: { [key: string]: string } = {
         'User is sending a message that is not a trigger but user is not in the middle of an action either',
     UNKNOWN_ERROR: 'The reason is unknown, please investigate ASAP!!!',
     UNSUPPORTED_EVENT: 'Received an unsupported event',
+    FLEX_MESSAGE_DESIGN_NOT_FOUND:
+        'URGENT: Flex message or its design not found, need to be fixed ASAP',
+    INPUT_OUT_OF_OPTION: 'User input is out of the available options',
 };
 
 export const USER_ERROR_MESSAGES: { [key: string]: string } = {
@@ -31,6 +34,7 @@ export const USER_ERROR_MESSAGES: { [key: string]: string } = {
     FORBIDDEN_ACTION: '現在その操作は行うことができません。',
     NON_TRIGGER_MESSAGE_NO_ACTION:
         '申し訳ございませんが、こちらのチャットでは文章でのお問い合わせは受け付けておりません。担当の方にご連絡をお願いいたします🙇',
+    INPUT_OUT_OF_OPTION: '選択肢の中からお選びください。',
 };
 
 export const errorHandler = (

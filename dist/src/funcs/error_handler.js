@@ -14,6 +14,8 @@ exports.ERROR_LOGS = {
     NON_TRIGGER_MESSAGE_NO_ACTION: 'User is sending a message that is not a trigger but user is not in the middle of an action either',
     UNKNOWN_ERROR: 'The reason is unknown, please investigate ASAP!!!',
     UNSUPPORTED_EVENT: 'Received an unsupported event',
+    FLEX_MESSAGE_DESIGN_NOT_FOUND: 'URGENT: Flex message or its design not found, need to be fixed ASAP',
+    INPUT_OUT_OF_OPTION: 'User input is out of the available options',
 };
 exports.USER_ERROR_MESSAGES = {
     INTERNAL_ERROR: '問題が発生しました。大変お手数ですが担当までお知らせください。',
@@ -21,6 +23,7 @@ exports.USER_ERROR_MESSAGES = {
     NEW_ACTION_WHILE_IN_PROGRESS: '現在別のプロセスが進行中です。現在の操作をキャンセルまたは完了してください。',
     FORBIDDEN_ACTION: '現在その操作は行うことができません。',
     NON_TRIGGER_MESSAGE_NO_ACTION: '申し訳ございませんが、こちらのチャットでは文章でのお問い合わせは受け付けておりません。担当の方にご連絡をお願いいたします🙇',
+    INPUT_OUT_OF_OPTION: '選択肢の中からお選びください。',
 };
 const errorHandler = (internal_error_code, user_error_code, user, error) => {
     const internal_error_msgs = exports.ERROR_LOGS;

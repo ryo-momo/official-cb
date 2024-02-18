@@ -9,7 +9,7 @@ export interface DataLocations {
 
 export interface Columns {
     table_name: string;
-    columns: object;
+    columns: { [key: string]: string };
 }
 
 export interface UserInfo {
@@ -23,7 +23,7 @@ export interface UserInfo {
     phone_number: string;
     workplace_name: string;
     workplace_address: string;
-    workplace_department: string;
+    workplace_position: string;
     workplace_job_category: string;
     workplace_years_of_service: number;
     gross_salary_minus_1: number;
@@ -59,7 +59,7 @@ export const user_info_locations: DataLocations = [
             phone_number: users_columns.phone_number,
             workplace_name: users_columns.workplace_name,
             workplace_address: users_columns.workplace_address,
-            workplace_department: users_columns.workplace_department,
+            workplace_position: users_columns.workplace_position,
             workplace_job_category: users_columns.workplace_job_category,
             workplace_years_of_service: users_columns.workplace_years_of_service,
             gross_salary_minus_1: users_columns.gross_salary_minus_1,
@@ -100,7 +100,7 @@ export const handleGetUserInfoAction = async (user: User, text: string): Promise
                 }\n電話番号: ${user_info.phone_number}\n職場名: ${
                     user_info.workplace_name
                 }\n職場住所: ${user_info.workplace_address}\n職場部署: ${
-                    user_info.workplace_department
+                    user_info.workplace_position
                 }\n職種: ${user_info.workplace_job_category}\n勤続年数: ${
                     user_info.workplace_years_of_service
                 }年\n前年度収入: ${user_info.gross_salary_minus_1}万円\n前々年度収入: ${

@@ -80,7 +80,7 @@ export const surveyValidator = (user: User, answer_text: string): ValidationResp
         case 'email_address':
         case 'workplace_name':
         case 'workplace_address':
-        case 'department':
+        case 'position':
         case 'job_category':
             validation_result = validateTextType(answer_text);
             break;

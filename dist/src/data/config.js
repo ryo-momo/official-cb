@@ -24,7 +24,7 @@ exports.db_data = {
                 phone_number: 'phone_number',
                 workplace_name: 'workplace_name',
                 workplace_address: 'workplace_address',
-                workplace_department: 'workplace_department',
+                workplace_position: 'workplace_position',
                 workplace_job_category: 'workplace_job_category',
                 workplace_years_of_service: 'workplace_years_of_service',
                 gross_salary_minus_1: 'gross_salary_minus_1',

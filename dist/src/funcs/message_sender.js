@@ -44,8 +44,8 @@ class MessageSender {
             }
             catch (error) {
                 // Log: Error sending message
-                console.error();
-                throw new Error(`Error sending message: ${error.message}`);
+                console.log('🚀 ~ file: message_sender.ts:42 ~ MessageSender ~ messages:', messages);
+                throw new Error(`${error.message}`);
             }
         });
     }

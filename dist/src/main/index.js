@@ -26,5 +26,5 @@ const lambdaHandler = (event, context) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.lambdaHandler = lambdaHandler;
-//TODO 5分ごとに起動するやつ実装
 //TODO 任意の情報を更新するやつ実装
+//TODO survey中に

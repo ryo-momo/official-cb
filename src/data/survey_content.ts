@@ -139,17 +139,17 @@ export const survey_contents: SurveyContents = {
                     id: 'workplace_address',
                     text: 'お客様の勤務先住所をお教えください。',
                     type: 'text',
-                    next: 'department',
+                    next: 'position',
                     related_table: db_data.tables.users.name, // Added related_table property
                     related_column: user_columns.workplace_address,
                 },
                 {
-                    id: 'department',
+                    id: 'position',
                     text: 'お客様の役職をお教えください。',
                     type: 'text',
                     next: 'job_category',
                     related_table: db_data.tables.users.name, // Added related_table property
-                    related_column: user_columns.workplace_department,
+                    related_column: user_columns.workplace_position,
                 },
                 {
                     id: 'job_category',
