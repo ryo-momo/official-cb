@@ -270,7 +270,7 @@ const user_states_base: UserStates = {
                 {
                     step_id: 'complete',
                     next: 'end',
-                    text: 'お客様情報の登録が完了いたしました、お疲れさまでした。',
+                    text: 'お疲れさまでした、お客様情報の登録が完了いたしました。まだの場合は、希望物件条件の登録にお進みください。',
                 },
             ],
             handler: basicInfoSurveyHandler,
@@ -317,6 +317,7 @@ const user_states_base: UserStates = {
                 {
                     step_id: 'complete',
                     next: 'end',
+                    text: 'お疲れさまでした、希望物件条件の登録が完了いたしました。担当が確認次第対応いたしますので今しばらくお待ちください。',
                 },
             ],
             handler: searchConditionSurveyHandler,

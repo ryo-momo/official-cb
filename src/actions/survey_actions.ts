@@ -385,7 +385,6 @@ const storeAnswerInDatabase = async (user: User, answer_text: string): Promise<v
 };
 
 const endSurveyAction = (user: User, current_survey_id: string): void => {
-    //--------いずれminor_state遷移のトリガー処理を追加！！
     switch (current_survey_id) {
         case 'basic_info':
             user.minor_state_id = 'basic_info_registered';
@@ -395,19 +394,33 @@ const endSurveyAction = (user: User, current_survey_id: string): void => {
             break;
         default:
     }
-    //--------------------------------------------------------
+    const current_action = user_states.actions.find(
+        (action) => action.action_id === user.current_action_id
+    );
+    if (current_action) {
+        if ('survey_id' in current_action) {
+            const end_step = current_action.steps.find((step) => step.step_id === 'end');
+            if (end_step) {
+                user.response.message.push({
+                    type: 'text',
+                    text:
+                        end_step.text ||
+                        '以上です、お疲れさまでした！担当が対応いたしますのでお待ちください。',
+                });
+            } else {
+                user.response.message.push(
+                    errorHandler('END_STEP_NOT_FOUND', 'INTERNAL_ERROR', user)
+                );
+            }
+        } else {
+            user.response.message.push(errorHandler('ACTION_NOT_A_SURVEY', 'INTERNAL_ERROR', user));
+        }
+    }
     user.current_action_id = null;
     user.current_survey_id = null;
     user.current_step_id = null;
     user.current_question_id = null;
     user.current_answers = null;
-    user.response.shouldReply = true;
-    user.response.message = [
-        {
-            type: 'text',
-            text: '質問は以上です、お疲れさまでした！担当が対応いたしますのでしばらくお待ちくださいませ。',
-        },
-    ] as Message[];
 };
 
 const setQuestion = (user: User, current_question: Question): void => {

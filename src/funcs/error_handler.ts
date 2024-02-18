@@ -24,6 +24,8 @@ export const ERROR_LOGS: { [key: string]: string } = {
     FLEX_MESSAGE_DESIGN_NOT_FOUND:
         'URGENT: Flex message or its design not found, need to be fixed ASAP',
     INPUT_OUT_OF_OPTION: 'User input is out of the available options',
+    END_STEP_NOT_FOUND: 'End step not found',
+    ACTION_NOT_A_SURVEY: 'Action is not a survey',
 };
 
 export const USER_ERROR_MESSAGES: { [key: string]: string } = {
