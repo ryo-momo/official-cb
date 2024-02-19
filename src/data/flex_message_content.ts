@@ -641,7 +641,7 @@ export const flex_message_contents: FlexMessageContent[] = [
         },
     },
     {
-        id: 'change_user_property_by item',
+        id: 'change_user_property_by_item',
         design: {
             type: 'carousel',
             contents: [

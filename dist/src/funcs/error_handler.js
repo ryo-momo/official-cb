@@ -21,6 +21,7 @@ exports.ERROR_LOGS = {
     ACTION_NOT_A_SURVEY: 'Action is not a survey',
     UNEXPECTED_ANSWERS_LENGTH: 'URGENT: Unexpected answers length, fix ASAP',
     TABLE_NOT_FOUND: 'Table not found in user_properties, fix ASAP',
+    INVALID_MINOR_STATE: 'Invalid minor state, fix ASAP',
 };
 exports.USER_ERROR_MESSAGES = {
     INTERNAL_ERROR: '問題が発生しました。大変お手数ですが担当までお知らせください。',
@@ -38,7 +39,7 @@ const errorHandler = (internal_error_code, user_error_code, user, error) => {
         console.error('Detailed error: ', error);
     }
     // 内部エラーログを取得
-    const internal_error_msg = internal_error_msgs[internal_error_code] || 'ERROR_MSG_NOT_FOUND';
+    const internal_error_msg = internal_error_msgs[internal_error_code] || `ERROR_MSG_NOT_FOUND: ${internal_error_code}`;
     // ユーザーエラーメッセージを取得
     const user_error_msg = user_error_msgs[user_error_code] ||
         '問題が発生しました。大変お手数ですが担当までお知らせください。';

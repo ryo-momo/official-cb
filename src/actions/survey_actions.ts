@@ -13,6 +13,7 @@ import { type Message, type FlexMessage, type QuickReplyItem } from '@line/bot-s
 import { type Question, type Survey } from '../data/survey_content';
 import { actionHandler } from './action_handler';
 import { errorHandler } from '../funcs/error_handler';
+import { date } from 'zod';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
 export const basicInfoSurveyHandler = async (user: User, answer_text: string): Promise<User> => {
@@ -219,6 +220,42 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
     }
 };
 
+const qr_basic_info_survey: QuickReplyItem = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '登録',
+        text: 'お客様情報の登録',
+    },
+};
+
+const qr_basic_info_update: QuickReplyItem = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '更新',
+        text: 'お客様情報の更新',
+    },
+};
+
+const qr_basic_info_inquiry: QuickReplyItem = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '参照',
+        text: 'お客様情報の参照',
+    },
+};
+
+const qr_cancel: QuickReplyItem = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: 'キャンセル',
+        text: '>キャンセル',
+    },
+};
+
 export const handleBasicInfoUpdateOrReference = async (user: User, text: string): Promise<User> => {
     if (user.current_step_id === null) {
         user.response.message = [
@@ -228,41 +265,38 @@ export const handleBasicInfoUpdateOrReference = async (user: User, text: string)
                 quickReply: {
                     items: [
                         //TODO ユーザーのminor_stateによって表示するものを変更！！！！
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: 'お客様情報の登録/更新',
-                                text: 'お客様情報の登録/更新',
-                            },
-                        },
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: 'お客様情報の参照',
-                                text: 'お客様情報の参照',
-                            },
-                        },
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: 'キャンセル',
-                                text: '>キャンセル',
-                            },
-                        },
                     ],
                 },
             },
         ];
+        switch (user.minor_state_id) {
+            case 'added': {
+                user.response.message[0].quickReply!.items.push(qr_basic_info_survey, qr_cancel);
+                break;
+            }
+            case 'basic_info_registered':
+            case 'search_condition_added':
+                user.response.message[0].quickReply!.items.push(
+                    qr_basic_info_update,
+                    qr_basic_info_inquiry,
+                    qr_cancel
+                );
+                break;
+            default:
+                user.response.message.push(
+                    errorHandler('INVALID_MINOR_STATE', 'INTERNAL_ERROR', user)
+                );
+        }
         user.current_action_id = 'basic_info_update_or_reference';
         user.current_step_id = 'update_or_reference';
     } else {
         if (user.current_step_id === 'update_or_reference') {
             switch (text) {
-                case 'お客様情報の登録/更新':
+                case 'お客様情報の登録':
                     user.current_action_id = 'basic_info_registration';
+                    break;
+                case 'お客様情報の更新':
+                    user.current_action_id = 'change_individual_user_property';
                     break;
                 case 'お客様情報の参照':
                     user.current_action_id = 'basic_info_inquiry';
@@ -284,6 +318,33 @@ export const handleBasicInfoUpdateOrReference = async (user: User, text: string)
         }
     }
     return user;
+};
+
+const qr_search_condition_survey: QuickReplyItem = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '希望物件条件の登録',
+        text: '希望物件条件の登録',
+    },
+};
+
+const qr_search_condition_update: QuickReplyItem = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '希望物件条件の更新',
+        text: '希望物件条件の更新',
+    },
+};
+
+const qr_search_condition_inquiry: QuickReplyItem = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '希望物件条件の参照',
+        text: '希望物件条件の参照',
+    },
 };
 
 export const handleSearchConditionUpdateOrReference = async (

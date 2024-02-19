@@ -221,6 +221,38 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
         return user;
     }
 });
+const qr_basic_info_survey = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '登録',
+        text: 'お客様情報の登録',
+    },
+};
+const qr_basic_info_update = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '更新',
+        text: 'お客様情報の更新',
+    },
+};
+const qr_basic_info_inquiry = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '参照',
+        text: 'お客様情報の参照',
+    },
+};
+const qr_cancel = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: 'キャンセル',
+        text: '>キャンセル',
+    },
+};
 const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 0, void 0, function* () {
     if (user.current_step_id === null) {
         user.response.message = [
@@ -229,43 +261,34 @@ const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 
                 text: '行いたい操作を選択してください。',
                 quickReply: {
                     items: [
-                        //TODO ユーザーのminor_stateによって表示するものを変更！！！！
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: 'お客様情報の登録/更新',
-                                text: 'お客様情報の登録/更新',
-                            },
-                        },
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: 'お客様情報の参照',
-                                text: 'お客様情報の参照',
-                            },
-                        },
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: 'キャンセル',
-                                text: '>キャンセル',
-                            },
-                        },
+                    //TODO ユーザーのminor_stateによって表示するものを変更！！！！
                     ],
                 },
             },
         ];
+        switch (user.minor_state_id) {
+            case 'added': {
+                user.response.message[0].quickReply.items.push(qr_basic_info_survey, qr_cancel);
+                break;
+            }
+            case 'basic_info_registered':
+            case 'search_condition_added':
+                user.response.message[0].quickReply.items.push(qr_basic_info_update, qr_basic_info_inquiry, qr_cancel);
+                break;
+            default:
+                user.response.message.push((0, error_handler_1.errorHandler)('INVALID_MINOR_STATE', 'INTERNAL_ERROR', user));
+        }
         user.current_action_id = 'basic_info_update_or_reference';
         user.current_step_id = 'update_or_reference';
     }
     else {
         if (user.current_step_id === 'update_or_reference') {
             switch (text) {
-                case 'お客様情報の登録/更新':
+                case 'お客様情報の登録':
                     user.current_action_id = 'basic_info_registration';
+                    break;
+                case 'お客様情報の更新':
+                    user.current_action_id = 'change_individual_user_property';
                     break;
                 case 'お客様情報の参照':
                     user.current_action_id = 'basic_info_inquiry';
@@ -286,6 +309,30 @@ const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 
     return user;
 });
 exports.handleBasicInfoUpdateOrReference = handleBasicInfoUpdateOrReference;
+const qr_search_condition_survey = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '希望物件条件の登録',
+        text: '希望物件条件の登録',
+    },
+};
+const qr_search_condition_update = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '希望物件条件の更新',
+        text: '希望物件条件の更新',
+    },
+};
+const qr_search_condition_inquiry = {
+    type: 'action',
+    action: {
+        type: 'message',
+        label: '希望物件条件の参照',
+        text: '希望物件条件の参照',
+    },
+};
 const handleSearchConditionUpdateOrReference = (user, text) => __awaiter(void 0, void 0, void 0, function* () {
     if (user.current_step_id === null) {
         user.response.message = [

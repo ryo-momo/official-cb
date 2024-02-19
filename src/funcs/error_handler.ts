@@ -29,6 +29,7 @@ export const ERROR_LOGS: { [key: string]: string } = {
     ACTION_NOT_A_SURVEY: 'Action is not a survey',
     UNEXPECTED_ANSWERS_LENGTH: 'URGENT: Unexpected answers length, fix ASAP',
     TABLE_NOT_FOUND: 'Table not found in user_properties, fix ASAP',
+    INVALID_MINOR_STATE: 'Invalid minor state, fix ASAP',
 };
 
 export const USER_ERROR_MESSAGES: { [key: string]: string } = {
@@ -56,7 +57,7 @@ export const errorHandler = (
     }
 
     // 内部エラーログを取得
-    const internal_error_msg = internal_error_msgs[internal_error_code] || 'ERROR_MSG_NOT_FOUND';
+    const internal_error_msg = internal_error_msgs[internal_error_code] || `ERROR_MSG_NOT_FOUND: ${internal_error_code}`;
 
     // ユーザーエラーメッセージを取得
     const user_error_msg =

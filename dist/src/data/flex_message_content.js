@@ -637,7 +637,7 @@ exports.flex_message_contents = [
         },
     },
     {
-        id: 'change_user_property_by item',
+        id: 'change_user_property_by_item',
         design: {
             type: 'carousel',
             contents: [
