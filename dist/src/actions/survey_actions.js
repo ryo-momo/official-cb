@@ -14,6 +14,7 @@ const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
 const config_1 = require("../data/config");
 const question_handler_1 = require("../funcs/question_handler");
 const survey_validator_1 = require("../funcs/survey_validator");
+const user_states_1 = require("../data/user_states");
 const message_helper_1 = require("../funcs/message_helper");
 const action_handler_1 = require("./action_handler");
 const error_handler_1 = require("../funcs/error_handler");
@@ -74,6 +75,57 @@ const handleInitialStep = (user) => __awaiter(void 0, void 0, void 0, function* 
 });
 const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
+    if (answer_text === '中断') {
+        console.log('User is trying to quit the survey'); // Log message
+        user.current_step_id = 'quit_confirmation';
+        user.response.message = [
+            {
+                type: 'text',
+                text: '中断しますか？※進行状況は保存されません。',
+                quickReply: {
+                    items: [
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'はい',
+                                text: 'はい',
+                            },
+                        },
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'いいえ',
+                                text: 'いいえ',
+                            },
+                        },
+                    ],
+                },
+            },
+        ];
+        return user;
+    }
+    else {
+        if (user.current_step_id === 'quit_confirmation') {
+            if (answer_text === 'はい') {
+                console.log('The user has confirmed to quit');
+                user.current_action_id = 'terminate_action';
+                return yield (0, action_handler_1.actionHandler)(user, answer_text, user.getCurrentAction());
+            }
+            else if (answer_text === 'いいえ') {
+                console.log('User decided to continue the survey');
+                user.current_step_id = user.current_question_id;
+                setQuestion(user, user.getCurrentQuestion());
+                return user;
+            }
+            else {
+                user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
+            }
+            return user;
+        }
+    }
+    //validate the answer
     let validation_result = (0, survey_validator_1.surveyValidator)(user, answer_text);
     user = validation_result.user_object;
     if (validation_result.isValid) {
@@ -129,6 +181,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
                     },
                 ];
             }
+            setCancel(user);
         }
         return user;
     }
@@ -163,6 +216,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
                 })),
             ];
         }
+        setCancel(user);
         user.response.message = message;
         return user;
     }
@@ -175,6 +229,7 @@ const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 
                 text: '行いたい操作を選択してください。',
                 quickReply: {
                     items: [
+                        //TODO ユーザーのminor_stateによって表示するものを変更！！！！
                         {
                             type: 'action',
                             action: {
@@ -318,7 +373,7 @@ const handleNextStep = (user, answer_text) => {
                 user.current_question_id = next_question.id;
                 setQuestion(user, next_question);
             }
-            user.current_answers = null;
+            user.current_answers = [];
             console.log(`Updated the user's step to ${user.current_step_id}`);
         }
         else {
@@ -368,7 +423,6 @@ const storeAnswerInDatabase = (user, answer_text) => __awaiter(void 0, void 0, v
     }
 });
 const endSurveyAction = (user, current_survey_id) => {
-    //--------いずれminor_state遷移のトリガー処理を追加！！
     switch (current_survey_id) {
         case 'basic_info':
             user.minor_state_id = 'basic_info_registered';
@@ -378,19 +432,30 @@ const endSurveyAction = (user, current_survey_id) => {
             break;
         default:
     }
-    //--------------------------------------------------------
+    const current_action = user_states_1.user_states.actions.find((action) => action.action_id === user.current_action_id);
+    if (current_action) {
+        if ('survey_id' in current_action) {
+            const end_step = current_action.steps.find((step) => step.step_id === 'end');
+            if (end_step) {
+                user.response.message.push({
+                    type: 'text',
+                    text: end_step.text ||
+                        '以上です、お疲れさまでした！担当が対応いたしますのでお待ちください。',
+                });
+            }
+            else {
+                user.response.message.push((0, error_handler_1.errorHandler)('END_STEP_NOT_FOUND', 'INTERNAL_ERROR', user));
+            }
+        }
+        else {
+            user.response.message.push((0, error_handler_1.errorHandler)('ACTION_NOT_A_SURVEY', 'INTERNAL_ERROR', user));
+        }
+    }
     user.current_action_id = null;
     user.current_survey_id = null;
     user.current_step_id = null;
     user.current_question_id = null;
-    user.current_answers = null;
-    user.response.shouldReply = true;
-    user.response.message = [
-        {
-            type: 'text',
-            text: '質問は以上です、お疲れさまでした！担当が対応いたしますのでしばらくお待ちくださいませ。',
-        },
-    ];
+    user.current_answers = [];
 };
 const setQuestion = (user, current_question) => {
     // Initialize message explicitly
@@ -418,6 +483,33 @@ const setQuestion = (user, current_question) => {
     }
     // update user response
     user.response.message = message;
+    setCancel(user);
+};
+const setCancel = (user) => {
+    const message = user.response.message[user.response.message.length - 1];
+    const quit_quick_reply = {
+        type: 'action',
+        action: {
+            type: 'message',
+            label: '中断',
+            text: '中断',
+        },
+    };
+    if ('quickReply' in message) {
+        if (message.quickReply !== undefined) {
+            message.quickReply.items.push(quit_quick_reply);
+        }
+        else {
+            message.quickReply = {
+                items: [quit_quick_reply],
+            };
+        }
+    }
+    else {
+        message.quickReply = {
+            items: [quit_quick_reply],
+        };
+    }
 };
 const getNextQuestion = (answer_text, current_question, current_survey) => {
     let next_question;

@@ -16,7 +16,6 @@
         ".prettierrc",
         "mock_db",
         "legacy_files",
-        "tests/User.test.ts",
-        "/home/ryo/projects/chatbot_backend/src/actions/change_individual_data_action.ts"
+        "tests/User.test.ts"
     ]
 }

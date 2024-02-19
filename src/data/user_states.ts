@@ -14,6 +14,7 @@ import {
     terminateAction,
 } from '../actions/general_actions';
 import { type User } from '../classes/User';
+import { changeIndividualUserPropertyAction } from '../actions/change_individual_data_action';
 
 export interface MinorState {
     state_id: string;
@@ -86,6 +87,7 @@ const user_states_base: UserStates = {
                         'search_condition',
                         'external_property',
                         'concierge_message',
+                        'change_individual_user_property',
                     ],
                     next: 'search_condition_added',
                 },
@@ -101,6 +103,7 @@ const user_states_base: UserStates = {
                         'search_condition_inquiry',
                         'external_property',
                         'concierge_message',
+                        'change_individual_user_property',
                     ],
                     next: 'end',
                 },
@@ -272,12 +275,31 @@ const user_states_base: UserStates = {
                     next: 'end',
                     text: 'お疲れさまでした、お客様情報の登録が完了いたしました。まだの場合は、希望物件条件の登録にお進みください。',
                 },
+                {
+                    step_id: 'quit_confirmation',
+                    next: 'unknown',
+                },
             ],
             handler: basicInfoSurveyHandler,
         },
         {
             action_id: 'basic_info_inquiry',
             handler: handleGetUserInfoAction,
+        },
+        {
+            action_id: 'change_individual_user_property',
+            steps: [
+                {
+                    step_id: 'specify_property_to_change',
+                    next: 'input_new_value',
+                },
+                {
+                    step_id: 'input_new_value',
+                    next: 'end',
+                },
+            ],
+            trigger_text: ['>お客様情報の更新'],
+            handler: changeIndividualUserPropertyAction,
         },
         {
             action_id: 'search_condition_update_or_reference',
@@ -319,6 +341,10 @@ const user_states_base: UserStates = {
                     next: 'end',
                     text: 'お疲れさまでした、希望物件条件の登録が完了いたしました。担当が確認次第対応いたしますので今しばらくお待ちください。',
                 },
+                {
+                    step_id: 'quit_confirmation',
+                    next: 'unknown',
+                },
             ],
             handler: searchConditionSurveyHandler,
         },
@@ -326,6 +352,22 @@ const user_states_base: UserStates = {
             action_id: 'search_condition_inquiry',
             handler: handleGetSearchConditionAction,
         },
+        //TODO 次これ実装
+        // {
+        //     action_id: 'change_individual_user_property',
+        //     steps: [
+        //         {
+        //             step_id: 'specify_property_to_change',
+        //             next: 'input_new_value',
+        //         },
+        //         {
+        //             step_id: 'input_new_value',
+        //             next: 'end',
+        //         },
+        //     ],
+        //     trigger_text: ['>希望物件条件の変更'],
+        //     handler: changeIndividualUserPropertyAction,
+        // },
         {
             action_id: 'concierge_message',
             steps: [],

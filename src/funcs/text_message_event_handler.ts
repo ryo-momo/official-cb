@@ -54,7 +54,7 @@ const handleNewUser = async (event: MessageEvent): Promise<Result> => {
             current_survey_id: null,
             current_step_id: null,
             current_question_id: null,
-            current_answers: null,
+            current_answers: [],
         },
         {
             shouldReply: true,

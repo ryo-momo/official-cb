@@ -22,7 +22,7 @@ export interface UserData {
     current_survey_id: string | null;
     current_step_id: string | null;
     current_question_id: string | null;
-    current_answers: string[] | string | null;
+    current_answers: string[] | string;
 }
 
 export interface UserResponse {
@@ -65,7 +65,7 @@ export class User implements UserProperty {
     current_survey_id: string | null;
     current_step_id: string | null;
     current_question_id: string | null;
-    current_answers: string[] | null;
+    current_answers: string[];
     response: UserResponse;
 
     constructor(user_property: UserData, response?: UserResponse) {

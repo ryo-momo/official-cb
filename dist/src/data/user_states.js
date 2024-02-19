@@ -4,6 +4,7 @@ exports.user_states = exports.globally_permitted_actions = void 0;
 const survey_actions_1 = require("../actions/survey_actions");
 const get_info_actions_1 = require("../actions/get_info_actions");
 const general_actions_1 = require("../actions/general_actions");
+const change_individual_data_action_1 = require("../actions/change_individual_data_action");
 exports.globally_permitted_actions = ['terminate_action'];
 const user_states_base = {
     major_states: [
@@ -31,6 +32,7 @@ const user_states_base = {
                         'search_condition',
                         'external_property',
                         'concierge_message',
+                        'change_individual_user_property',
                     ],
                     next: 'search_condition_added',
                 },
@@ -46,6 +48,7 @@ const user_states_base = {
                         'search_condition_inquiry',
                         'external_property',
                         'concierge_message',
+                        'change_individual_user_property',
                     ],
                     next: 'end',
                 },
@@ -215,7 +218,11 @@ const user_states_base = {
                 {
                     step_id: 'complete',
                     next: 'end',
-                    text: 'お客様情報の登録が完了いたしました、お疲れさまでした。',
+                    text: 'お疲れさまでした、お客様情報の登録が完了いたしました。まだの場合は、希望物件条件の登録にお進みください。',
+                },
+                {
+                    step_id: 'quit_confirmation',
+                    next: 'unknown',
                 },
             ],
             handler: survey_actions_1.basicInfoSurveyHandler,
@@ -223,6 +230,21 @@ const user_states_base = {
         {
             action_id: 'basic_info_inquiry',
             handler: get_info_actions_1.handleGetUserInfoAction,
+        },
+        {
+            action_id: 'change_individual_user_property',
+            steps: [
+                {
+                    step_id: 'specify_property_to_change',
+                    next: 'input_new_value',
+                },
+                {
+                    step_id: 'input_new_value',
+                    next: 'end',
+                },
+            ],
+            trigger_text: ['>お客様情報の更新'],
+            handler: change_individual_data_action_1.changeIndividualUserPropertyAction,
         },
         {
             action_id: 'search_condition_update_or_reference',
@@ -262,6 +284,11 @@ const user_states_base = {
                 {
                     step_id: 'complete',
                     next: 'end',
+                    text: 'お疲れさまでした、希望物件条件の登録が完了いたしました。担当が確認次第対応いたしますので今しばらくお待ちください。',
+                },
+                {
+                    step_id: 'quit_confirmation',
+                    next: 'unknown',
                 },
             ],
             handler: survey_actions_1.searchConditionSurveyHandler,
@@ -270,6 +297,22 @@ const user_states_base = {
             action_id: 'search_condition_inquiry',
             handler: get_info_actions_1.handleGetSearchConditionAction,
         },
+        //TODO 次これ実装
+        // {
+        //     action_id: 'change_individual_user_property',
+        //     steps: [
+        //         {
+        //             step_id: 'specify_property_to_change',
+        //             next: 'input_new_value',
+        //         },
+        //         {
+        //             step_id: 'input_new_value',
+        //             next: 'end',
+        //         },
+        //     ],
+        //     trigger_text: ['>希望物件条件の変更'],
+        //     handler: changeIndividualUserPropertyAction,
+        // },
         {
             action_id: 'concierge_message',
             steps: [],

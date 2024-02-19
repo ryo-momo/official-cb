@@ -9,7 +9,7 @@ export const terminateAction = (user: User, text: string): User => {
     user.current_survey_id = null;
     user.current_step_id = null;
     user.current_question_id = null;
-    user.current_answers = null;
+    user.current_answers = [];
     user.response.message.push({
         type: 'text',
         text: '現在のプロセスを中断しました。',

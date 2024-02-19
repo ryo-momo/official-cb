@@ -13,10 +13,10 @@ const terminateAction = (user, text) => {
     user.current_survey_id = null;
     user.current_step_id = null;
     user.current_question_id = null;
-    user.current_answers = null;
+    user.current_answers = [];
     user.response.message.push({
         type: 'text',
-        text: '現在のプロセスを終了しました。',
+        text: '現在のプロセスを中断しました。',
     });
     console.log("Terminating current action, progress won't be saved");
     return user;

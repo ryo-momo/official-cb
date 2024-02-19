@@ -26,7 +26,7 @@ const extractUserData = (user: User): UserData => ({
     current_step_id: user.current_step_id,
     current_question_id: user.current_question_id,
     //null if the answer[] is empty
-    current_answers: user.current_answers?.length ?? -1 > 0 ? user.current_answers : null,
+    current_answers: user.current_answers,
 });
 
 export class DatabaseCommunicator {

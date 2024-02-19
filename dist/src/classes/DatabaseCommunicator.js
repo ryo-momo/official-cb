@@ -17,21 +17,18 @@ const mysql_1 = __importDefault(require("mysql"));
 const config_1 = require("../data/config");
 const User_1 = require("./User");
 //basically for database querying
-const extractUserData = (user) => {
-    var _a, _b;
-    return ({
-        user_id: user.user_id,
-        user_line_id: user.user_line_id,
-        major_state_id: user.major_state_id,
-        minor_state_id: user.minor_state_id,
-        current_action_id: user.current_action_id,
-        current_survey_id: user.current_survey_id,
-        current_step_id: user.current_step_id,
-        current_question_id: user.current_question_id,
-        //null if the answer[] is empty
-        current_answers: ((_b = (_a = user.current_answers) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : -1 > 0) ? user.current_answers : null,
-    });
-};
+const extractUserData = (user) => ({
+    user_id: user.user_id,
+    user_line_id: user.user_line_id,
+    major_state_id: user.major_state_id,
+    minor_state_id: user.minor_state_id,
+    current_action_id: user.current_action_id,
+    current_survey_id: user.current_survey_id,
+    current_step_id: user.current_step_id,
+    current_question_id: user.current_question_id,
+    //null if the answer[] is empty
+    current_answers: user.current_answers,
+});
 class DatabaseCommunicator {
     constructor(db_connection_data) {
         this.db_connection_data = db_connection_data;

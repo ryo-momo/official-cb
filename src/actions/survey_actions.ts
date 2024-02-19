@@ -9,12 +9,10 @@ import { surveyValidator } from '../funcs/survey_validator';
 import { type User } from '../classes/User';
 import { type Step, user_states } from '../data/user_states';
 import { generateQuickReplyItems } from '../funcs/message_helper';
-import { type Message, type FlexMessage } from '@line/bot-sdk';
+import { type Message, type FlexMessage, type QuickReplyItem } from '@line/bot-sdk';
 import { type Question, type Survey } from '../data/survey_content';
 import { actionHandler } from './action_handler';
-import { isNullOrUndefined } from 'util';
 import { errorHandler } from '../funcs/error_handler';
-import { array } from 'zod';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
 export const basicInfoSurveyHandler = async (user: User, answer_text: string): Promise<User> => {
@@ -59,7 +57,6 @@ const handleInitialStep = async (user: User): Promise<User> => {
             user.current_step_id = current_step.step_id;
             user.current_question_id = current_question.id;
             setQuestion(user, current_question);
-            setCancel(user);
         } else {
             throw new Error('Next step not found.');
         }
@@ -71,6 +68,56 @@ const handleInitialStep = async (user: User): Promise<User> => {
 };
 
 const handleSubsequentSteps = async (user: User, answer_text: string): Promise<User> => {
+    if (answer_text === '中断') {
+        console.log('User is trying to quit the survey'); // Log message
+        user.current_step_id = 'quit_confirmation';
+        user.response.message = [
+            {
+                type: 'text',
+                text: '中断しますか？※進行状況は保存されません。',
+                quickReply: {
+                    items: [
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'はい',
+                                text: 'はい',
+                            },
+                        },
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: 'いいえ',
+                                text: 'いいえ',
+                            },
+                        },
+                    ],
+                },
+            },
+        ];
+        return user;
+    } else {
+        if (user.current_step_id === 'quit_confirmation') {
+            if (answer_text === 'はい') {
+                console.log('The user has confirmed to quit');
+                user.current_action_id = 'terminate_action';
+                return await actionHandler(user, answer_text, user.getCurrentAction());
+            } else if (answer_text === 'いいえ') {
+                console.log('User decided to continue the survey');
+                user.current_step_id = user.current_question_id;
+                setQuestion(user, user.getCurrentQuestion());
+                return user;
+            } else {
+                user.response.message.push(
+                    errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user)
+                );
+            }
+            return user;
+        }
+    }
+    //validate the answer
     let validation_result = surveyValidator(user, answer_text);
     user = validation_result.user_object;
     if (validation_result.isValid) {
@@ -180,6 +227,7 @@ export const handleBasicInfoUpdateOrReference = async (user: User, text: string)
                 text: '行いたい操作を選択してください。',
                 quickReply: {
                     items: [
+                        //TODO ユーザーのminor_stateによって表示するものを変更！！！！
                         {
                             type: 'action',
                             action: {
@@ -331,9 +379,8 @@ const handleNextStep = (user: User, answer_text: string): void => {
                 user.current_step_id = next_step.step_id;
                 user.current_question_id = next_question.id;
                 setQuestion(user, next_question);
-                setCancel(user);
             }
-            user.current_answers = null;
+            user.current_answers = [];
             console.log(`Updated the user's step to ${user.current_step_id}`);
         } else {
             throw new Error('Current action does not have steps.');
@@ -425,7 +472,7 @@ const endSurveyAction = (user: User, current_survey_id: string): void => {
     user.current_survey_id = null;
     user.current_step_id = null;
     user.current_question_id = null;
-    user.current_answers = null;
+    user.current_answers = [];
 };
 
 const setQuestion = (user: User, current_question: Question): void => {
@@ -456,49 +503,32 @@ const setQuestion = (user: User, current_question: Question): void => {
             },
         ];
     }
-
     // update user response
     user.response.message = message;
+    setCancel(user);
 };
 
 const setCancel = (user: User): void => {
-    const message = user.response.message[user.response.message.length-1];
+    const message = user.response.message[user.response.message.length - 1];
+    const quit_quick_reply: QuickReplyItem = {
+        type: 'action',
+        action: {
+            type: 'message',
+            label: '中断',
+            text: '中断',
+        },
+    };
     if ('quickReply' in message) {
         if (message.quickReply !== undefined) {
-            message.quickReply.items.push({
-                type: 'action',
-                action: {
-                    type: 'message',
-                    label: '中断',
-                    text: '>中断',
-                },
-            });
+            message.quickReply.items.push(quit_quick_reply);
         } else {
             message.quickReply = {
-                items: [
-                    {
-                        type: 'action',
-                        action: {
-                            type: 'message',
-                            label: '中断',
-                            text: '>中断',
-                        },
-                    },
-                ],
+                items: [quit_quick_reply],
             };
         }
     } else {
         message.quickReply = {
-            items: [
-                {
-                    type: 'action',
-                    action: {
-                        type: 'message',
-                        label: '中断',
-                        text: '>中断',
-                    },
-                },
-            ],
+            items: [quit_quick_reply],
         };
     }
 };

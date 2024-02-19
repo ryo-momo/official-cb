@@ -8,12 +8,13 @@ export interface ErrorEvent {
 
 export const ERROR_LOGS: { [key: string]: string } = {
     ACTION_HANDLER_NOT_FOUND: 'Handler not found in action',
-    DATABASE_UPDATE_FAILED: 'Failed to update user in database',
     FLEX_MESSAGE_NOT_FOUND: 'Flex message not found',
     INVALID_MESSAGE: 'Invalid message for select_method',
     INVALID_CURRENT_STEP: "User's current step is invalid",
     INVALID_URL: 'User sent the invalid URL',
     DATABASE_CONNECTION_FAILED: 'Failed to connect to the database',
+    DATABASE_READ_FAILED: 'Failed to read from the database',
+    DATABASE_UPDATE_FAILED: 'Failed to update user in database',
     FORBIDDEN_ACTION: 'User is trying to do an action that is not allowed in the current state',
     NEW_ACTION_WHILE_IN_PROGRESS:
         'User is trying to start a new action while in the middle of another action',
@@ -26,6 +27,8 @@ export const ERROR_LOGS: { [key: string]: string } = {
     INPUT_OUT_OF_OPTION: 'User input is out of the available options',
     END_STEP_NOT_FOUND: 'End step not found',
     ACTION_NOT_A_SURVEY: 'Action is not a survey',
+    UNEXPECTED_ANSWERS_LENGTH: 'URGENT: Unexpected answers length, fix ASAP',
+    TABLE_NOT_FOUND: 'Table not found in user_properties, fix ASAP',
 };
 
 export const USER_ERROR_MESSAGES: { [key: string]: string } = {
@@ -53,10 +56,12 @@ export const errorHandler = (
     }
 
     // 内部エラーログを取得
-    const internal_error_msg = internal_error_msgs[internal_error_code];
+    const internal_error_msg = internal_error_msgs[internal_error_code] || 'ERROR_MSG_NOT_FOUND';
 
     // ユーザーエラーメッセージを取得
-    const user_error_msg = user_error_msgs[user_error_code];
+    const user_error_msg =
+        user_error_msgs[user_error_code] ||
+        '問題が発生しました。大変お手数ですが担当までお知らせください。';
 
     // エラーをログに出力
     console.error(`ERROR:${internal_error_msg}`);
