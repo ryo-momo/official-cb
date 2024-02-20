@@ -59,7 +59,7 @@ const handleNewUser = async (event: MessageEvent): Promise<Result> => {
         {
             shouldReply: true,
             reply_token: null,
-            //この時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
+            //TODOこの時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
             message: [],
         }
     );
@@ -121,6 +121,7 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                                 user
                             )
                         );
+                        //TODO 中断しますか？というメッセージを送信
                         return { user, succeed: false };
                     }
                 } else {
