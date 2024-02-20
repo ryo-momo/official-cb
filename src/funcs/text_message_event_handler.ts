@@ -113,14 +113,10 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                         );
                         return { user: result, succeed: true };
                     } else {
-                        console.log('User is trying to invoke a non-globally permitted action');
-                        user.response.message.push(
-                            errorHandler(
-                                'NEW_ACTION_WHILE_IN_PROGRESS',
-                                'NEW_ACTION_WHILE_IN_PROGRESS',
-                                user
-                            )
+                        console.log(
+                            'User is trying to invoke a non-globally permitted action while in another action'
                         );
+                        user.current_action_id = 'error_terminate_action';
                         //TODO 中断しますか？というメッセージを送信
                         return { user, succeed: false };
                     }
@@ -135,7 +131,8 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                 }
             } else {
                 user.response.message?.push(
-                    errorHandler('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user)
+                    errorHandler('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user),
+                    ...((await dbc.getLastMessage(user.user_line_id)) || [])
                 );
                 return { user: user, succeed: false };
             }
@@ -146,7 +143,8 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                         'NON_TRIGGER_MESSAGE_NO_ACTION',
                         'NON_TRIGGER_MESSAGE_NO_ACTION',
                         user
-                    )
+                    ),
+                    ...((await dbc.getLastMessage(user.user_line_id)) || [])
                 );
                 return { user: user, succeed: false };
             } else {

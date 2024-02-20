@@ -6,6 +6,8 @@ import {
 } from '@line/bot-sdk';
 import { type QuestionOption } from '../data/survey_content';
 import { type User } from '../classes/User';
+import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
+import { db_data } from '../data/config';
 
 // export interface QuickReplyOption {
 //     type: string;
@@ -170,5 +172,13 @@ export const organizeQRs = (user: User): void => {
     if (user.response.message) {
         user.response.message = reduceDuplicateQROptions(user.response.message);
         user.response.message = slideQRsToLast(user.response.message);
+    }
+};
+
+export const setLastMessage = async (user: User): Promise<void> => {
+    const dbc = new DatabaseCommunicator(db_data);
+    const last_message = await dbc.getLastMessage(user.user_line_id);
+    if (last_message) {
+        user.response.message.push(...last_message);
     }
 };

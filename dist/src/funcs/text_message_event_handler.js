@@ -58,7 +58,7 @@ const handleNewUser = (event) => __awaiter(void 0, void 0, void 0, function* () 
     }, {
         shouldReply: true,
         reply_token: null,
-        //この時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
+        //TODOこの時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
         message: [],
     });
     // Assuming the rest of the code is unchanged and the DatabaseCommunicator instance is already created and connected.
@@ -111,6 +111,7 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
                     else {
                         console.log('User is trying to invoke a non-globally permitted action');
                         user.response.message.push((0, error_handler_1.errorHandler)('NEW_ACTION_WHILE_IN_PROGRESS', 'NEW_ACTION_WHILE_IN_PROGRESS', user));
+                        //TODO 中断しますか？というメッセージを送信
                         return { user, succeed: false };
                     }
                 }
@@ -123,13 +124,13 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
                 }
             }
             else {
-                (_a = user.response.message) === null || _a === void 0 ? void 0 : _a.push((0, error_handler_1.errorHandler)('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user));
+                (_a = user.response.message) === null || _a === void 0 ? void 0 : _a.push((0, error_handler_1.errorHandler)('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user), ...((yield dbc.getLastMessage(user.user_line_id)) || []));
                 return { user: user, succeed: false };
             }
         }
         else {
             if (user.current_action_id === null) {
-                user.response.message.push((0, error_handler_1.errorHandler)('NON_TRIGGER_MESSAGE_NO_ACTION', 'NON_TRIGGER_MESSAGE_NO_ACTION', user));
+                user.response.message.push((0, error_handler_1.errorHandler)('NON_TRIGGER_MESSAGE_NO_ACTION', 'NON_TRIGGER_MESSAGE_NO_ACTION', user), ...((yield dbc.getLastMessage(user.user_line_id)) || []));
                 return { user: user, succeed: false };
             }
             else {

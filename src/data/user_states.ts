@@ -9,6 +9,7 @@ import {
     handleGetSearchConditionAction,
 } from '../actions/get_info_actions';
 import {
+    errorTerminateAction,
     externalPropertyAction,
     messageToConcierge,
     terminateAction,
@@ -170,6 +171,16 @@ const user_states_base: UserStates = {
             action_id: 'terminate_action',
             trigger_text: ['>キャンセル'],
             handler: terminateAction,
+        },
+        {
+            action_id: 'error_terminate_action',
+            steps: [
+                {
+                    step_id: 'terminate_or_continue',
+                    next: 'end',
+                },
+            ],
+            handler: errorTerminateAction,
         },
         {
             action_id: 'basic_info_update_or_reference',

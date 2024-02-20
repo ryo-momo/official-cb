@@ -17,6 +17,8 @@ const text_message_event_handler_1 = require("./text_message_event_handler");
 const message_sender_1 = require("./message_sender");
 const dotenv_1 = __importDefault(require("dotenv"));
 const follow_event_handler_1 = require("./follow_event_handler");
+const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
+const config_1 = require("../data/config");
 dotenv_1.default.config();
 const eventResultHandler = (result, reply_token) => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.CHANNEL_ACCESS_TOKEN) {
@@ -29,6 +31,19 @@ const eventResultHandler = (result, reply_token) => __awaiter(void 0, void 0, vo
                 }
                 catch (err) {
                     console.error('Error in sending message:', err);
+                }
+                if (result.user.current_action_id !== null) {
+                    const dbc = new DatabaseCommunicator_1.DatabaseCommunicator(config_1.db_data);
+                    try {
+                        yield dbc.connect();
+                        yield dbc.saveLastMessage(result.user.user_line_id, result.user.current_action_id);
+                    }
+                    catch (error) {
+                        console.error('Error in saving last message:', error);
+                    }
+                    finally {
+                        void dbc.disconnect();
+                    }
                 }
             }
         }

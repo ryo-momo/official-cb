@@ -4,6 +4,8 @@ import { type User } from '../classes/User';
 import { MessageSender } from './message_sender';
 import dotenv from 'dotenv';
 import { followEventHandler } from './follow_event_handler';
+import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
+import { db_data } from '../data/config';
 
 dotenv.config();
 
@@ -22,6 +24,21 @@ const eventResultHandler = async (result: Result, reply_token: string): Promise<
                     await ms.validateAndSendReplyMessage(reply_token, result.user.response.message);
                 } catch (err) {
                     console.error('Error in sending message:', err);
+                }
+                if (result.user.current_action_id !== null) {
+                    console.log('saving last message');
+                    const dbc = new DatabaseCommunicator(db_data);
+                    try {
+                        await dbc.connect();
+                        await dbc.saveLastMessage(
+                            result.user.user_line_id,
+                            result.user.response.message
+                        );
+                    } catch (error) {
+                        console.error('Error in saving last message:', error);
+                    } finally {
+                        void dbc.disconnect();
+                    }
                 }
             }
         } else {

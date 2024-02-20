@@ -141,6 +141,31 @@ class DatabaseCommunicator {
         return this.query(sql, args);
     }
     // ------- User Methods -------
+    getLastMessage(user_line_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connect();
+            const sql = `SELECT last_message_cache FROM users WHERE user_line_id = ?`;
+            const args = [user_line_id];
+            const rows = (yield this.query(sql, args));
+            yield this.disconnect();
+            if (rows.length > 0) {
+                return JSON.parse(rows[0].last_message_cache); // JSON文字列をJSオブジェクトに変換
+            }
+            else {
+                return null;
+            }
+        });
+    }
+    saveLastMessage(user_line_id, objectData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connect();
+            const jsonData = JSON.stringify(objectData); // オブジェクトをJSON文字列に変換
+            const sql = `UPDATE users SET last_message_cache = ? WHERE user_line_id = ?`;
+            const args = [jsonData, user_line_id];
+            yield this.query(sql, args);
+            yield this.disconnect();
+        });
+    }
     // Method to check if a user exists in the database
     // user: User object with a user_id property
     userExists(user_line_id) {
@@ -275,3 +300,105 @@ class DatabaseCommunicator {
     }
 }
 exports.DatabaseCommunicator = DatabaseCommunicator;
+//------------Quick Test Driver -------------------------
+/***
+const arr = [
+    {
+        type: 'flex',
+        altText: '物件情報の共有方法を選択してください',
+        contents: {
+            type: 'bubble',
+            body: {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                    {
+                        type: 'text',
+                        text: '他社提案物件を問い合わせる',
+                        weight: 'bold',
+                        size: 'lg',
+                        align: 'center',
+                    },
+                    {
+                        type: 'text',
+                        contents: [
+                            {
+                                type: 'span',
+                                text: '他社から提示された仲介手数料の\n',
+                            },
+                            {
+                                type: 'span',
+                                text: '『 半額 』',
+                                weight: 'bold',
+                            },
+                            {
+                                type: 'span',
+                                text: 'でお受けいたします。',
+                            },
+                        ],
+                        wrap: true,
+                        margin: 'lg',
+                    },
+                    {
+                        type: 'text',
+                        text: '（スーモ、ホームズ、カナリーなど）',
+                        size: 'xs',
+                    },
+                ],
+            },
+            footer: {
+                type: 'box',
+                layout: 'vertical',
+                spacing: 'sm',
+                contents: [
+                    {
+                        type: 'button',
+                        style: 'primary',
+                        action: {
+                            type: 'message',
+                            label: 'URLを送る',
+                            text: 'URLを送る',
+                        },
+                        color: '#F09199',
+                        margin: 'none',
+                        height: 'sm',
+                    },
+                    {
+                        type: 'button',
+                        style: 'primary',
+                        height: 'sm',
+                        action: {
+                            type: 'message',
+                            label: 'PDFファイルを送る',
+                            text: 'PDFファイルを送る',
+                        },
+                        color: '#F09199',
+                        margin: 'xl',
+                    },
+                    {
+                        type: 'button',
+                        style: 'primary',
+                        height: 'sm',
+                        action: {
+                            type: 'message',
+                            label: '画像を送る',
+                            text: '画像を送る',
+                        },
+                        color: '#F09199',
+                        margin: 'xl',
+                    },
+                ],
+                borderWidth: 'none',
+            },
+        },
+    },
+];
+****/
+// const dbc = new DatabaseCommunicator(db_data);
+// // 非同期関数を定義して使用
+// const run = async (): Promise<void> => {
+//     await dbc.saveLastMessage('Ue478ad4286f7e7b0d2baf5e39bdb9908', arr);
+//     console.log(await dbc.getLastMessage('Ue478ad4286f7e7b0d2baf5e39bdb9908'));
+// };
+// // 非同期関数を実行
+// void run();

@@ -7,6 +7,7 @@ import {
     user_info_locations,
     Columns,
 } from '../actions/get_info_actions';
+import { type Message } from '@line/bot-sdk';
 
 interface DBConnectionData {
     host: string;
@@ -146,7 +147,7 @@ export class DatabaseCommunicator {
     }
 
     // ------- User Methods -------
-    async getLastMessage(user_line_id: string): Promise<Record<string, unknown> | null> {
+    async getLastMessage(user_line_id: string): Promise<Message[] | null> {
         await this.connect();
         const sql = `SELECT last_message_cache FROM users WHERE user_line_id = ?`;
         const args = [user_line_id];
@@ -295,6 +296,9 @@ export class DatabaseCommunicator {
     }
 }
 
+//------------Quick Test Driver -------------------------
+
+/***
 const arr = [
     {
         type: 'flex',
@@ -386,8 +390,7 @@ const arr = [
         },
     },
 ];
-
-//------------Quick Test Driver -------------------------
+****/
 
 // const dbc = new DatabaseCommunicator(db_data);
 

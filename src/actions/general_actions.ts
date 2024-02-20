@@ -3,6 +3,7 @@ import { flex_message_contents } from '../data/flex_message_content';
 import { address_url } from '../data/config';
 import z from 'zod';
 import { errorHandler } from '../funcs/error_handler';
+import { setLastMessage } from '../funcs/message_helper';
 
 export const terminateAction = (user: User, text: string): User => {
     user.current_action_id = null;
@@ -15,6 +16,64 @@ export const terminateAction = (user: User, text: string): User => {
         text: '現在のプロセスを中断しました。',
     });
     console.log("Terminating current action, progress won't be saved");
+    return user;
+};
+
+export const errorTerminateAction = async (user: User, text: string): Promise<User> => {
+    switch (user.current_step_id) {
+        case null: {
+            console.log('asking the user if they want to terminate current action');
+            user.response.message.push({
+                type: 'text',
+                text: '現在別のプロセスの進行中です。現在のプロセスを中断しますか？',
+                quickReply: {
+                    items: [
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: '中断する',
+                                text: '中断する',
+                            },
+                        },
+                        {
+                            type: 'action',
+                            action: {
+                                type: 'message',
+                                label: '中断しない',
+                                text: '中断しない',
+                            },
+                        },
+                    ],
+                },
+            });
+            user.current_step_id = 'terminate_or_continue';
+            break;
+        }
+        case 'terminate_or_continue': {
+            switch (text) {
+                case '中断する':
+                    console.log('terminating current action');
+                    return terminateAction(user, text);
+                case '中断しない':
+                    console.log('resuming current action');
+                    user.current_step_id = null;
+                    await setLastMessage(user);
+                    break;
+                default:
+                    user.response.message.push(
+                        errorHandler('INPUT_OUT_OF_OPTION', 'INTERNAL_ERROR', user)
+                    );
+            }
+            break;
+        }
+        default: {
+            user.response.message.push(
+                errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user)
+            );
+            break;
+        }
+    }
     return user;
 };
 
