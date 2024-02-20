@@ -22,6 +22,7 @@ exports.ERROR_LOGS = {
     UNEXPECTED_ANSWERS_LENGTH: 'URGENT: Unexpected answers length, fix ASAP',
     TABLE_NOT_FOUND: 'Table not found in user_properties, fix ASAP',
     INVALID_MINOR_STATE: 'Invalid minor state, fix ASAP',
+    UNEXPECTED_ACTION_ID: 'Unexpected action ID, fix ASAP',
 };
 exports.USER_ERROR_MESSAGES = {
     INTERNAL_ERROR: '問題が発生しました。大変お手数ですが担当までお知らせください。',

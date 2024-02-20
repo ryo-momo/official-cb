@@ -1,42 +1,48 @@
-import { type QuickReplyItem } from '@line/bot-sdk';
+import {
+    type FlexContainer,
+    type FlexMessage,
+    type Message,
+    type QuickReplyItem,
+} from '@line/bot-sdk';
 import { type QuestionOption } from '../data/survey_content';
+import { type User } from '../classes/User';
 
-export interface QuickReplyOption {
-    type: string;
-    action: {
-        type: string;
-        label: string;
-        text: string;
-    };
-}
+// export interface QuickReplyOption {
+//     type: string;
+//     action: {
+//         type: string;
+//         label: string;
+//         text: string;
+//     };
+// }
 
-export interface Message {
-    type: 'text';
-    text: string;
-    quickReply?: {
-        items: QuickReplyOption[];
-    };
-}
+// export interface Message {
+//     type: 'text';
+//     text: string;
+//     quickReply?: {
+//         items: QuickReplyOption[];
+//     };
+// }
 
-export interface FlexMessage {
-    type: 'flex';
-    altText: string;
-    contents: string;
-    quickReply?: {
-        items: QuickReplyOption[];
-    };
-}
+// export interface FlexMessage {
+//     type: 'flex';
+//     altText: string;
+//     contents: string;
+//     quickReply?: {
+//         items: QuickReplyOption[];
+//     };
+// }
 
-// Simple message object
-export const createSimpleMessage = (text: string): Message => {
-    if (typeof text !== 'string') {
-        throw new Error('Invalid argument: text must be a string');
-    }
-    return {
-        type: 'text',
-        text: text,
-    };
-};
+// // Simple message object
+// export const createSimpleMessage = (text: string): Message => {
+//     if (typeof text !== 'string') {
+//         throw new Error('Invalid argument: text must be a string');
+//     }
+//     return {
+//         type: 'text',
+//         text: text,
+//     };
+// };
 
 // Generate quick reply items
 export const generateQuickReplyItems = (options: QuestionOption[]): QuickReplyItem[] =>
@@ -52,7 +58,7 @@ export const generateQuickReplyItems = (options: QuestionOption[]): QuickReplyIt
 // Flex message object
 export const createFlexMessage = (
     altText: string,
-    contents: string,
+    contents: FlexContainer,
     text?: string
 ): FlexMessage => {
     if (typeof altText !== 'string') {
@@ -71,7 +77,7 @@ export const createFlexMessage = (
 // Add quick reply items to a message object
 export const addQuickReplyItems = (
     message: Message | FlexMessage,
-    quickReplyItems: QuickReplyOption[]
+    quickReplyItems: QuickReplyItem[]
 ): Message | FlexMessage => {
     if (typeof message !== 'object') {
         throw new Error('Invalid argument: message must be an object');
@@ -90,24 +96,79 @@ export const addQuickReplyItems = (
     return message;
 };
 
-// Create a message object with quick reply
-export const createMessageWithQuickReplies = (
-    text: string,
-    quickReplyItems: QuickReplyOption[]
-): Message => {
-    const message: Message = {
-        type: 'text',
-        text: text,
-    };
-    return addQuickReplyItems(message, quickReplyItems) as Message;
+// // Create a message object with quick reply
+// export const createMessageWithQuickReplies = (
+//     text: string,
+//     quickReplyItems: QuickReplyOption[]
+// ): Message => {
+//     const message: Message = {
+//         type: 'text',
+//         text: text,
+//     };
+//     return addQuickReplyItems(message, quickReplyItems) as Message;
+// };
+
+// // Generate Flex Message with Quick Replies
+// export const createFlexMessageWithQuickReplies = (
+//     altText: string,
+//     contents: string,
+//     quickReplyItems: QuickReplyOption[]
+// ): FlexMessage => {
+//     const flex_message = createFlexMessage(altText, contents);
+//     return addQuickReplyItems(flex_message, quickReplyItems) as FlexMessage;
+// };
+
+const reduceDuplicateQROptions = (messages: Message[]): Message[] =>
+    messages.map((message, index) => {
+        if (
+            index === messages.length - 1 &&
+            message.quickReply &&
+            message.quickReply.items.length > 0
+        ) {
+            const uniqueItems = [];
+            const labels = new Set();
+            for (const item of message.quickReply.items) {
+                if (!labels.has(item.action.label)) {
+                    uniqueItems.push(item);
+                    labels.add(item.action.label);
+                } else {
+                    // Log: Found duplicate quickReplyItem, removing it
+                    console.log(
+                        `Found duplicate quickReplyItem with label: ${item.action.label}, removing it`
+                    );
+                }
+            }
+            message.quickReply.items = uniqueItems;
+        }
+        return message;
+    });
+
+const slideQRsToLast = (messages: Message[]): Message[] => {
+    // Slide all quickReplies to the last message and remove from others
+    if (messages.length > 1) {
+        let allQuickReplies: QuickReplyItem[] = [];
+        messages.forEach((message, index) => {
+            if (message.quickReply) {
+                allQuickReplies = allQuickReplies.concat(message.quickReply.items);
+                if (index !== messages.length - 1) {
+                    // Remove quickReply from all but the last message
+                    delete message.quickReply;
+                }
+            }
+        });
+        // Add all collected quickReplies to the last message
+        const lastMessage = messages[messages.length - 1];
+        if (!lastMessage.quickReply) {
+            lastMessage.quickReply = { items: [] };
+        }
+        lastMessage.quickReply.items = allQuickReplies;
+    }
+    return messages;
 };
 
-// Generate Flex Message with Quick Replies
-export const createFlexMessageWithQuickReplies = (
-    altText: string,
-    contents: string,
-    quickReplyItems: QuickReplyOption[]
-): FlexMessage => {
-    const flex_message = createFlexMessage(altText, contents);
-    return addQuickReplyItems(flex_message, quickReplyItems) as FlexMessage;
+export const organizeQRs = (user: User): void => {
+    if (user.response.message) {
+        user.response.message = reduceDuplicateQROptions(user.response.message);
+        user.response.message = slideQRsToLast(user.response.message);
+    }
 };

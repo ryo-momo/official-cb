@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleSearchConditionUpdateOrReference = exports.handleBasicInfoUpdateOrReference = exports.searchConditionSurveyHandler = exports.basicInfoSurveyHandler = void 0;
+exports.setQR = exports.handleSearchConditionUpdateOrReference = exports.handleBasicInfoUpdateOrReference = exports.searchConditionSurveyHandler = exports.basicInfoSurveyHandler = void 0;
 const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
 const config_1 = require("../data/config");
 const question_handler_1 = require("../funcs/question_handler");
@@ -75,7 +75,7 @@ const handleInitialStep = (user) => __awaiter(void 0, void 0, void 0, function* 
 });
 const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    if (answer_text === '中断') {
+    if (answer_text === '中断する') {
         console.log('User is trying to quit the survey'); // Log message
         user.current_step_id = 'quit_confirmation';
         user.response.message = [
@@ -181,7 +181,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
                     },
                 ];
             }
-            setCancel(user);
+            (0, exports.setQR)(user, '中断する');
         }
         return user;
     }
@@ -216,7 +216,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
                 })),
             ];
         }
-        setCancel(user);
+        (0, exports.setQR)(user, '中断する');
         user.response.message = message;
         return user;
     }
@@ -509,55 +509,52 @@ const setQuestion = (user, current_question) => {
     let message;
     if (current_question.design) {
         // Flex message
-        message = [
-            {
-                type: 'flex',
-                altText: '次の質問をご確認ください。',
-                contents: current_question.design,
-            },
-        ];
+        message = {
+            type: 'flex',
+            altText: '次の質問をご確認ください。',
+            contents: current_question.design,
+        };
     }
     else {
         // Text message with conditional quickReply, using type guard
-        message = [
-            Object.assign({ type: 'text', text: current_question.text || '質問のテキストが設定されていません。' }, ('options' in current_question && {
-                // 型ガードを使用してoptionsの存在をチェック
-                quickReply: {
-                    items: (0, message_helper_1.generateQuickReplyItems)(current_question.options),
-                },
-            })),
-        ];
+        message = Object.assign({ type: 'text', text: current_question.text || '質問のテキストが設定されていません。' }, ('options' in current_question && {
+            // 型ガードを使用してoptionsの存在をチェック
+            quickReply: {
+                items: (0, message_helper_1.generateQuickReplyItems)(current_question.options),
+            },
+        }));
     }
     // update user response
-    user.response.message = message;
-    setCancel(user);
+    user.response.message.push(message);
+    (0, exports.setQR)(user, '中断する');
 };
-const setCancel = (user) => {
+const setQR = (user, text) => {
     const message = user.response.message[user.response.message.length - 1];
-    const quit_quick_reply = {
+    const quick_reply_item = {
         type: 'action',
         action: {
             type: 'message',
-            label: '中断',
-            text: '中断',
+            label: text,
+            text: text,
         },
     };
     if ('quickReply' in message) {
         if (message.quickReply !== undefined) {
-            message.quickReply.items.push(quit_quick_reply);
+            message.quickReply.items.push(quick_reply_item);
         }
         else {
             message.quickReply = {
-                items: [quit_quick_reply],
+                items: [quick_reply_item],
             };
         }
     }
     else {
         message.quickReply = {
-            items: [quit_quick_reply],
+            items: [quick_reply_item],
         };
     }
 };
+exports.setQR = setQR;
 const getNextQuestion = (answer_text, current_question, current_survey) => {
     let next_question;
     // Check if current_question.next is a string or an object

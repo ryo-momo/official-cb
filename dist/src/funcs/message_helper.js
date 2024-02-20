@@ -1,17 +1,39 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createFlexMessageWithQuickReplies = exports.createMessageWithQuickReplies = exports.addQuickReplyItems = exports.createFlexMessage = exports.generateQuickReplyItems = exports.createSimpleMessage = void 0;
-// Simple message object
-const createSimpleMessage = (text) => {
-    if (typeof text !== 'string') {
-        throw new Error('Invalid argument: text must be a string');
-    }
-    return {
-        type: 'text',
-        text: text,
-    };
-};
-exports.createSimpleMessage = createSimpleMessage;
+exports.organizeQRs = exports.addQuickReplyItems = exports.createFlexMessage = exports.generateQuickReplyItems = void 0;
+// export interface QuickReplyOption {
+//     type: string;
+//     action: {
+//         type: string;
+//         label: string;
+//         text: string;
+//     };
+// }
+// export interface Message {
+//     type: 'text';
+//     text: string;
+//     quickReply?: {
+//         items: QuickReplyOption[];
+//     };
+// }
+// export interface FlexMessage {
+//     type: 'flex';
+//     altText: string;
+//     contents: string;
+//     quickReply?: {
+//         items: QuickReplyOption[];
+//     };
+// }
+// // Simple message object
+// export const createSimpleMessage = (text: string): Message => {
+//     if (typeof text !== 'string') {
+//         throw new Error('Invalid argument: text must be a string');
+//     }
+//     return {
+//         type: 'text',
+//         text: text,
+//     };
+// };
 // Generate quick reply items
 const generateQuickReplyItems = (options) => options.map((option) => ({
     type: 'action',
@@ -57,18 +79,72 @@ const addQuickReplyItems = (message, quickReplyItems) => {
     return message;
 };
 exports.addQuickReplyItems = addQuickReplyItems;
-// Create a message object with quick reply
-const createMessageWithQuickReplies = (text, quickReplyItems) => {
-    const message = {
-        type: 'text',
-        text: text,
-    };
-    return (0, exports.addQuickReplyItems)(message, quickReplyItems);
+// // Create a message object with quick reply
+// export const createMessageWithQuickReplies = (
+//     text: string,
+//     quickReplyItems: QuickReplyOption[]
+// ): Message => {
+//     const message: Message = {
+//         type: 'text',
+//         text: text,
+//     };
+//     return addQuickReplyItems(message, quickReplyItems) as Message;
+// };
+// // Generate Flex Message with Quick Replies
+// export const createFlexMessageWithQuickReplies = (
+//     altText: string,
+//     contents: string,
+//     quickReplyItems: QuickReplyOption[]
+// ): FlexMessage => {
+//     const flex_message = createFlexMessage(altText, contents);
+//     return addQuickReplyItems(flex_message, quickReplyItems) as FlexMessage;
+// };
+const reduceDuplicateQROptions = (messages) => messages.map((message, index) => {
+    if (index === messages.length - 1 &&
+        message.quickReply &&
+        message.quickReply.items.length > 0) {
+        const uniqueItems = [];
+        const labels = new Set();
+        for (const item of message.quickReply.items) {
+            if (!labels.has(item.action.label)) {
+                uniqueItems.push(item);
+                labels.add(item.action.label);
+            }
+            else {
+                // Log: Found duplicate quickReplyItem, removing it
+                console.log(`Found duplicate quickReplyItem with label: ${item.action.label}, removing it`);
+            }
+        }
+        message.quickReply.items = uniqueItems;
+    }
+    return message;
+});
+const slideQRsToLast = (messages) => {
+    // Slide all quickReplies to the last message and remove from others
+    if (messages.length > 1) {
+        let allQuickReplies = [];
+        messages.forEach((message, index) => {
+            if (message.quickReply) {
+                allQuickReplies = allQuickReplies.concat(message.quickReply.items);
+                if (index !== messages.length - 1) {
+                    // Remove quickReply from all but the last message
+                    delete message.quickReply;
+                }
+            }
+        });
+        // Add all collected quickReplies to the last message
+        const lastMessage = messages[messages.length - 1];
+        if (!lastMessage.quickReply) {
+            lastMessage.quickReply = { items: [] };
+        }
+        lastMessage.quickReply.items = allQuickReplies;
+    }
+    return messages;
 };
-exports.createMessageWithQuickReplies = createMessageWithQuickReplies;
-// Generate Flex Message with Quick Replies
-const createFlexMessageWithQuickReplies = (altText, contents, quickReplyItems) => {
-    const flex_message = (0, exports.createFlexMessage)(altText, contents);
-    return (0, exports.addQuickReplyItems)(flex_message, quickReplyItems);
+const organizeQRs = (user) => {
+    if (user.response.message) {
+        user.response.message = reduceDuplicateQROptions(user.response.message);
+        user.response.message = slideQRsToLast(user.response.message);
+    }
 };
-exports.createFlexMessageWithQuickReplies = createFlexMessageWithQuickReplies;
+exports.organizeQRs = organizeQRs;

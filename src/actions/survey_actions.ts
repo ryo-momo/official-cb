@@ -9,7 +9,12 @@ import { surveyValidator } from '../funcs/survey_validator';
 import { type User } from '../classes/User';
 import { type Step, user_states } from '../data/user_states';
 import { generateQuickReplyItems } from '../funcs/message_helper';
-import { type Message, type FlexMessage, type QuickReplyItem } from '@line/bot-sdk';
+import {
+    type Message,
+    type FlexMessage,
+    type QuickReplyItem,
+    type TextMessage,
+} from '@line/bot-sdk';
 import { type Question, type Survey } from '../data/survey_content';
 import { actionHandler } from './action_handler';
 import { errorHandler } from '../funcs/error_handler';
@@ -69,7 +74,7 @@ const handleInitialStep = async (user: User): Promise<User> => {
 };
 
 const handleSubsequentSteps = async (user: User, answer_text: string): Promise<User> => {
-    if (answer_text === '中断') {
+    if (answer_text === '中断する') {
         console.log('User is trying to quit the survey'); // Log message
         user.current_step_id = 'quit_confirmation';
         user.response.message = [
@@ -176,7 +181,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                     },
                 ] as Message[];
             }
-            setCancel(user);
+            setQR(user, '中断する');
         }
         return user;
     } else {
@@ -214,7 +219,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                 },
             ];
         }
-        setCancel(user);
+        setQR(user, '中断する');
         user.response.message = message;
         return user;
     }
@@ -538,58 +543,54 @@ const endSurveyAction = (user: User, current_survey_id: string): void => {
 
 const setQuestion = (user: User, current_question: Question): void => {
     // Initialize message explicitly
-    let message: Message[] | FlexMessage[];
+    let message: TextMessage | FlexMessage;
 
     if (current_question.design) {
         // Flex message
-        message = [
-            {
-                type: 'flex',
-                altText: '次の質問をご確認ください。',
-                contents: current_question.design,
-            },
-        ];
+        message = {
+            type: 'flex',
+            altText: '次の質問をご確認ください。',
+            contents: current_question.design,
+        };
     } else {
         // Text message with conditional quickReply, using type guard
-        message = [
-            {
-                type: 'text',
-                text: current_question.text || '質問のテキストが設定されていません。',
-                ...('options' in current_question && {
-                    // 型ガードを使用してoptionsの存在をチェック
-                    quickReply: {
-                        items: generateQuickReplyItems(current_question.options),
-                    },
-                }),
-            },
-        ];
+        message = {
+            type: 'text',
+            text: current_question.text || '質問のテキストが設定されていません。',
+            ...('options' in current_question && {
+                // 型ガードを使用してoptionsの存在をチェック
+                quickReply: {
+                    items: generateQuickReplyItems(current_question.options),
+                },
+            }),
+        };
     }
     // update user response
-    user.response.message = message;
-    setCancel(user);
+    user.response.message.push(message);
+    setQR(user, '中断する');
 };
 
-const setCancel = (user: User): void => {
+export const setQR = (user: User, text: string): void => {
     const message = user.response.message[user.response.message.length - 1];
-    const quit_quick_reply: QuickReplyItem = {
+    const quick_reply_item: QuickReplyItem = {
         type: 'action',
         action: {
             type: 'message',
-            label: '中断',
-            text: '中断',
+            label: text,
+            text: text,
         },
     };
     if ('quickReply' in message) {
         if (message.quickReply !== undefined) {
-            message.quickReply.items.push(quit_quick_reply);
+            message.quickReply.items.push(quick_reply_item);
         } else {
             message.quickReply = {
-                items: [quit_quick_reply],
+                items: [quick_reply_item],
             };
         }
     } else {
         message.quickReply = {
-            items: [quit_quick_reply],
+            items: [quick_reply_item],
         };
     }
 };

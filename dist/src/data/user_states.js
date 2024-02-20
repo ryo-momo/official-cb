@@ -299,7 +299,7 @@ const user_states_base = {
         },
         //TODO 次これ実装
         // {
-        //     action_id: 'change_individual_user_property',
+        //     action_id: 'change_individual_search_condition',
         //     steps: [
         //         {
         //             step_id: 'specify_property_to_change',

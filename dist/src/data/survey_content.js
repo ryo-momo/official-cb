@@ -45,7 +45,7 @@ exports.survey_contents = {
                 },
                 {
                     id: 'residence_category',
-                    text: 'お客様の住居区分を以下から選択してください。',
+                    text: 'お客様の住居区分を以下からお選びください。',
                     type: 'single-choice',
                     options: [
                         {
@@ -128,6 +128,7 @@ exports.survey_contents = {
                 {
                     id: 'gross_salary_minus_1',
                     text: `お客様の過去三年の額面給与額をお聞きします。\nまず、令和${reiwa_year - 1}年度の額面給与額（万円）をお教えください。`,
+                    text_secondary: `令和${reiwa_year - 1}年度の額面給与額（万円）をお教えください。`,
                     type: 'text',
                     next: 'gross_salary_minus_2',
                     related_table: config_1.db_data.tables.users.name,
@@ -136,6 +137,7 @@ exports.survey_contents = {
                 {
                     id: 'gross_salary_minus_2',
                     text: `次に、令和${reiwa_year - 2}年度の額面給与額（万円）をお教えください。`,
+                    text_secondary: `令和${reiwa_year - 2}年度の額面給与額（万円）をお教えください。`,
                     type: 'text',
                     next: 'gross_salary_minus_3',
                     related_table: config_1.db_data.tables.users.name,
@@ -144,6 +146,7 @@ exports.survey_contents = {
                 {
                     id: 'gross_salary_minus_3',
                     text: `最後に、令和${reiwa_year - 3}年度の額面給与額（万円）をお教えください。`,
+                    text_secondary: `令和${reiwa_year - 3}年度の額面給与額（万円）をお教えください。`,
                     type: 'text',
                     next: 'family_structure_spouse',
                     related_table: config_1.db_data.tables.users.name,
@@ -152,6 +155,7 @@ exports.survey_contents = {
                 {
                     id: 'family_structure_spouse',
                     text: '次に、家族構成についてお聞きします。現在、配偶者はいらっしゃいますか？',
+                    text_secondary: '配偶者の有無をお選びください。',
                     type: 'single-choice',
                     options: [
                         {
@@ -181,6 +185,7 @@ exports.survey_contents = {
                 {
                     id: 'borrowed_money',
                     text: 'お客様の保有する資産についてお聞きします。まず、現在の借入総額（万円）をお教えください。',
+                    text_secondary: '現在の借入総額（万円）をお教えください。',
                     type: 'text',
                     next: 'deposit',
                     related_table: config_1.db_data.tables.users.name,
@@ -205,6 +210,7 @@ exports.survey_contents = {
                 {
                     id: 'purchaser_category',
                     text: '最後に、不動産を購入される際の名義を以下からお選びください。',
+                    text_secondary: '不動産を購入される際の名義をお選びください。',
                     type: 'single-choice',
                     options: [
                         {
@@ -287,6 +293,7 @@ exports.survey_contents = {
                 {
                     id: 'target',
                     text: '次に、お客様の希望する物件のターゲット層をお教えください。 \n※単身者/カップル向け（1R,1K,1DK,1LDK中心）\n※ファミリー向け（2DK以上）',
+                    text_secondary: 'お客様の希望する物件のターゲット層をお選びください。 \n※単身者/カップル向け（1R,1K,1DK,1LDK中心）\n※ファミリー向け（2DK以上）',
                     type: 'single-choice',
                     related_table: config_1.db_data.tables.users.name,
                     related_column: config_1.db_data.tables.users.columns.desired_target,
@@ -374,6 +381,7 @@ exports.survey_contents = {
                 {
                     id: 'structure',
                     text: '次に、お客様の希望する物件の構造をお教えください。（2つ選択）',
+                    text_secondary: 'お客様の希望する物件の構造をお教えください。（2つ選択）',
                     type: 'multiple-choice',
                     related_table: config_1.db_data.tables.user_desired_structures.name,
                     related_column: config_1.db_data.tables.user_desired_structures.columns.desired_structure,
