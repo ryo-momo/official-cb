@@ -4,6 +4,7 @@ import {
     handleTextQuestion,
     handleSingleChoiceQuestion,
     handleMultipleChoiceQuestion,
+    type QuestionHandlerResult,
 } from '../funcs/question_handler';
 import { surveyValidator } from '../funcs/survey_validator';
 import { type User } from '../classes/User';
@@ -18,7 +19,6 @@ import {
 import { type Question, type Survey } from '../data/survey_content';
 import { invokeAction } from './action_handler';
 import { errorHandler } from '../funcs/error_handler';
-import { date } from 'zod';
 
 // This function validates the user's answer, stores the answer to the database, and returns the modified User instance.
 export const basicInfoSurveyHandler = async (user: User, answer_text: string): Promise<User> => {
@@ -131,7 +131,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
         answer_text = validation_result.answer_text_revised;
 
         // Process the answer based on the question type.
-        let process_result;
+        let process_result: QuestionHandlerResult;
         const question_type = user.getCurrentQuestion().type ?? null;
         switch (question_type) {
             case 'text':
@@ -466,7 +466,7 @@ const handleNextStep = (user: User, answer_text: string): void => {
     }
 };
 
-const storeAnswerInDatabase = async (user: User, answer_text: string): Promise<void> => {
+export const storeAnswerInDatabase = async (user: User, answer_text: string): Promise<void> => {
     let dbc = new DatabaseCommunicator(db_data);
     await dbc.connect();
     const current_question = user.getCurrentQuestion();
@@ -588,7 +588,7 @@ export const setQR = (user: User, label: string, text: string): void => {
         type: 'action',
         action: {
             type: 'message',
-            label: text,
+            label: label,
             text: text,
         },
     };

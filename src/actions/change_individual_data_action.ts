@@ -1,3 +1,4 @@
+import { type Message } from '@line/bot-sdk';
 import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { type User } from '../classes/User';
 import { db_data } from '../data/config';
@@ -5,8 +6,16 @@ import { flex_message_contents } from '../data/flex_message_content';
 import { type Question } from '../data/survey_content';
 import { errorHandler } from '../funcs/error_handler';
 import { generateQuickReplyItems, organizeQRs } from '../funcs/message_helper';
+import {
+    type QuestionHandlerResult,
+    handleMultipleChoiceQuestion,
+    handleSingleChoiceQuestion,
+    handleTextQuestion,
+} from '../funcs/question_handler';
+import { surveyValidator } from '../funcs/survey_validator';
 import { Columns, user_info_locations, DataLocations } from './get_info_actions';
-import { setQR } from './survey_actions';
+import { setQR, storeAnswerInDatabase } from './survey_actions';
+import { invokeAction } from './action_handler';
 
 export interface DataPropertyTable {
     table_name: string;
@@ -289,12 +298,10 @@ export const changeIndividualUserPropertyAction = async (
                     'User has specified a valid property, getting the current value and prompt for update'
                 );
                 await dbc.connect();
-                const column =
-                    table.data[
-                        Object.keys(table.data).find(
-                            (key) => table.data[key].label_ja === text
-                        ) as keyof DataPropertyTable['data']
-                    ];
+                const column_key = Object.keys(table.data).find(
+                    (key) => table.data[key].label_ja === text
+                ) as keyof DataPropertyTable['data'];
+                const column = table.data[column_key];
                 let current_value: { [key: string]: string | number | boolean } = {};
                 try {
                     const current_value_array: { [key: string]: string | number | boolean }[] =
@@ -303,6 +310,7 @@ export const changeIndividualUserPropertyAction = async (
                             [column.data_location],
                             `user_id = \'${user.user_id}\'`
                         );
+                    //TODO 二つ以上該当する場合があるよーーーーー
                     current_value = current_value_array[0];
                 } catch (err) {
                     user.response.message.push(
@@ -336,9 +344,8 @@ export const changeIndividualUserPropertyAction = async (
                     setQR(user, 'キャンセル', '>キャンセル');
                     organizeQRs(user);
                     console.log('Change the step ID to input_new_value');
-                    user.current_step_id = 'input_new_value';
                     //store the item name to update
-                    user.current_answers = [column.data_location];
+                    user.current_step_id = String(column_key);
                 } else {
                     user.response.message.push(
                         errorHandler('DATABASE_READ_FAILED', 'INTERNAL_ERROR', user)
@@ -351,66 +358,173 @@ export const changeIndividualUserPropertyAction = async (
             }
             break;
         }
-        case 'input_new_value': {
-            console.log('Expecting that the user has input the new value, updating the database');
-            if (text === '>キャンセル') {
-                console.log('User is trying to cancel the update');
+        case 'continue_or_not': {
+            if (text === 'する') {
+                user.current_step_id = null;
+                user.current_answers = [];
+                if (user.current_action_id) {
+                    await invokeAction(user, '', user.current_action_id, false);
+                } else {
+                    user.response.message.push(
+                        errorHandler('UNEXPECTED_ACTION_ID', 'INTERNAL_ERROR', user)
+                    );
+                }
+            } else if (text === 'しない') {
                 user.response.message.push({
                     type: 'text',
-                    text: '変更をキャンセルしました。',
+                    text: '情報の更新を終了します。',
                 });
                 user.current_action_id = null;
                 user.current_step_id = null;
-                user.current_answers = [];
             } else {
-                const data_loc = user.current_answers.pop();
-                //TODO:validationを行う
-                if (data_loc) {
-                    const table = user_properties.find((table) =>
-                        Object.keys(table.data)
-                            .map((key) => table.data[key].data_location)
-                            .includes(data_loc)
-                    );
-                    if (table) {
-                        const dbc = new DatabaseCommunicator(db_data);
-                        await dbc.connect();
-                        try {
-                            await dbc.update(
-                                table.table_name,
-                                { [data_loc]: text },
-                                `user_id = \'${user.user_id}\'`
-                            );
-                        } catch (err) {
-                            user.response.message.push(
-                                errorHandler('DATABASE_UPDATE_FAILED', 'INTERNAL_ERROR', user, err)
-                            );
-                        } finally {
-                            void dbc.disconnect();
-                        }
-                        console.log('Update complete with value: ', text);
-                        user.response.message.push({
-                            type: 'text',
-                            text: '更新が完了しました。',
-                        });
-                        user.current_action_id = null;
-                        user.current_step_id = null;
-                        user.current_answers = [];
-                    } else {
-                        user.response.message.push(
-                            errorHandler('TABLE_NOT_FOUND', 'INTERNAL_ERROR', user)
-                        );
-                    }
-                } else {
-                    user.response.message.push(
-                        errorHandler('UNEXPECTED_ANSWERS_LENGTH', 'INTERNAL_ERROR', user)
-                    );
-                }
+                user.response.message.push(
+                    errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user)
+                );
             }
             break;
         }
         default: {
-            user.response.message.push(errorHandler('UNEXPECTED_STEP_ID', 'INTERNAL_ERROR', user));
-            break;
+            let table: DataPropertyTable;
+            switch (user.current_action_id) {
+                case 'change_individual_user_property': {
+                    table = user_properties[0];
+                    break;
+                }
+                case 'change_individual_search_condition': {
+                    table = user_properties[1];
+                    break;
+                }
+                default:
+                    user.response.message.push(
+                        errorHandler('UNEXPECTED_ACTION_ID', 'INTERNAL_ERROR', user)
+                    );
+                    return user;
+            }
+            if (Object.keys(table.data).includes(user.current_step_id)) {
+                console.log(
+                    'Expecting that the user has input the new value, updating the database'
+                );
+                if (text === '>キャンセル') {
+                    console.log('User is trying to cancel the update');
+                    user.response.message.push({
+                        type: 'text',
+                        text: '変更をキャンセルしました。',
+                    });
+                    user.current_action_id = null;
+                    user.current_step_id = null;
+                    user.current_answers = [];
+                } else {
+                    const validation_result = surveyValidator(user, text);
+                    user = validation_result.user_object;
+
+                    if (validation_result.isValid) {
+                        console.log('Validation is successful');
+
+                        text = validation_result.answer_text_revised;
+
+                        // Process the answer based on the question type.
+                        let process_result: QuestionHandlerResult;
+                        const question_type = user.getCurrentQuestion().type ?? null;
+                        switch (question_type) {
+                            case 'text':
+                                console.log('Processing text question.'); // Log message
+                                process_result = handleTextQuestion(user, text);
+                                break;
+                            case 'single-choice':
+                                console.log('Processing single-choice question.'); // Log message
+                                process_result = handleSingleChoiceQuestion(user, text);
+                                break;
+                            case 'multiple-choice':
+                                console.log('Processing multiple-choice question.'); // Log message
+                                process_result = handleMultipleChoiceQuestion(user, text);
+                                break;
+                            default:
+                                throw new Error(`Invalid question type: ${question_type}`);
+                        }
+                        console.log(
+                            '🚀 ~ file: change_individual_data_action.ts:413 ~ process_result:',
+                            process_result
+                        );
+
+                        // If the answer needs to be stored in the database, connect to the database and update the user's information.
+                        if (process_result.storeValueToDB) {
+                            console.log('Storing answer to database.'); // Log message
+                            try {
+                                await storeAnswerInDatabase(user, text);
+                            } catch (err) {
+                                console.error('Error storing answer in database: ', err); // Log message
+                                // Handle the error appropriately
+                            }
+                            console.log('Answer stored in database successfully.');
+                        }
+                        if (process_result.goToNextStep) {
+                            console.log('Update complete');
+                            user.response.message.push({
+                                type: 'text',
+                                text: '更新が完了しました。続けて更新しますか？',
+                                quickReply: {
+                                    items: [
+                                        {
+                                            type: 'action',
+                                            action: {
+                                                type: 'message',
+                                                label: 'する',
+                                                text: 'する',
+                                            },
+                                        },
+                                        {
+                                            type: 'action',
+                                            action: {
+                                                type: 'message',
+                                                label: 'しない',
+                                                text: 'しない',
+                                            },
+                                        },
+                                    ],
+                                },
+                            });
+                            user.current_step_id = 'continue_or_not';
+                            user.current_answers = [];
+                        } else {
+                            //set the current question to the user response again, except deleting the already selected option from options.
+                            const current_question = user.getCurrentQuestion();
+                            if ('options' in current_question) {
+                                //for multiple choice questions, delete the already selected option from options.
+                                current_question.options = current_question.options.filter(
+                                    (option) => option.text !== text
+                                );
+                                user.response.message = [
+                                    {
+                                        type: 'text',
+                                        text: current_question.text,
+                                        quickReply: {
+                                            items: generateQuickReplyItems(
+                                                current_question.options
+                                            ),
+                                        },
+                                    },
+                                ] as Message[];
+                            }
+                            setQR(user, 'キャンセル', '>キャンセル');
+                        }
+                    } else {
+                        console.log('Validation failed');
+                        user.response.message.push({
+                            type: 'text',
+                            text: validation_result.error_message,
+                        });
+                        setQuestionSecondary(user, user.getCurrentQuestion());
+                        setQR(user, 'キャンセル', '>キャンセル');
+                        return user;
+                    }
+                }
+                break;
+            } else {
+                user.response.message.push(
+                    errorHandler('UNEXPECTED_STEP_ID', 'INTERNAL_ERROR', user)
+                );
+                break;
+            }
         }
     }
     return user;

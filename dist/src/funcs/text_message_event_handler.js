@@ -58,7 +58,7 @@ const handleNewUser = (event) => __awaiter(void 0, void 0, void 0, function* () 
         current_question_id: null,
         current_answers: [],
     }, {
-        shouldReply: true,
+        shouldReply: false,
         reply_token: null,
         //TODOこの時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
         message: [],
@@ -100,6 +100,7 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
             reply_token: null,
             message: [],
         });
+        console.log(JSON.stringify(user));
         const triggered_action = findActionByTrigger(text_message.text);
         if (triggered_action !== null) {
             if ((0, exports.isActionAllowedInCurrentState)(user, text_message.text)) {

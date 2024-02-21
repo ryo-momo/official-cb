@@ -254,7 +254,7 @@ class DatabaseCommunicator {
             for (const key in user_data) {
                 const item = user_data[key];
                 if (Array.isArray(item)) {
-                    user_data[key] = item.join(',');
+                    user_data[key] = item.length === 0 ? null : item.join(',');
                 }
             }
             const columns = User_1.db_references;
@@ -275,12 +275,11 @@ class DatabaseCommunicator {
             try {
                 yield this.connect();
                 const user_data = extractUserData(user);
-                console.log('🚀 ~ file: DatabaseCommunicator.ts:277 ~ DatabaseCommunicator ~ updateUser ~ user_data:', JSON.stringify(user_data));
                 // Convert array values in user_data to JSON string
                 for (const key in user_data) {
                     const item = user_data[key];
                     if (Array.isArray(item)) {
-                        user_data[key] = item.join(',');
+                        user_data[key] = item.length === 0 ? null : item.join(',');
                     }
                 }
                 const table_name = config_1.db_data.tables.users.name;

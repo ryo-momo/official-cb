@@ -59,7 +59,7 @@ const handleNewUser = async (event: MessageEvent): Promise<Result> => {
             current_answers: [],
         },
         {
-            shouldReply: true,
+            shouldReply: false,
             reply_token: null,
             //TODOこの時点でユーザーが登録されていないのはおかしいため、エラーメッセージを送信
             message: [],
@@ -100,6 +100,8 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
             reply_token: null,
             message: [],
         });
+
+        console.log(JSON.stringify(user));
 
         const triggered_action = findActionByTrigger(text_message.text);
         if (triggered_action !== null) {

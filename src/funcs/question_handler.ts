@@ -1,7 +1,7 @@
 import { type User } from '../classes/User';
 import { SingleChoiceQuestion, MultipleChoiceQuestion } from '../data/survey_content';
 
-interface QuestionHandlerResult {
+export interface QuestionHandlerResult {
     user_object: User;
     storeValueToDB: boolean;
     goToNextStep: boolean;
@@ -14,15 +14,18 @@ const ERROR_MESSAGES = {
 };
 
 export const handleQuestion = (user: User, answer_text: string): QuestionHandlerResult => ({
-        user_object: user,
-        storeValueToDB: true,
-        goToNextStep: true,
-    });
+    user_object: user,
+    storeValueToDB: true,
+    goToNextStep: true,
+});
 
 export const handleTextQuestion = handleQuestion;
 export const handleSingleChoiceQuestion = handleQuestion;
 
-export const handleMultipleChoiceQuestion = (user: User, answer_text: string): QuestionHandlerResult => {
+export const handleMultipleChoiceQuestion = (
+    user: User,
+    answer_text: string
+): QuestionHandlerResult => {
     const current_question = user.getCurrentQuestion();
     if (user.current_answers && current_question) {
         //add the answer to the current answer array

@@ -306,7 +306,11 @@ const user_states_base: UserStates = {
                 },
                 {
                     step_id: 'input_new_value',
-                    next: 'end',
+                    next: 'continue_or_not',
+                },
+                {
+                    step_id: 'continue_or_not',
+                    next: 'unknown',
                 },
             ],
             trigger_text: ['>お客様情報の更新'],

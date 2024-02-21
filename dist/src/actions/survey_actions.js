@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setQR = exports.handleSearchConditionUpdateOrReference = exports.handleBasicInfoUpdateOrReference = exports.searchConditionSurveyHandler = exports.basicInfoSurveyHandler = void 0;
+exports.setQR = exports.storeAnswerInDatabase = exports.handleSearchConditionUpdateOrReference = exports.handleBasicInfoUpdateOrReference = exports.searchConditionSurveyHandler = exports.basicInfoSurveyHandler = void 0;
 const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
 const config_1 = require("../data/config");
 const question_handler_1 = require("../funcs/question_handler");
@@ -154,7 +154,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
         if (process_result.storeValueToDB) {
             console.log('Storing answer to database.'); // Log message
             try {
-                yield storeAnswerInDatabase(user, answer_text);
+                yield (0, exports.storeAnswerInDatabase)(user, answer_text);
             }
             catch (err) {
                 console.error('Error storing answer in database: ', err); // Log message
@@ -181,7 +181,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
                     },
                 ];
             }
-            (0, exports.setQR)(user, '中断する');
+            (0, exports.setQR)(user, '中断する', '中断する');
         }
         return user;
     }
@@ -216,7 +216,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
                 })),
             ];
         }
-        (0, exports.setQR)(user, '中断する');
+        (0, exports.setQR)(user, '中断する', '中断する');
         user.response.message = message;
         return user;
     }
@@ -481,6 +481,7 @@ const storeAnswerInDatabase = (user, answer_text) => __awaiter(void 0, void 0, v
         yield dbc.disconnect();
     }
 });
+exports.storeAnswerInDatabase = storeAnswerInDatabase;
 const endSurveyAction = (user, current_survey_id) => {
     switch (current_survey_id) {
         case 'basic_info':
@@ -538,15 +539,15 @@ const setQuestion = (user, current_question) => {
     }
     // update user response
     user.response.message.push(message);
-    (0, exports.setQR)(user, '中断する');
+    (0, exports.setQR)(user, '中断する', '中断する');
 };
-const setQR = (user, text) => {
+const setQR = (user, label, text) => {
     const message = user.response.message[user.response.message.length - 1];
     const quick_reply_item = {
         type: 'action',
         action: {
             type: 'message',
-            label: text,
+            label: label,
             text: text,
         },
     };
