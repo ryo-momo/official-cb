@@ -7,8 +7,10 @@ import { setLastMessage } from '../funcs/message_helper';
 
 export const terminateAction = (user: User, text: string): User => {
     user.current_action_id = null;
+    user.detour_action_id = null;
     user.current_survey_id = null;
     user.current_step_id = null;
+    user.detour_step_id = null;
     user.current_question_id = null;
     user.current_answers = [];
     user.response.message.push({
@@ -20,8 +22,9 @@ export const terminateAction = (user: User, text: string): User => {
 };
 
 export const errorTerminateAction = async (user: User, text: string): Promise<User> => {
-    switch (user.current_step_id) {
+    switch (user.detour_step_id) {
         case null: {
+            user.detour_action_id = 'error_terminate_action';
             console.log('asking the user if they want to terminate current action');
             user.response.message.push({
                 type: 'text',
@@ -47,22 +50,25 @@ export const errorTerminateAction = async (user: User, text: string): Promise<Us
                     ],
                 },
             });
-            user.current_step_id = 'terminate_or_continue';
+            user.detour_step_id = 'terminate_or_continue';
             break;
         }
         case 'terminate_or_continue': {
             switch (text) {
                 case '中断する':
                     console.log('terminating current action');
+                    user.detour_action_id = null;
+                    user.detour_step_id = null;
                     return terminateAction(user, text);
                 case '中断しない':
                     console.log('resuming current action');
-                    user.current_step_id = null;
+                    user.detour_action_id = null;
+                    user.detour_step_id = null;
                     await setLastMessage(user);
                     break;
                 default:
                     user.response.message.push(
-                        errorHandler('INPUT_OUT_OF_OPTION', 'INTERNAL_ERROR', user)
+                        errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user)
                     );
             }
             break;
@@ -97,7 +103,7 @@ export const externalPropertyAction = (user: User, text: string): User => {
                 user.current_step_id = 'select_method';
             } else {
                 user.response.message.push(
-                    errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user)
+                    errorHandler('FLEX_MESSAGE_NOT_FOUND', 'INTERNAL_ERROR', user)
                 );
             }
 
@@ -137,7 +143,7 @@ export const externalPropertyAction = (user: User, text: string): User => {
                     break;
                 default:
                     user.response.message.push(
-                        errorHandler('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user)
+                        errorHandler('INPUT_OUT_OF_OPTION', 'INTERNAL_ERROR', user)
                     );
             }
             break;

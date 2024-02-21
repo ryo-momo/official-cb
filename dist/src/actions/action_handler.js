@@ -9,13 +9,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.actionHandler = void 0;
+exports.invokeAction = void 0;
 const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
 const config_1 = require("../data/config");
+const user_states_1 = require("../data/user_states");
 const error_handler_1 = require("../funcs/error_handler");
-const invokeAction = (user, text, action) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('Invoking action:', action.action_id);
-    user.current_action_id = action.action_id;
+const getActionById = (action_id) => {
+    const action = user_states_1.user_states.actions.find((action) => action.action_id === action_id);
+    if (action) {
+        return action;
+    }
+    else {
+        throw new Error(`Action not found: ${action_id}`);
+    }
+};
+const invokeAction = (user, text, action_id, isDetour) => __awaiter(void 0, void 0, void 0, function* () {
+    if (isDetour) {
+        console.log('Invoking detour action:', action_id);
+        user.detour_action_id = action_id;
+    }
+    else {
+        console.log('Invoking action:', action_id);
+        user.current_action_id = action_id;
+    }
+    const action = getActionById(action_id);
     if (action.handler) {
         user = yield action.handler(user, text);
         console.log('Storing the user to database.'); // Log message
@@ -32,19 +49,4 @@ const invokeAction = (user, text, action) => __awaiter(void 0, void 0, void 0, f
     }
     return user;
 });
-const actionHandler = (user, text, action) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if (action) {
-            return yield invokeAction(user, text, action);
-        }
-        else {
-            const current_action = user.getCurrentAction();
-            return yield invokeAction(user, text, current_action);
-        }
-    }
-    catch (err) {
-        const errorInstance = err instanceof Error ? err : new Error(`Unknown error: ${err}`);
-        throw (0, error_handler_1.errorHandler)('ACTION_HANDLER_NOT_FOUND', 'INTERNAL_ERROR', user, errorInstance);
-    }
-});
-exports.actionHandler = actionHandler;
+exports.invokeAction = invokeAction;

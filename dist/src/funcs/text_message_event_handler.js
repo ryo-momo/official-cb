@@ -51,8 +51,10 @@ const handleNewUser = (event) => __awaiter(void 0, void 0, void 0, function* () 
         major_state_id: user_states_1.user_states.major_states[0].state_id,
         minor_state_id: user_states_1.user_states.major_states[0].minor_states[0].state_id,
         current_action_id: null,
+        detour_action_id: null,
         current_survey_id: null,
         current_step_id: null,
+        detour_step_id: null,
         current_question_id: null,
         current_answers: [],
     }, {
@@ -105,21 +107,22 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
                     if (user_states_1.globally_permitted_actions.includes(triggered_action.action_id)) {
                         console.log('User is trying to invoke a globally permitted action');
                         user.current_action_id = triggered_action.action_id;
-                        const result = yield (0, action_handler_1.actionHandler)(user, text_message.text, triggered_action);
+                        const result = yield (0, action_handler_1.invokeAction)(user, text_message.text, triggered_action.action_id, false);
                         return { user: result, succeed: true };
                     }
                     else {
-                        console.log('User is trying to invoke a non-globally permitted action');
-                        user.response.message.push((0, error_handler_1.errorHandler)('NEW_ACTION_WHILE_IN_PROGRESS', 'NEW_ACTION_WHILE_IN_PROGRESS', user));
+                        console.log('User is trying to invoke a non-globally permitted action while in another action');
                         //TODO 中断しますか？というメッセージを送信
-                        return { user, succeed: false };
+                        user = yield (0, action_handler_1.invokeAction)(user, text_message.text, 'error_terminate_action', true);
+                        // user = await errorTerminateAction(user, text_message.text);
+                        return { user, succeed: true };
                     }
                 }
                 else {
                     console.log("User's is not in the middle of an action, and is starting a new one");
                     user.current_action_id = triggered_action.action_id;
                     user.current_step_id = null;
-                    const result = yield (0, action_handler_1.actionHandler)(user, text_message.text, triggered_action);
+                    const result = yield (0, action_handler_1.invokeAction)(user, text_message.text, triggered_action.action_id, false);
                     return { user: result, succeed: true };
                 }
             }
@@ -134,9 +137,16 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
                 return { user: user, succeed: false };
             }
             else {
-                console.log('User is in the middle of an action');
-                user = yield (0, action_handler_1.actionHandler)(user, text_message.text);
-                return { user: user, succeed: true };
+                if (user.detour_action_id === null) {
+                    console.log('User is in the middle of an action');
+                    user = yield (0, action_handler_1.invokeAction)(user, text_message.text, user.current_action_id, false);
+                    return { user: user, succeed: true };
+                }
+                else {
+                    console.log('User is in the middle of a detour action');
+                    user = yield (0, action_handler_1.invokeAction)(user, text_message.text, user.detour_action_id, true);
+                    return { user, succeed: true };
+                }
             }
         }
     }

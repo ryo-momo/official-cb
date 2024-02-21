@@ -32,11 +32,13 @@ const eventResultHandler = (result, reply_token) => __awaiter(void 0, void 0, vo
                 catch (err) {
                     console.error('Error in sending message:', err);
                 }
-                if (result.user.current_action_id !== null) {
+                if (result.user.current_action_id !== null &&
+                    result.user.detour_action_id === null) {
+                    console.log('saving last message');
                     const dbc = new DatabaseCommunicator_1.DatabaseCommunicator(config_1.db_data);
                     try {
                         yield dbc.connect();
-                        yield dbc.saveLastMessage(result.user.user_line_id, result.user.current_action_id);
+                        yield dbc.saveLastMessage(result.user.user_line_id, result.user.response.message);
                     }
                     catch (error) {
                         console.error('Error in saving last message:', error);

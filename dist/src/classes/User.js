@@ -11,8 +11,10 @@ exports.db_references = {
     major_state_id: users_columns.major_state_id,
     minor_state_id: users_columns.minor_state_id,
     current_action_id: users_columns.current_action_id,
+    detour_action_id: users_columns.detour_action_id,
     current_survey_id: users_columns.current_survey_id,
     current_step_id: users_columns.current_step_id,
+    detour_step_id: users_columns.detour_step_id,
     current_question_id: users_columns.current_question_id,
     current_answers: users_columns.current_answers,
 };
@@ -23,8 +25,10 @@ class User {
         this.major_state_id = user_property.major_state_id || null;
         this.minor_state_id = user_property.minor_state_id || null;
         this.current_action_id = user_property.current_action_id || null;
+        this.detour_action_id = user_property.detour_action_id || null;
         this.current_survey_id = user_property.current_survey_id || null;
         this.current_step_id = user_property.current_step_id || null;
+        this.detour_step_id = user_property.detour_step_id || null;
         this.current_question_id = user_property.current_question_id || null;
         this.current_answers = Array.isArray(user_property.current_answers)
             ? user_property.current_answers

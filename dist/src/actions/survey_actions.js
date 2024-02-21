@@ -111,7 +111,7 @@ const handleSubsequentSteps = (user, answer_text) => __awaiter(void 0, void 0, v
             if (answer_text === 'はい') {
                 console.log('The user has confirmed to quit');
                 user.current_action_id = 'terminate_action';
-                return yield (0, action_handler_1.actionHandler)(user, answer_text, user.getCurrentAction());
+                return yield (0, action_handler_1.invokeAction)(user, answer_text, user.current_action_id, false);
             }
             else if (answer_text === 'いいえ') {
                 console.log('User decided to continue the survey');
@@ -300,7 +300,9 @@ const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 
                     user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
             }
             user.current_step_id = null;
-            user = yield (0, action_handler_1.actionHandler)(user, text, user.getCurrentAction());
+            if (user.current_action_id) {
+                user = yield (0, action_handler_1.invokeAction)(user, text, user.current_action_id, false);
+            }
         }
         else {
             user.response.message.push((0, error_handler_1.errorHandler)('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user));
@@ -388,7 +390,9 @@ const handleSearchConditionUpdateOrReference = (user, text) => __awaiter(void 0,
                     user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
             }
             user.current_step_id = null;
-            user = yield (0, action_handler_1.actionHandler)(user, text, user.getCurrentAction());
+            if (user.current_action_id) {
+                user = yield (0, action_handler_1.invokeAction)(user, text, user.current_action_id, false);
+            }
         }
         else {
             user.response.message.push((0, error_handler_1.errorHandler)('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user));

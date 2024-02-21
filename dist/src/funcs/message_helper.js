@@ -1,6 +1,17 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.organizeQRs = exports.addQuickReplyItems = exports.createFlexMessage = exports.generateQuickReplyItems = void 0;
+exports.setLastMessage = exports.organizeQRs = exports.addQuickReplyItems = exports.createFlexMessage = exports.generateQuickReplyItems = void 0;
+const DatabaseCommunicator_1 = require("../classes/DatabaseCommunicator");
+const config_1 = require("../data/config");
 // export interface QuickReplyOption {
 //     type: string;
 //     action: {
@@ -148,3 +159,11 @@ const organizeQRs = (user) => {
     }
 };
 exports.organizeQRs = organizeQRs;
+const setLastMessage = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const dbc = new DatabaseCommunicator_1.DatabaseCommunicator(config_1.db_data);
+    const last_message = yield dbc.getLastMessage(user.user_line_id);
+    if (last_message) {
+        user.response.message.push(...last_message);
+    }
+});
+exports.setLastMessage = setLastMessage;

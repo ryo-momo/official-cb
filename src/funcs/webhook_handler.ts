@@ -25,7 +25,10 @@ const eventResultHandler = async (result: Result, reply_token: string): Promise<
                 } catch (err) {
                     console.error('Error in sending message:', err);
                 }
-                if (result.user.current_action_id !== null) {
+                if (
+                    result.user.current_action_id !== null &&
+                    result.user.detour_action_id === null
+                ) {
                     console.log('saving last message');
                     const dbc = new DatabaseCommunicator(db_data);
                     try {

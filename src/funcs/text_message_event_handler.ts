@@ -3,7 +3,7 @@ import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { User } from '../classes/User';
 import { db_data } from '../data/config';
 import { user_states, globally_permitted_actions } from '../data/user_states';
-import { actionHandler } from '../actions/action_handler';
+import { invokeAction } from '../actions/action_handler';
 import { type Action } from '../data/user_states';
 import { errorHandler } from './error_handler';
 import { type TextEventMessage, type MessageEvent } from '@line/bot-sdk';
@@ -51,8 +51,10 @@ const handleNewUser = async (event: MessageEvent): Promise<Result> => {
             major_state_id: user_states.major_states[0].state_id,
             minor_state_id: user_states.major_states[0].minor_states[0].state_id,
             current_action_id: null,
+            detour_action_id: null,
             current_survey_id: null,
             current_step_id: null,
+            detour_step_id: null,
             current_question_id: null,
             current_answers: [],
         },
@@ -106,19 +108,26 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                     if (globally_permitted_actions.includes(triggered_action.action_id)) {
                         console.log('User is trying to invoke a globally permitted action');
                         user.current_action_id = triggered_action.action_id;
-                        const result = await actionHandler(
+                        const result = await invokeAction(
                             user,
                             text_message.text,
-                            triggered_action
+                            triggered_action.action_id,
+                            false
                         );
                         return { user: result, succeed: true };
                     } else {
                         console.log(
                             'User is trying to invoke a non-globally permitted action while in another action'
                         );
-                        user.current_action_id = 'error_terminate_action';
                         //TODO 中断しますか？というメッセージを送信
-                        return { user, succeed: false };
+                        user = await invokeAction(
+                            user,
+                            text_message.text,
+                            'error_terminate_action',
+                            true
+                        );
+                        // user = await errorTerminateAction(user, text_message.text);
+                        return { user, succeed: true };
                     }
                 } else {
                     console.log(
@@ -126,7 +135,12 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                     );
                     user.current_action_id = triggered_action.action_id;
                     user.current_step_id = null;
-                    const result = await actionHandler(user, text_message.text, triggered_action);
+                    const result = await invokeAction(
+                        user,
+                        text_message.text,
+                        triggered_action.action_id,
+                        false
+                    );
                     return { user: result, succeed: true };
                 }
             } else {
@@ -148,9 +162,20 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                 );
                 return { user: user, succeed: false };
             } else {
-                console.log('User is in the middle of an action');
-                user = await actionHandler(user, text_message.text);
-                return { user: user, succeed: true };
+                if (user.detour_action_id === null) {
+                    console.log('User is in the middle of an action');
+                    user = await invokeAction(
+                        user,
+                        text_message.text,
+                        user.current_action_id,
+                        false
+                    );
+                    return { user: user, succeed: true };
+                } else {
+                    console.log('User is in the middle of a detour action');
+                    user = await invokeAction(user, text_message.text, user.detour_action_id, true);
+                    return { user, succeed: true };
+                }
             }
         }
     } catch (err) {

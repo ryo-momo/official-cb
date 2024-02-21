@@ -25,8 +25,10 @@ export interface UserTableColumns {
     major_state_id: string;
     minor_state_id: string;
     current_action_id: string;
+    detour_action_id: string;
     current_survey_id: string;
     current_step_id: string;
+    detour_step_id: string;
     current_question_id: string;
     current_answers: string;
     desired_price: string;
@@ -102,8 +104,10 @@ export const db_data: DbData = {
                 major_state_id: 'major_state_id',
                 minor_state_id: 'minor_state_id',
                 current_action_id: 'current_action_id',
+                detour_action_id: 'detour_action_id',
                 current_survey_id: 'current_survey_id',
                 current_step_id: 'current_step_id',
+                detour_step_id: 'detour_step_id',
                 current_question_id: 'current_question_id',
                 current_answers: 'current_answers',
                 desired_price: 'desired_price',

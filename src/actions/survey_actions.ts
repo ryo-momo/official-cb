@@ -16,7 +16,7 @@ import {
     type TextMessage,
 } from '@line/bot-sdk';
 import { type Question, type Survey } from '../data/survey_content';
-import { actionHandler } from './action_handler';
+import { invokeAction } from './action_handler';
 import { errorHandler } from '../funcs/error_handler';
 import { date } from 'zod';
 
@@ -109,7 +109,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
             if (answer_text === 'はい') {
                 console.log('The user has confirmed to quit');
                 user.current_action_id = 'terminate_action';
-                return await actionHandler(user, answer_text, user.getCurrentAction());
+                return await invokeAction(user, answer_text, user.current_action_id, false);
             } else if (answer_text === 'いいえ') {
                 console.log('User decided to continue the survey');
                 user.current_step_id = user.current_question_id;
@@ -315,7 +315,9 @@ export const handleBasicInfoUpdateOrReference = async (user: User, text: string)
                     );
             }
             user.current_step_id = null;
-            user = await actionHandler(user, text, user.getCurrentAction());
+            if (user.current_action_id) {
+                user = await invokeAction(user, text, user.current_action_id, false);
+            }
         } else {
             user.response.message.push(
                 errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user)
@@ -411,7 +413,9 @@ export const handleSearchConditionUpdateOrReference = async (
                     );
             }
             user.current_step_id = null;
-            user = await actionHandler(user, text, user.getCurrentAction());
+            if (user.current_action_id) {
+                user = await invokeAction(user, text, user.current_action_id, false);
+            }
         } else {
             user.response.message.push(
                 errorHandler('INVALID_CURRENT_STEP', 'INTERNAL_ERROR', user)

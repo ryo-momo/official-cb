@@ -117,6 +117,16 @@ const user_states_base = {
             handler: general_actions_1.terminateAction,
         },
         {
+            action_id: 'error_terminate_action',
+            steps: [
+                {
+                    step_id: 'terminate_or_continue',
+                    next: 'end',
+                },
+            ],
+            handler: general_actions_1.errorTerminateAction,
+        },
+        {
             action_id: 'basic_info_update_or_reference',
             steps: [
                 {

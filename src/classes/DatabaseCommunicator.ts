@@ -23,8 +23,10 @@ const extractUserData = (user: User): UserData => ({
     major_state_id: user.major_state_id,
     minor_state_id: user.minor_state_id,
     current_action_id: user.current_action_id,
+    detour_action_id: user.detour_action_id,
     current_survey_id: user.current_survey_id,
     current_step_id: user.current_step_id,
+    detour_step_id: user.detour_step_id,
     current_question_id: user.current_question_id,
     //null if the answer[] is empty
     current_answers: user.current_answers,
@@ -272,6 +274,10 @@ export class DatabaseCommunicator {
         try {
             await this.connect();
             const user_data = extractUserData(user);
+            console.log(
+                '🚀 ~ file: DatabaseCommunicator.ts:277 ~ DatabaseCommunicator ~ updateUser ~ user_data:',
+                JSON.stringify(user_data)
+            );
             // Convert array values in user_data to JSON string
             for (const key in user_data) {
                 const item = user_data[key];
