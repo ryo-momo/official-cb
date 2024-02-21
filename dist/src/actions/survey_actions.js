@@ -294,7 +294,11 @@ const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 
                     user.current_action_id = 'basic_info_inquiry';
                     break;
                 case '>キャンセル':
-                    user.current_action_id = 'terminate_action';
+                    user.current_action_id = null;
+                    user.response.message.push({
+                        type: 'text',
+                        text: 'キャンセルしました。',
+                    });
                     break;
                 default:
                     user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
@@ -384,7 +388,11 @@ const handleSearchConditionUpdateOrReference = (user, text) => __awaiter(void 0,
                     user.current_action_id = 'search_condition_inquiry';
                     break;
                 case '>キャンセル':
-                    user.current_action_id = 'terminate_action';
+                    user.current_action_id = null;
+                    user.response.message.push({
+                        type: 'text',
+                        text: 'キャンセルしました。',
+                    });
                     break;
                 default:
                     user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));

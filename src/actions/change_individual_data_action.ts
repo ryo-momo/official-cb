@@ -333,7 +333,7 @@ export const changeIndividualUserPropertyAction = async (
                         type: 'text',
                         text: `現在の値: ${getDataRepresentation(column, current_value[column.data_location], false)}`,
                     });
-                    setQR(user, 'キャンセル');
+                    setQR(user, 'キャンセル', '>キャンセル');
                     organizeQRs(user);
                     console.log('Change the step ID to input_new_value');
                     user.current_step_id = 'input_new_value';
@@ -353,7 +353,7 @@ export const changeIndividualUserPropertyAction = async (
         }
         case 'input_new_value': {
             console.log('Expecting that the user has input the new value, updating the database');
-            if (text === 'キャンセル') {
+            if (text === '>キャンセル') {
                 console.log('User is trying to cancel the update');
                 user.response.message.push({
                     type: 'text',

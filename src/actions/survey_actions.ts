@@ -181,7 +181,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                     },
                 ] as Message[];
             }
-            setQR(user, '中断する');
+            setQR(user, '中断する', '中断する');
         }
         return user;
     } else {
@@ -219,7 +219,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                 },
             ];
         }
-        setQR(user, '中断する');
+        setQR(user, '中断する', '中断する');
         user.response.message = message;
         return user;
     }
@@ -307,7 +307,11 @@ export const handleBasicInfoUpdateOrReference = async (user: User, text: string)
                     user.current_action_id = 'basic_info_inquiry';
                     break;
                 case '>キャンセル':
-                    user.current_action_id = 'terminate_action';
+                    user.current_action_id = null;
+                    user.response.message.push({
+                        type: 'text',
+                        text: 'キャンセルしました。',
+                    });
                     break;
                 default:
                     user.response.message.push(
@@ -405,7 +409,11 @@ export const handleSearchConditionUpdateOrReference = async (
                     user.current_action_id = 'search_condition_inquiry';
                     break;
                 case '>キャンセル':
-                    user.current_action_id = 'terminate_action';
+                    user.current_action_id = null;
+                    user.response.message.push({
+                        type: 'text',
+                        text: 'キャンセルしました。',
+                    });
                     break;
                 default:
                     user.response.message.push(
@@ -571,10 +579,10 @@ const setQuestion = (user: User, current_question: Question): void => {
     }
     // update user response
     user.response.message.push(message);
-    setQR(user, '中断する');
+    setQR(user, '中断する', '中断する');
 };
 
-export const setQR = (user: User, text: string): void => {
+export const setQR = (user: User, label: string, text: string): void => {
     const message = user.response.message[user.response.message.length - 1];
     const quick_reply_item: QuickReplyItem = {
         type: 'action',

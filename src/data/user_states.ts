@@ -169,7 +169,7 @@ const user_states_base: UserStates = {
     actions: [
         {
             action_id: 'terminate_action',
-            trigger_text: ['>キャンセル'],
+            trigger_text: ['>terminate'],
             handler: terminateAction,
         },
         {
