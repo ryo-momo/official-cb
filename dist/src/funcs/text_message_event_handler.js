@@ -113,7 +113,6 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
                     }
                     else {
                         console.log('User is trying to invoke a non-globally permitted action while in another action');
-                        //TODO 中断しますか？というメッセージを送信
                         user = yield (0, action_handler_1.invokeAction)(user, text_message.text, 'error_terminate_action', true);
                         // user = await errorTerminateAction(user, text_message.text);
                         return { user, succeed: true };
@@ -128,7 +127,7 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
                 }
             }
             else {
-                (_a = user.response.message) === null || _a === void 0 ? void 0 : _a.push((0, error_handler_1.errorHandler)('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user), ...((yield dbc.getLastMessage(user.user_line_id)) || []));
+                (_a = user.response.message) === null || _a === void 0 ? void 0 : _a.push((0, error_handler_1.errorHandler)('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user));
                 return { user: user, succeed: false };
             }
         }

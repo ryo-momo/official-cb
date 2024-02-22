@@ -61,6 +61,26 @@ const handleInitialStep = (user) => __awaiter(void 0, void 0, void 0, function* 
         if (current_step) {
             user.current_step_id = current_step.step_id;
             user.current_question_id = current_question.id;
+            switch (user.current_action_id) {
+                case 'basic_info_survey':
+                    user.response.message = [
+                        {
+                            type: 'text',
+                            text: 'お客様情報の登録を行います。',
+                        },
+                    ];
+                    break;
+                case 'search_condition_survey':
+                    user.response.message = [
+                        {
+                            type: 'text',
+                            text: '希望物件条件の登録を行います。',
+                        },
+                    ];
+                    break;
+                default:
+                    console.log('none of these surveys, please add case for this survey: ', user.current_action_id);
+            }
             setQuestion(user, current_question);
         }
         else {
@@ -285,10 +305,10 @@ const handleBasicInfoUpdateOrReference = (user, text) => __awaiter(void 0, void 
         if (user.current_step_id === 'update_or_reference') {
             switch (text) {
                 case 'お客様情報の登録':
-                    user.current_action_id = 'basic_info_registration';
+                    user.current_action_id = 'basic_info_survey';
                     break;
                 case 'お客様情報の更新':
-                    user.current_action_id = 'change_individual_user_property';
+                    user.current_action_id = 'change_individual_basic_info';
                     break;
                 case 'お客様情報の参照':
                     user.current_action_id = 'basic_info_inquiry';
@@ -319,7 +339,7 @@ const qr_search_condition_survey = {
     type: 'action',
     action: {
         type: 'message',
-        label: '希望物件条件の登録',
+        label: '登録',
         text: '希望物件条件の登録',
     },
 };
@@ -327,7 +347,7 @@ const qr_search_condition_update = {
     type: 'action',
     action: {
         type: 'message',
-        label: '希望物件条件の更新',
+        label: '更新',
         text: '希望物件条件の更新',
     },
 };
@@ -335,7 +355,7 @@ const qr_search_condition_inquiry = {
     type: 'action',
     action: {
         type: 'message',
-        label: '希望物件条件の参照',
+        label: '参照',
         text: '希望物件条件の参照',
     },
 };
@@ -346,43 +366,32 @@ const handleSearchConditionUpdateOrReference = (user, text) => __awaiter(void 0,
                 type: 'text',
                 text: '行いたい操作を選択してください。',
                 quickReply: {
-                    items: [
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: '希望物件条件の登録/更新',
-                                text: '希望物件条件の登録/更新',
-                            },
-                        },
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: '希望物件条件の参照',
-                                text: '希望物件条件の参照',
-                            },
-                        },
-                        {
-                            type: 'action',
-                            action: {
-                                type: 'message',
-                                label: 'キャンセル',
-                                text: '>キャンセル',
-                            },
-                        },
-                    ],
+                    items: [],
                 },
             },
         ];
+        switch (user.minor_state_id) {
+            case 'basic_info_registered': {
+                user.response.message[0].quickReply.items.push(qr_search_condition_survey, qr_cancel);
+                break;
+            }
+            case 'search_condition_added':
+                user.response.message[0].quickReply.items.push(qr_search_condition_update, qr_search_condition_inquiry, qr_cancel);
+                break;
+            default:
+                user.response.message.push((0, error_handler_1.errorHandler)('INVALID_MINOR_STATE', 'INTERNAL_ERROR', user));
+        }
         user.current_action_id = 'search_condition_update_or_reference';
         user.current_step_id = 'update_or_reference';
     }
     else {
         if (user.current_step_id === 'update_or_reference') {
             switch (text) {
-                case '希望物件条件の登録/更新':
-                    user.current_action_id = 'search_condition_registration';
+                case '希望物件条件の登録':
+                    user.current_action_id = 'search_condition_survey';
+                    break;
+                case '希望物件条件の更新':
+                    user.current_action_id = 'change_individual_search_condition';
                     break;
                 case '希望物件条件の参照':
                     user.current_action_id = 'search_condition_inquiry';
@@ -495,11 +504,11 @@ const endSurveyAction = (user, current_survey_id) => {
     const current_action = user_states_1.user_states.actions.find((action) => action.action_id === user.current_action_id);
     if (current_action) {
         if ('survey_id' in current_action) {
-            const end_step = current_action.steps.find((step) => step.step_id === 'end');
-            if (end_step) {
+            const complete_step = current_action.steps.find((step) => step.step_id === 'complete');
+            if (complete_step) {
                 user.response.message.push({
                     type: 'text',
-                    text: end_step.text ||
+                    text: complete_step.text ||
                         '以上です、お疲れさまでした！担当が対応いたしますのでお待ちください。',
                 });
             }

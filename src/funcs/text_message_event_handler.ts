@@ -121,7 +121,6 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                         console.log(
                             'User is trying to invoke a non-globally permitted action while in another action'
                         );
-                        //TODO 中断しますか？というメッセージを送信
                         user = await invokeAction(
                             user,
                             text_message.text,
@@ -147,8 +146,7 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                 }
             } else {
                 user.response.message?.push(
-                    errorHandler('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user),
-                    ...((await dbc.getLastMessage(user.user_line_id)) || [])
+                    errorHandler('FORBIDDEN_ACTION', 'FORBIDDEN_ACTION', user)
                 );
                 return { user: user, succeed: false };
             }

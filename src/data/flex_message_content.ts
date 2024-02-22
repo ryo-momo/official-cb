@@ -1027,4 +1027,133 @@ export const flex_message_contents: FlexMessageContent[] = [
             ],
         },
     },
+    {
+        id: 'change_individual_search_condition',
+        design: {
+            type: 'carousel',
+            contents: [
+                {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            {
+                                type: 'box',
+                                layout: 'horizontal',
+                                spacing: 'none',
+                                contents: [
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: '総額範囲',
+                                            text: '総額範囲',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'none',
+                                    },
+                                ],
+                                borderWidth: 'none',
+                                margin: 'none',
+                            },
+                            {
+                                type: 'box',
+                                layout: 'horizontal',
+                                spacing: 'none',
+                                contents: [
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: 'ターゲット',
+                                            text: 'ターゲット',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'none',
+                                    },
+                                ],
+                                borderWidth: 'none',
+                                margin: 'md',
+                            },
+                            {
+                                type: 'box',
+                                layout: 'horizontal',
+                                spacing: 'none',
+                                contents: [
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: 'エリア',
+                                            text: 'エリア',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'none',
+                                    },
+                                ],
+                                borderWidth: 'none',
+                                margin: 'md',
+                            },
+                            {
+                                type: 'box',
+                                layout: 'horizontal',
+                                spacing: 'none',
+                                contents: [
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: '構造',
+                                            text: '構造',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'none',
+                                    },
+                                ],
+                                borderWidth: 'none',
+                                margin: 'md',
+                            },
+                            {
+                                type: 'box',
+                                layout: 'horizontal',
+                                spacing: 'none',
+                                contents: [
+                                    {
+                                        type: 'button',
+                                        style: 'primary',
+                                        height: 'sm',
+                                        action: {
+                                            type: 'message',
+                                            label: '想定利回り',
+                                            text: '想定利回り',
+                                        },
+                                        color: '#F09199',
+                                        margin: 'none',
+                                    },
+                                ],
+                                borderWidth: 'none',
+                                margin: 'md',
+                            },
+                        ],
+                    },
+                },
+            ],
+        },
+    },
 ];
+
+console.log(
+    JSON.stringify(
+        flex_message_contents.find((content) => content.id === 'change_user_property_by_item')!
+            .design
+    )
+);

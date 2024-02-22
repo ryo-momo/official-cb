@@ -51,7 +51,7 @@ export const handleMultipleChoiceQuestion = (
                 goToNextStep: true,
             };
         } else if (answers_to_go > 0) {
-            current_question.text = `${current_question.text}\n\n残り選択数：${answers_to_go}\n既に選んだもの：\n${answers_in_text}`;
+            current_question.text = `${current_question.text}\n\n残り選択数：${answers_to_go}\n既に選んだもの：${answers_in_text}`;
             return {
                 user_object: user,
                 storeValueToDB: false,

@@ -80,8 +80,7 @@ const errorTerminateAction = (user, text) => __awaiter(void 0, void 0, void 0, f
                     yield (0, message_helper_1.setLastMessage)(user);
                     break;
                 default: {
-                    user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
-                    user.response.message.push({
+                    user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user), {
                         type: 'text',
                         text: '現在のプロセスを中断しますか？',
                         quickReply: {

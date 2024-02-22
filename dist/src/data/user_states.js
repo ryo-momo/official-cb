@@ -16,7 +16,7 @@ const user_states_base = {
                     actions_on_transition: [],
                     permitted_actions: [
                         'basic_info_update_or_reference',
-                        'basic_info_registration',
+                        'basic_info_survey',
                         'concierge_message',
                     ],
                     next: 'basic_info_registered',
@@ -26,13 +26,12 @@ const user_states_base = {
                     actions_on_transition: [],
                     permitted_actions: [
                         'basic_info_update_or_reference',
-                        'basic_info_registration',
                         'basic_info_inquiry',
+                        'change_individual_basic_info',
                         'search_condition_update_or_reference',
-                        'search_condition',
+                        'search_condition_survey',
                         'external_property',
                         'concierge_message',
-                        'change_individual_user_property',
                     ],
                     next: 'search_condition_added',
                 },
@@ -41,14 +40,13 @@ const user_states_base = {
                     actions_on_transition: [],
                     permitted_actions: [
                         'basic_info_update_or_reference',
-                        'basic_info_registration',
                         'basic_info_inquiry',
+                        'change_individual_basic_info',
                         'search_condition_update_or_reference',
-                        'search_condition',
                         'search_condition_inquiry',
+                        'change_individual_search_condition',
                         'external_property',
                         'concierge_message',
-                        'change_individual_user_property',
                     ],
                     next: 'end',
                 },
@@ -135,10 +133,10 @@ const user_states_base = {
                 },
             ],
             trigger_text: ['>お客様情報'],
-            handler: survey_actions_1.handleBasicInfoUpdateOrReference, // `user`は適切な`User`型の変数に置き換えてください。
+            handler: survey_actions_1.handleBasicInfoUpdateOrReference,
         },
         {
-            action_id: 'basic_info_registration',
+            action_id: 'basic_info_survey',
             survey_id: 'basic_info',
             steps: [
                 {
@@ -242,7 +240,7 @@ const user_states_base = {
             handler: get_info_actions_1.handleGetUserInfoAction,
         },
         {
-            action_id: 'change_individual_user_property',
+            action_id: 'change_individual_basic_info',
             steps: [
                 {
                     step_id: 'specify_property_to_change',
@@ -272,7 +270,7 @@ const user_states_base = {
             handler: survey_actions_1.handleSearchConditionUpdateOrReference,
         },
         {
-            action_id: 'search_condition',
+            action_id: 'search_condition_survey',
             survey_id: 'property_conditions',
             steps: [
                 {
@@ -311,25 +309,23 @@ const user_states_base = {
             action_id: 'search_condition_inquiry',
             handler: get_info_actions_1.handleGetSearchConditionAction,
         },
-        //TODO 次これ実装
-        // {
-        //     action_id: 'change_individual_search_condition',
-        //     steps: [
-        //         {
-        //             step_id: 'specify_property_to_change',
-        //             next: 'input_new_value',
-        //         },
-        //         {
-        //             step_id: 'input_new_value',
-        //             next: 'end',
-        //         },
-        //     ],
-        //     trigger_text: ['>希望物件条件の変更'],
-        //     handler: changeIndividualUserPropertyAction,
-        // },
+        {
+            action_id: 'change_individual_search_condition',
+            steps: [
+                {
+                    step_id: 'specify_property_to_change',
+                    next: 'input_new_value',
+                },
+                {
+                    step_id: 'input_new_value',
+                    next: 'end',
+                },
+            ],
+            trigger_text: [],
+            handler: change_individual_data_action_1.changeIndividualUserPropertyAction,
+        },
         {
             action_id: 'concierge_message',
-            steps: [],
             trigger_text: ['>担当者にメッセージ'],
             handler: general_actions_1.messageToConcierge,
         },

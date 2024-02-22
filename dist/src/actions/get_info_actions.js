@@ -38,6 +38,16 @@ exports.user_info_locations = [
             deposit: users_columns.deposit,
             other_assets: users_columns.other_assets,
             purchaser_category: users_columns.purchaser_category,
+            desired_price: users_columns.desired_price,
+            desired_target: users_columns.desired_target,
+            desired_area: users_columns.desired_area,
+            desired_yield: users_columns.desired_yield,
+        },
+    },
+    {
+        table_name: config_1.db_data.tables.user_desired_structures.name,
+        columns: {
+            desired_structure: config_1.db_data.tables.user_desired_structures.columns.desired_structure,
         },
     },
 ];

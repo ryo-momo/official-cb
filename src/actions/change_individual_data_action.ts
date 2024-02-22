@@ -1,4 +1,4 @@
-import { type Message } from '@line/bot-sdk';
+import { type FlexContainer, type Message } from '@line/bot-sdk';
 import { DatabaseCommunicator } from '../classes/DatabaseCommunicator';
 import { type User } from '../classes/User';
 import { db_data } from '../data/config';
@@ -16,6 +16,11 @@ import { surveyValidator } from '../funcs/survey_validator';
 import { Columns, user_info_locations, DataLocations } from './get_info_actions';
 import { setQR, storeAnswerInDatabase } from './survey_actions';
 import { invokeAction } from './action_handler';
+
+export interface DataProperty {
+    property_name: string;
+    tables: DataPropertyTable[];
+}
 
 export interface DataPropertyTable {
     table_name: string;
@@ -69,164 +74,219 @@ const getDataRepresentation = (
             return `${includeLabel ? `${data_property.label_ja}: ` : ''}${data_property.representation.prefix}${value ? data_property.representation.true_label : data_property.representation.false_label}${data_property.representation.suffix}`;
     }
 };
-const user_properties: DataPropertyTable[] = [
+const user_data: DataProperty[] = [
     {
-        table_name: user_info_locations[0].table_name,
-        data: {
-            user_name: {
-                label_ja: '氏名',
-                data_location: user_info_locations[0].columns.user_name,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'name_primary',
-            },
-            user_name_kana: {
-                label_ja: '氏名（カナ）',
-                data_location: user_info_locations[0].columns.user_name_kana,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'name_kana',
-            },
-            address_postal_code: {
-                label_ja: '郵便番号',
-                data_location: user_info_locations[0].columns.address_postal_code,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'postal_code',
-            },
-            address: {
-                label_ja: '住所',
-                data_location: user_info_locations[0].columns.address,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'address',
-            },
-            residence_category: {
-                label_ja: '住居区分',
-                data_location: user_info_locations[0].columns.residence_category,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'residence_category',
-            },
-            email_address: {
-                label_ja: 'メールアドレス',
-                data_location: user_info_locations[0].columns.email_address,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'email_address',
-            },
-            phone_number: {
-                label_ja: '電話番号',
-                data_location: user_info_locations[0].columns.phone_number,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'phone_number',
-            },
-            workplace_name: {
-                label_ja: '勤務先名',
-                data_location: user_info_locations[0].columns.workplace_name,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'workplace_name',
-            },
-            workplace_address: {
-                label_ja: '勤務先住所',
-                data_location: user_info_locations[0].columns.workplace_address,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'workplace_address',
-            },
-            workplace_position: {
-                label_ja: '役職',
-                data_location: user_info_locations[0].columns.workplace_position,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'position',
-            },
-            workplace_job_category: {
-                label_ja: '職種',
-                data_location: user_info_locations[0].columns.workplace_job_category,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'job_category',
-            },
-            workplace_years_of_service: {
-                label_ja: '勤続年数',
-                data_location: user_info_locations[0].columns.workplace_years_of_service,
-                representation: { type: 'number', prefix: '', suffix: '年' },
-                unit: '',
-                question_id: 'years_of_service',
-            },
-            gross_salary_minus_1: {
-                label_ja: 'R5年 額面給与',
-                data_location: user_info_locations[0].columns.gross_salary_minus_1,
-                representation: { type: 'number', prefix: '', suffix: '万円' },
-                unit: '',
-                question_id: 'gross_salary_minus_1',
-            },
-            gross_salary_minus_2: {
-                label_ja: 'R4年 額面給与',
-                data_location: user_info_locations[0].columns.gross_salary_minus_2,
-                representation: { type: 'number', prefix: '', suffix: '万円' },
-                unit: '',
-                question_id: 'gross_salary_minus_2',
-            },
-            gross_salary_minus_3: {
-                label_ja: 'R3年 額面給与',
-                data_location: user_info_locations[0].columns.gross_salary_minus_3,
-                representation: { type: 'number', prefix: '', suffix: '万円' },
-                unit: '',
-                question_id: 'gross_salary_minus_3',
-            },
-            family_structure_spouse: {
-                label_ja: '配偶者の有無',
-                data_location: user_info_locations[0].columns.family_structure_spouse,
-                representation: {
-                    type: 'boolean',
-                    prefix: '',
-                    suffix: '',
-                    true_label: '有',
-                    false_label: '無',
+        property_name: 'user_info',
+        tables: [
+            {
+                table_name: user_info_locations[0].table_name,
+                data: {
+                    user_name: {
+                        label_ja: '氏名',
+                        data_location: user_info_locations[0].columns.user_name,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'name_primary',
+                    },
+                    user_name_kana: {
+                        label_ja: '氏名（カナ）',
+                        data_location: user_info_locations[0].columns.user_name_kana,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'name_kana',
+                    },
+                    address_postal_code: {
+                        label_ja: '郵便番号',
+                        data_location: user_info_locations[0].columns.address_postal_code,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'postal_code',
+                    },
+                    address: {
+                        label_ja: '住所',
+                        data_location: user_info_locations[0].columns.address,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'address',
+                    },
+                    residence_category: {
+                        label_ja: '住居区分',
+                        data_location: user_info_locations[0].columns.residence_category,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'residence_category',
+                    },
+                    email_address: {
+                        label_ja: 'メールアドレス',
+                        data_location: user_info_locations[0].columns.email_address,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'email_address',
+                    },
+                    phone_number: {
+                        label_ja: '電話番号',
+                        data_location: user_info_locations[0].columns.phone_number,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'phone_number',
+                    },
+                    workplace_name: {
+                        label_ja: '勤務先名',
+                        data_location: user_info_locations[0].columns.workplace_name,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'workplace_name',
+                    },
+                    workplace_address: {
+                        label_ja: '勤務先住所',
+                        data_location: user_info_locations[0].columns.workplace_address,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'workplace_address',
+                    },
+                    workplace_position: {
+                        label_ja: '役職',
+                        data_location: user_info_locations[0].columns.workplace_position,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'position',
+                    },
+                    workplace_job_category: {
+                        label_ja: '職種',
+                        data_location: user_info_locations[0].columns.workplace_job_category,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'job_category',
+                    },
+                    workplace_years_of_service: {
+                        label_ja: '勤続年数',
+                        data_location: user_info_locations[0].columns.workplace_years_of_service,
+                        representation: { type: 'number', prefix: '', suffix: '年' },
+                        unit: '',
+                        question_id: 'years_of_service',
+                    },
+                    gross_salary_minus_1: {
+                        label_ja: 'R5年 額面給与',
+                        data_location: user_info_locations[0].columns.gross_salary_minus_1,
+                        representation: { type: 'number', prefix: '', suffix: '万円' },
+                        unit: '',
+                        question_id: 'gross_salary_minus_1',
+                    },
+                    gross_salary_minus_2: {
+                        label_ja: 'R4年 額面給与',
+                        data_location: user_info_locations[0].columns.gross_salary_minus_2,
+                        representation: { type: 'number', prefix: '', suffix: '万円' },
+                        unit: '',
+                        question_id: 'gross_salary_minus_2',
+                    },
+                    gross_salary_minus_3: {
+                        label_ja: 'R3年 額面給与',
+                        data_location: user_info_locations[0].columns.gross_salary_minus_3,
+                        representation: { type: 'number', prefix: '', suffix: '万円' },
+                        unit: '',
+                        question_id: 'gross_salary_minus_3',
+                    },
+                    family_structure_spouse: {
+                        label_ja: '配偶者の有無',
+                        data_location: user_info_locations[0].columns.family_structure_spouse,
+                        representation: {
+                            type: 'boolean',
+                            prefix: '',
+                            suffix: '',
+                            true_label: '有',
+                            false_label: '無',
+                        },
+                        unit: '',
+                        question_id: 'family_structure_spouse',
+                    },
+                    family_structure_children: {
+                        label_ja: '子供の人数',
+                        data_location: user_info_locations[0].columns.family_structure_children,
+                        representation: { type: 'number', prefix: '', suffix: '人' },
+                        unit: '',
+                        question_id: 'family_structure_children',
+                    },
+                    borrowed_money: {
+                        label_ja: '借入総額',
+                        data_location: user_info_locations[0].columns.borrowed_money,
+                        representation: { type: 'number', prefix: '', suffix: '万円' },
+                        unit: '',
+                        question_id: 'borrowed_money',
+                    },
+                    deposit: {
+                        label_ja: '預金総額',
+                        data_location: user_info_locations[0].columns.deposit,
+                        representation: { type: 'number', prefix: '', suffix: '万円' },
+                        unit: '',
+                        question_id: 'deposit',
+                    },
+                    other_assets: {
+                        label_ja: 'その他資産',
+                        data_location: user_info_locations[0].columns.other_assets,
+                        representation: { type: 'number', prefix: '', suffix: '万円' },
+                        unit: '',
+                        question_id: 'other_assets',
+                    },
+                    purchaser_category: {
+                        label_ja: '購入名義',
+                        data_location: user_info_locations[0].columns.purchaser_category,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'purchaser_category',
+                    },
                 },
-                unit: '',
-                question_id: 'family_structure_spouse',
             },
-            family_structure_children: {
-                label_ja: '子供の人数',
-                data_location: user_info_locations[0].columns.family_structure_children,
-                representation: { type: 'number', prefix: '', suffix: '人' },
-                unit: '',
-                question_id: 'family_structure_children',
+        ],
+    },
+    {
+        property_name: 'user_search_conditions',
+        tables: [
+            {
+                table_name: user_info_locations[0].table_name,
+                data: {
+                    desired_price: {
+                        label_ja: '総額範囲',
+                        data_location: user_info_locations[0].columns.desired_price,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'price',
+                    },
+                    desired_target: {
+                        label_ja: 'ターゲット',
+                        data_location: user_info_locations[0].columns.desired_target,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'target',
+                    },
+                    desired_area: {
+                        label_ja: 'エリア',
+                        data_location: user_info_locations[0].columns.desired_area,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'area',
+                    },
+                    desired_yield: {
+                        label_ja: '想定利回り',
+                        data_location: user_info_locations[0].columns.desired_yield,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'yield',
+                    },
+                },
             },
-            borrowed_money: {
-                label_ja: '借入総額',
-                data_location: user_info_locations[0].columns.borrowed_money,
-                representation: { type: 'number', prefix: '', suffix: '万円' },
-                unit: '',
-                question_id: 'borrowed_money',
+            {
+                table_name: user_info_locations[1].table_name,
+                data: {
+                    desired_structure: {
+                        label_ja: '構造',
+                        data_location: user_info_locations[1].columns.desired_structure,
+                        representation: { type: 'string', prefix: '', suffix: '' },
+                        unit: '',
+                        question_id: 'structure',
+                    },
+                },
             },
-            deposit: {
-                label_ja: '預金総額',
-                data_location: user_info_locations[0].columns.deposit,
-                representation: { type: 'number', prefix: '', suffix: '万円' },
-                unit: '',
-                question_id: 'deposit',
-            },
-            other_assets: {
-                label_ja: 'その他資産',
-                data_location: user_info_locations[0].columns.other_assets,
-                representation: { type: 'number', prefix: '', suffix: '万円' },
-                unit: '',
-                question_id: 'other_assets',
-            },
-            purchaser_category: {
-                label_ja: '購入名義',
-                data_location: user_info_locations[0].columns.purchaser_category,
-                representation: { type: 'string', prefix: '', suffix: '' },
-                unit: '',
-                question_id: 'purchaser_category',
-            },
-        },
+        ],
     },
 ];
 
@@ -261,12 +321,35 @@ export const changeIndividualUserPropertyAction = async (
     user: User,
     text: string
 ): Promise<User> => {
+    let flex_message_design: FlexContainer | undefined;
+    let user_properties: DataProperty;
+    switch (user.current_action_id) {
+        case 'change_individual_basic_info': {
+            flex_message_design = flex_message_contents.find(
+                (content) => content.id === 'change_user_property_by_item'
+            )?.design;
+            user_properties = user_data[0];
+            break;
+        }
+        case 'change_individual_search_condition': {
+            flex_message_design = flex_message_contents.find(
+                (content) => content.id === 'change_individual_search_condition'
+            )?.design;
+            user_properties = user_data[1];
+            break;
+        }
+        default:
+            user.response.message.push(
+                errorHandler('UNEXPECTED_ACTION_ID', 'INTERNAL_ERROR', user)
+            );
+            return user;
+    }
     switch (user.current_step_id) {
         case null: {
             console.log('Step ID is null, processing the initial step');
-            const flex_message_design = flex_message_contents.find(
-                (content) => content.id === 'change_user_property_by_item'
-            )?.design;
+            // const flex_message_design = flex_message_contents.find(
+            //     (content) => content.id === 'change_user_property_by_item'
+            // )?.design;
             if (flex_message_design) {
                 user.response.message.push(
                     { type: 'text', text: '変更したい項目を以下からご選択下さい。' },
@@ -288,7 +371,7 @@ export const changeIndividualUserPropertyAction = async (
         case 'specify_property_to_change': {
             console.log('Expecting that the user has specified the property to change');
             const dbc = new DatabaseCommunicator(db_data);
-            const table = user_properties.find((table) =>
+            const table = user_properties.tables.find((table) =>
                 Object.keys(table.data)
                     .map((key) => table.data[key].label_ja)
                     .includes(text)
@@ -302,7 +385,7 @@ export const changeIndividualUserPropertyAction = async (
                     (key) => table.data[key].label_ja === text
                 ) as keyof DataPropertyTable['data'];
                 const column = table.data[column_key];
-                let current_value: { [key: string]: string | number | boolean } = {};
+                let current_values: (string | number | boolean)[] = [];
                 try {
                     const current_value_array: { [key: string]: string | number | boolean }[] =
                         await dbc.read(
@@ -310,8 +393,9 @@ export const changeIndividualUserPropertyAction = async (
                             [column.data_location],
                             `user_id = \'${user.user_id}\'`
                         );
-                    //TODO 二つ以上該当する場合があるよーーーーー
-                    current_value = current_value_array[0];
+                    current_values = current_value_array.map(
+                        (value) => value[column.data_location]
+                    );
                 } catch (err) {
                     user.response.message.push(
                         errorHandler('DATABASE_READ_FAILED', 'INTERNAL_ERROR', user, err)
@@ -319,9 +403,9 @@ export const changeIndividualUserPropertyAction = async (
                 } finally {
                     void dbc.disconnect();
                 }
-                if (current_value) {
+                if (current_values) {
                     switch (user.current_action_id) {
-                        case 'change_individual_user_property': {
+                        case 'change_individual_basic_info': {
                             user.current_survey_id = 'basic_info';
                             break;
                         }
@@ -339,7 +423,7 @@ export const changeIndividualUserPropertyAction = async (
                     setQuestionSecondary(user, user.getCurrentQuestion());
                     user.response.message.push({
                         type: 'text',
-                        text: `現在の値: ${getDataRepresentation(column, current_value[column.data_location], false)}`,
+                        text: `現在の値: ${getDataRepresentation(column, current_values.join('、'), false)}`,
                     });
                     setQR(user, 'キャンセル', '>キャンセル');
                     organizeQRs(user);
@@ -361,6 +445,7 @@ export const changeIndividualUserPropertyAction = async (
         case 'continue_or_not': {
             if (text === 'する') {
                 user.current_step_id = null;
+                user.current_question_id = null;
                 user.current_answers = [];
                 if (user.current_action_id) {
                     await invokeAction(user, '', user.current_action_id, false);
@@ -376,6 +461,8 @@ export const changeIndividualUserPropertyAction = async (
                 });
                 user.current_action_id = null;
                 user.current_step_id = null;
+                user.current_question_id = null;
+                user.current_answers = [];
             } else {
                 user.response.message.push(
                     errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user)
@@ -384,23 +471,12 @@ export const changeIndividualUserPropertyAction = async (
             break;
         }
         default: {
-            let table: DataPropertyTable;
-            switch (user.current_action_id) {
-                case 'change_individual_user_property': {
-                    table = user_properties[0];
-                    break;
-                }
-                case 'change_individual_search_condition': {
-                    table = user_properties[1];
-                    break;
-                }
-                default:
-                    user.response.message.push(
-                        errorHandler('UNEXPECTED_ACTION_ID', 'INTERNAL_ERROR', user)
-                    );
-                    return user;
-            }
-            if (Object.keys(table.data).includes(user.current_step_id)) {
+            if (
+                user_properties.tables
+                    .map((table) => Object.keys(table.data))
+                    .flat()
+                    .includes(user.current_step_id)
+            ) {
                 console.log(
                     'Expecting that the user has input the new value, updating the database'
                 );
@@ -412,6 +488,7 @@ export const changeIndividualUserPropertyAction = async (
                     });
                     user.current_action_id = null;
                     user.current_step_id = null;
+                    user.current_question_id = null;
                     user.current_answers = [];
                 } else {
                     const validation_result = surveyValidator(user, text);
@@ -484,6 +561,7 @@ export const changeIndividualUserPropertyAction = async (
                                 },
                             });
                             user.current_step_id = 'continue_or_not';
+                            user.current_question_id = null;
                             user.current_answers = [];
                         } else {
                             //set the current question to the user response again, except deleting the already selected option from options.
