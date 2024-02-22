@@ -97,7 +97,7 @@ const handleInitialStep = async (user: User): Promise<User> => {
 };
 
 const handleSubsequentSteps = async (user: User, answer_text: string): Promise<User> => {
-    if (answer_text === '中断する') {
+    if (answer_text === '>中断する') {
         console.log('User is trying to quit the survey'); // Log message
         user.current_step_id = 'quit_confirmation';
         user.response.message = [
@@ -204,7 +204,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                     },
                 ] as Message[];
             }
-            setQR(user, '中断する', '中断する');
+            setQR(user, '中断する', '>中断する');
         }
         return user;
     } else {
@@ -242,7 +242,7 @@ const handleSubsequentSteps = async (user: User, answer_text: string): Promise<U
                 },
             ];
         }
-        setQR(user, '中断する', '中断する');
+        setQR(user, '中断する', '>中断する');
         user.response.message = message;
         return user;
     }
@@ -291,9 +291,7 @@ export const handleBasicInfoUpdateOrReference = async (user: User, text: string)
                 type: 'text',
                 text: '行いたい操作を選択してください。',
                 quickReply: {
-                    items: [
-                        //TODO ユーザーのminor_stateによって表示するものを変更！！！！
-                    ],
+                    items: [],
                 },
             },
         ];
@@ -600,7 +598,7 @@ const setQuestion = (user: User, current_question: Question): void => {
     }
     // update user response
     user.response.message.push(message);
-    setQR(user, '中断する', '中断する');
+    setQR(user, '中断する', '>中断する');
 };
 
 export const setQR = (user: User, label: string, text: string): void => {
