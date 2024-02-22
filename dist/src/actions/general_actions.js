@@ -79,8 +79,35 @@ const errorTerminateAction = (user, text) => __awaiter(void 0, void 0, void 0, f
                     user.detour_step_id = null;
                     yield (0, message_helper_1.setLastMessage)(user);
                     break;
-                default:
+                default: {
                     user.response.message.push((0, error_handler_1.errorHandler)('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user));
+                    user.response.message.push({
+                        type: 'text',
+                        text: '現在のプロセスを中断しますか？',
+                        quickReply: {
+                            items: [
+                                {
+                                    type: 'action',
+                                    action: {
+                                        type: 'message',
+                                        label: '中断する',
+                                        text: '中断する',
+                                    },
+                                },
+                                {
+                                    type: 'action',
+                                    action: {
+                                        type: 'message',
+                                        label: '中断しない',
+                                        text: '中断しない',
+                                    },
+                                },
+                            ],
+                        },
+                    });
+                    user.detour_step_id = 'terminate_or_continue';
+                    break;
+                }
             }
             break;
         }

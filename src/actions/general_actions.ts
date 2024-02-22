@@ -66,10 +66,37 @@ export const errorTerminateAction = async (user: User, text: string): Promise<Us
                     user.detour_step_id = null;
                     await setLastMessage(user);
                     break;
-                default:
+                default: {
                     user.response.message.push(
-                        errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user)
+                        errorHandler('INPUT_OUT_OF_OPTION', 'INPUT_OUT_OF_OPTION', user),
+                        {
+                            type: 'text',
+                            text: '現在のプロセスを中断しますか？',
+                            quickReply: {
+                                items: [
+                                    {
+                                        type: 'action',
+                                        action: {
+                                            type: 'message',
+                                            label: '中断する',
+                                            text: '中断する',
+                                        },
+                                    },
+                                    {
+                                        type: 'action',
+                                        action: {
+                                            type: 'message',
+                                            label: '中断しない',
+                                            text: '中断しない',
+                                        },
+                                    },
+                                ],
+                            },
+                        }
                     );
+                    user.detour_step_id = 'terminate_or_continue';
+                    break;
+                }
             }
             break;
         }

@@ -737,7 +737,7 @@ exports.flex_message_contents = [
                                         action: {
                                             type: 'message',
                                             label: 'メールアドレス',
-                                            text: '5000～7500万円',
+                                            text: 'メールアドレス',
                                         },
                                         color: '#F09199',
                                         margin: 'sm',

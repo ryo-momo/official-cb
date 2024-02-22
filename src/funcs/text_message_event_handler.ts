@@ -159,8 +159,7 @@ const handleExistingUser = async (event: MessageEvent): Promise<Result> => {
                         'NON_TRIGGER_MESSAGE_NO_ACTION',
                         'NON_TRIGGER_MESSAGE_NO_ACTION',
                         user
-                    ),
-                    ...((await dbc.getLastMessage(user.user_line_id)) || [])
+                    )
                 );
                 return { user: user, succeed: false };
             } else {

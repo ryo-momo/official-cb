@@ -134,7 +134,7 @@ const handleExistingUser = (event) => __awaiter(void 0, void 0, void 0, function
         }
         else {
             if (user.current_action_id === null) {
-                user.response.message.push((0, error_handler_1.errorHandler)('NON_TRIGGER_MESSAGE_NO_ACTION', 'NON_TRIGGER_MESSAGE_NO_ACTION', user), ...((yield dbc.getLastMessage(user.user_line_id)) || []));
+                user.response.message.push((0, error_handler_1.errorHandler)('NON_TRIGGER_MESSAGE_NO_ACTION', 'NON_TRIGGER_MESSAGE_NO_ACTION', user));
                 return { user: user, succeed: false };
             }
             else {
