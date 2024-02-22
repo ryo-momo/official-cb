@@ -444,18 +444,14 @@ export const survey_contents: SurveyContents = {
                     options: [
                         {
                             id: 1,
-                            text: '木造',
+                            text: '木造・軽量鉄骨造',
                         },
                         {
                             id: 2,
-                            text: '軽量鉄骨造',
+                            text: '鉄骨造',
                         },
                         {
                             id: 3,
-                            text: '重量鉄骨造',
-                        },
-                        {
-                            id: 4,
                             text: 'RC造',
                         },
                     ],

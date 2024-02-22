@@ -1153,7 +1153,6 @@ export const flex_message_contents: FlexMessageContent[] = [
 
 console.log(
     JSON.stringify(
-        flex_message_contents.find((content) => content.id === 'change_user_property_by_item')!
-            .design
+        flex_message_contents.find((content) => content.id === 'property_conditions_area')!.design
     )
 );

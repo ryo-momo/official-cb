@@ -156,7 +156,7 @@ const externalPropertyAction = (user, text) => {
                     user.response.message = [
                         {
                             type: 'text',
-                            text: '申し訳ございませんが、公式LINEチャットではファイルを送信できないため、「担当者にメッセージ」から直接ファイルをお送りください。',
+                            text: '申し訳ございません、公式LINEチャットではファイルを送信できないため、「担当者にメッセージ」から直接ファイルをお送りください。',
                         },
                     ];
                     user.current_step_id = 'complete';
@@ -166,7 +166,7 @@ const externalPropertyAction = (user, text) => {
                     user.response.message = [
                         {
                             type: 'text',
-                            text: 'お手数ですが、「担当者にメッセージ」から直接画像をお送りください。',
+                            text: '申し訳ございません、現在こちらのチャットでは画像の送信に対応しておりません。お手数ですが、「担当者にメッセージ」から直接画像をお送りください。',
                         },
                     ];
                     user.current_step_id = 'complete';

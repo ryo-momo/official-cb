@@ -1146,5 +1146,4 @@ exports.flex_message_contents = [
         },
     },
 ];
-console.log(JSON.stringify(exports.flex_message_contents.find((content) => content.id === 'change_user_property_by_item')
-    .design));
+console.log(JSON.stringify(exports.flex_message_contents.find((content) => content.id === 'property_conditions_area').design));

@@ -425,6 +425,7 @@ export const changeIndividualUserPropertyAction = async (
                         type: 'text',
                         text: `現在の値: ${getDataRepresentation(column, current_values.join('、'), false)}`,
                     });
+                    setQR(user, '戻る', '>戻る');
                     setQR(user, 'キャンセル', '>キャンセル');
                     organizeQRs(user);
                     console.log('Change the step ID to input_new_value');
@@ -490,6 +491,25 @@ export const changeIndividualUserPropertyAction = async (
                     user.current_step_id = null;
                     user.current_question_id = null;
                     user.current_answers = [];
+                } else if (text === '>戻る') {
+                    console.log('User is trying to go back to the previous step');
+                    if (flex_message_design) {
+                        user.response.message.push(
+                            { type: 'text', text: '変更したい項目を以下からご選択下さい。' },
+                            {
+                                type: 'flex',
+                                altText: 'こちらからご選択ください。',
+                                contents: flex_message_design,
+                            }
+                        );
+                    } else {
+                        user.response.message.push(
+                            errorHandler('FLEX_MESSAGE_DESIGN_NOT_FOUND', 'INTERNAL_ERROR', user)
+                        );
+                    }
+                    console.log('Change the step ID to specify_property_to_change');
+                    user.current_step_id = 'specify_property_to_change';
+                    break;
                 } else {
                     const validation_result = surveyValidator(user, text);
                     user = validation_result.user_object;
